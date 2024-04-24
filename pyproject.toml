@@ -1,0 +1,16 @@
+[project]
+name = "huracanpy"
+version = "0.1.0"
+authors = [
+  { name="Leo Saffin", email="l.saffin@reading.ac.uk" },
+  { name="Stella Bourdin" },
+  { name="Kelvin Ng" },
+]
+description = "A python package for working with various forms of feature tracking data"
+dependencies = [
+    "xarray",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
