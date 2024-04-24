@@ -8,7 +8,10 @@ authors = [
 ]
 description = "A python package for working with various forms of feature tracking data"
 dependencies = [
+    "numpy<2",
     "xarray",
+    "cftime",
+    "parse",
 ]
 
 [build-system]
