@@ -3,7 +3,7 @@ name = "huracanpy"
 version = "0.1.0"
 authors = [
   { name="Leo Saffin", email="l.saffin@reading.ac.uk" },
-  { name="Stella Bourdin" },
+  { name="Stella Bourdin", email="stella.bourdin@physics.ox.ac.uk" },
   { name="Kelvin Ng" },
 ]
 description = "A python package for working with various forms of feature tracking data"
@@ -20,3 +20,17 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
 huracanpy = ["example_data/*"]
+
+
+# - How to distribute the package
+
+# 0/ Applying black formatting
+
+# 1/ Generate the distribution
+# 1a. Make sure that build is up-to-date: `pip install --upgrade build`(add the --user option if necessary)
+# 1b. Run python -m build in the package's root directory
+# -> Two new files are created in the dist folder, a wheel (.whl) and a tarball (.tar.gz), with the the version code in the present file
+
+# 2/ Distribute the distribution of PyPI
+# 2a. Make sure that twine is up-to-date `pip install (--user) --upgrade twine`
+# 2b. Upload the package: `python -m twine upload --repository pypi dist/*x.x.x*` (x.x.x = version number)
