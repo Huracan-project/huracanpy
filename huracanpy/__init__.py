@@ -18,8 +18,7 @@ example_TRACK_file = str(
 
 
 def load(filename, tracker=None, **kwargs):
-    match tracker:
-        case "TRACK" | "track":
-            return TRACK.load(filename, **kwargs)
-        case _:
-            raise ValueError(f"Tracker {tracker} unsupported or misspelled")
+    if tracker.lower() == "track":
+        return TRACK.load(filename, **kwargs)
+    else:
+        raise ValueError(f"Tracker {tracker} unsupported or misspelled")
