@@ -10,7 +10,7 @@ from ._tracker_specific import TRACK
 
 
 here = pathlib.Path(__file__).parent
-testdata_dir = here.parent / "tests/testdata/"
+testdata_dir = here / "example_data"
 
 example_TRACK_file = str(
     testdata_dir / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind.tcident.new"
