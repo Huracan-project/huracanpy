@@ -9,6 +9,13 @@ def test_load_track():
     assert len(data.groupby("track_id")) == 2
 
 
+def test_load_csv():
+    data = huracanpy.load(huracanpy.example_csv_file, tracker = "tempestextremes")
+    assert len(data) == 13
+    assert len(data.obs) == 99
+    assert len(data.groupby("track_id")) == 3
+
+
 def test_load_netcdf():
     data = huracanpy.load(huracanpy.example_TRACK_netcdf_file)
     assert len(data.time) == 4580
