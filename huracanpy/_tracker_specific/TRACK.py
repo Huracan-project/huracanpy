@@ -142,4 +142,7 @@ def load(filename, calendar=None, variable_names=None):
             ds["time"] = ("obs", times)
             output.append(ds)
 
-    return xr.concat(output, dim="obs")
+    output = xr.concat(output, dim="obs")
+    output.track_id.attrs["cf_role"] = "trajectory_id"
+
+    return output
