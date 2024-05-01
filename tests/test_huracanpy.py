@@ -19,7 +19,7 @@ def test_load_csv():
 def test_load_netcdf():
     data = huracanpy.load(huracanpy.example_TRACK_netcdf_file)
     assert len(data.time) == 4580
-    track_id = huracanpy._find_trajectory_id(data)
+    track_id = huracanpy._tracker_specific.netcdf._find_trajectory_id(data)
     assert len(track_id) == 4580
     assert len(np.unique(track_id)) == 86
 
