@@ -12,6 +12,7 @@ dependencies = [
     "xarray",
     "cftime",
     "parse",
+    "netCDF4",
 ]
 
 [build-system]
