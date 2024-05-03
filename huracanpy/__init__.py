@@ -24,7 +24,7 @@ example_csv_file = str(
 def load(filename, tracker=None, **kwargs):
     if tracker.lower() == "track":
         return TRACK.load(filename, **kwargs)
-    if tracker.lower() in ["csv", "te", "tempestextremes", "uz"]:
+    if (tracker.lower() in ["csv", "te", "tempestextremes", "uz"]) or ((tracker == None) &  (filename[-3:] == "csv")):
         return csv.load(filename)
     else:
         raise ValueError(f"Tracker {tracker} unsupported or misspelled")
