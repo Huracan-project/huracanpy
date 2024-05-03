@@ -44,7 +44,7 @@ def load(filename,):
     filename : str
         The file must contain at least longitude, latitude, time and track ID. 
             - longitude and latitude can be named that, or lon and lat.
-            - time must be defined by four columns : year, month, day, hour 
+            - time must be defined a single `time`column or by four columns : year, month, day, hour 
             - track ID must be within a column named track_id.
 
     Returns
@@ -64,8 +64,11 @@ def load(filename,):
     #tracks["hemisphere"] = np.where(tracks.lat > 0, "N", "S")
     # TODO : Determine basin (wrapper level?)
 
-    ## Temporal attributes
-    tracks["time"] = get_time(tracks.year, tracks.month, tracks.day, tracks.hour)
+    ## Time attribute
+    if "time" not in tracks.columns :
+        tracks["time"] = get_time(tracks.year, tracks.month, tracks.day, tracks.hour)
+    else :
+        tracks["time"] = pd.to_datetime(tracks.time)
     # TODO : Determine season (wrapper level?)
     
     # Output xr dataset
