@@ -1,3 +1,7 @@
+"""
+Auxilliary file to define the basins according to the different conventions
+"""
+
 from shapely.geometry import Polygon, MultiPolygon, Point
 import geopandas as gpd
 
