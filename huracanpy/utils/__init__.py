@@ -1,1 +1,1 @@
-""" Huracanpy module for useful auxilliary functions """import .geographyimport .category
+""" Huracanpy module for useful auxilliary functions """from . import geographyfrom . import category

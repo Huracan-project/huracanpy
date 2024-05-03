@@ -7,7 +7,7 @@ __all__ = ["load"]
 import pathlib
 
 from ._tracker_specific import TRACK, csv
-import .utils
+from . import utils
 
 
 here = pathlib.Path(__file__).parent
