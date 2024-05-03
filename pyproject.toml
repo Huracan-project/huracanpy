@@ -12,6 +12,11 @@ dependencies = [
     "xarray",
     "cftime",
     "parse",
+    "shapely",
+    "pandas",
+    "geopandas",
+    "matplotlib",
+    "seaborn",
 ]
 
 [build-system]
