@@ -2,11 +2,11 @@
 
 __version__ = "0.1.0"
 __author__ = "Leo Saffin <l.saffin@reading.ac.uk>, Stella Bourdin <stella.bourdin@physics.ox.ac.uk>, Kelvin Ng "
-__all__ = ["load"]
+__all__ = ["load", "save"]
 
 import pathlib
 
-from ._tracker_specific import TRACK, csv
+from ._tracker_specific import TRACK, csv, netcdf
 from . import utils
 
 
@@ -21,6 +21,10 @@ example_csv_file = str(
     testdata_dir / "sample.csv"
 )
 
+example_TRACK_netcdf_file = str(
+    testdata_dir / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind.tcident.new.nc"
+)
+
 
 def load(filename, tracker=None, **kwargs):
 
@@ -28,14 +32,23 @@ def load(filename, tracker=None, **kwargs):
     if (tracker == None):
         if filename[-3:] == "csv":
             return csv.load(filename)
-        else : 
+        elif filename.split(".")[-1] == "nc":
+            return netcdf.load(filename, **kwargs)
+        else :
             raise ValueError(f"{tracker} is set to None and file type is not detected")
-    
+
     # If tracker is given, use the relevant function
     else :
         if tracker.lower() == "track":
-            return TRACK.load(filename, **kwargs)    
+            return TRACK.load(filename, **kwargs)
         elif tracker.lower() in ["csv", "te", "tempestextremes", "uz"]  :
             return csv.load(filename)
         else:
             raise ValueError(f"Tracker {tracker} unsupported or misspelled")
+
+
+def save(dataset, filename):
+    if filename.split(".")[-1] == "nc":
+        netcdf.save(dataset, filename)
+    else:
+        raise NotImplementedError("CSV-style saving not implemented yet")

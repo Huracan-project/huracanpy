@@ -17,6 +17,7 @@ dependencies = [
     "geopandas",
     "matplotlib",
     "seaborn",
+    "netcdf4",
 ]
 
 [build-system]

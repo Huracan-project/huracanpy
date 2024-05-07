@@ -100,7 +100,6 @@ def load(filename, calendar=None, variable_names=None):
             var_labels.append(variable_name)
 
         # Read in each track as an xarray dataset with time as the coordinate
-        obs_count = 0
         for n in range(ntracks):
             # Read individual track header (two lines)
             line = f.readline().strip()
@@ -108,9 +107,6 @@ def load(filename, calendar=None, variable_names=None):
                 track_info = _parse(track_header_fmt, line).named
             except ValueError:
                 track_info = _parse(track_header_fmt_new, line).named
-                track_info["start_time"] = parse_date(
-                    track_info["start_time"], calendar=calendar
-                )
 
             line = f.readline().strip()
             npoints = _parse(track_info_fmt, line)["npoints"]
@@ -119,8 +115,6 @@ def load(filename, calendar=None, variable_names=None):
             # Time is a list because it will hold datetime or cftime objects
             # Other variables are a dictionary mapping variable name to a tuple of
             # (time, data_array) as this is what is passed to xarray.Dataset
-            obs = np.arange(obs_count, obs_count + npoints, dtype=int)
-            obs_count += npoints
             times = [None] * npoints
             track_data = {label: ("obs", np.zeros(npoints)) for label in var_labels}
 
@@ -128,7 +122,6 @@ def load(filename, calendar=None, variable_names=None):
             # for groupby
             track_id = np.array([track_info["track_id"]] * npoints)
             track_data["track_id"] = ("obs", track_id)
-            del track_info["track_id"]
 
             # Populate time and data line by line
             for m in range(npoints):
@@ -145,8 +138,11 @@ def load(filename, calendar=None, variable_names=None):
             # Return a dataset for the individual track
             # Add time separately so xarray can deal with the awkward np.datetime64
             # format
-            ds = xr.Dataset(track_data, coords=dict(obs=obs), attrs=track_info)
+            ds = xr.Dataset(track_data)
             ds["time"] = ("obs", times)
             output.append(ds)
 
-    return xr.concat(output, dim="obs")
+    output = xr.concat(output, dim="obs")
+    output.track_id.attrs["cf_role"] = "trajectory_id"
+
+    return output
