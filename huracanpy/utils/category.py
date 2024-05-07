@@ -74,5 +74,7 @@ def get_pressure_cat(p, convention = "Klotzbach"):
         You can append it to your tracks by running tracks["cat"] = get_pressure_cat(tracks.slp)
 
     """
-    
+    if p.min() > 10 000:
+        print("Caution, pressure are likely in Pa, they are being converted to hPa for categorization")
+        p = p/100
     return categorize(p, _slp_thresholds[convention], labels=np.flip(np.arange(-1,5+1)))
