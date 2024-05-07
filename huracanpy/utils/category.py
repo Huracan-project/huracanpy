@@ -4,9 +4,7 @@ Utils related to storm category
 
 import numpy as np
 import xarray as xr
-
-bins_sshs = [0,16,29,38,44,52,63,np.inf]
-labels_sshs = [-1,0,1,2,3,4,5]
+import pandas as pd
 
 def categorize(var, bins, labels=None):
     """
@@ -26,7 +24,7 @@ def categorize(var, bins, labels=None):
     None.
 
     """
-    cat = pd.cut(var, bins_sshs, labels=labels_sshs)
+    cat = pd.cut(var, bins, labels=labels)
     return xr.DataArray(cat, dims = "obs", coords = {"obs":var.obs})
     
 
@@ -46,19 +44,14 @@ def get_sshs_cat(wind): # TODO : Manage units properly (with pint?)
         You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
     """
     
-    sshs = np.where(wind <= 16, -1, None)
-    sshs = np.where((sshs == None) & (wind < 29), 0, sshs)
-    sshs = np.where((sshs == None) & (wind < 38), 1, sshs)
-    sshs = np.where((sshs == None) & (wind < 44), 2, sshs)
-    sshs = np.where((sshs == None) & (wind < 52), 3, sshs)
-    sshs = np.where((sshs == None) & (wind < 63), 4, sshs)
-    sshs = np.where((sshs == None) & (~np.isnan(wind)), 5, sshs)
-    sshs = np.where(sshs == None, np.nan, sshs)
-    return xr.DataArray(sshs, dims = "obs", coords = {"obs":wind.obs})
+    bins_sshs = [0,16,29,38,44,52,63,np.inf]
+    labels_sshs = [-1,0,1,2,3,4,5]
+    
+    return categorize(wind, bins_sshs, labels_sshs)
 
 _slp_thresholds = {
-    "Simpson" : [990, 980, 970, 965, 945, 920],
-    "Klotzbach" : [1005, 990, 975, 960, 945, 925]
+    "Simpson" : np.flip([+np.inf, 990, 980, 970, 965, 945, 920, 0]),
+    "Klotzbach" : np.flip([+np.inf, 1005, 990, 975, 960, 945, 925, 0])
     }
 
 def get_pressure_cat(p, convention = "Klotzbach"):
@@ -82,13 +75,4 @@ def get_pressure_cat(p, convention = "Klotzbach"):
 
     """
     
-    p0, p1, p2, p3, p4, p5 = _slp_thresholds[convention]
-    cat = np.where(p > p0, -1, None)
-    cat = np.where((cat == None) & (p >= p1), 0, cat)
-    cat = np.where((cat == None) & (p >= p2), 1, cat)
-    cat = np.where((cat == None) & (p >= p3), 2, cat)
-    cat = np.where((cat == None) & (p >= p4), 3, cat)
-    cat = np.where((cat == None) & (p >= p5), 4, cat)
-    cat = np.where((cat == None) & (~np.isnan(p)), 5, cat)
-    cat = np.where(cat == None, np.nan, cat)
-    return xr.DataArray(cat, dims = "obs", coords = {"obs":p.obs})
+    return categorize(p, _slp_thresholds[convention], labels=np.flip(np.arange(-1,5+1)))
