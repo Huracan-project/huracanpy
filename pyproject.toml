@@ -20,6 +20,13 @@ dependencies = [
     "netcdf4",
 ]
 
+[project.optional-dependencies]
+dev = [
+  "pre-commit",
+  "pytest",
+  "ruff",
+]
+
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
