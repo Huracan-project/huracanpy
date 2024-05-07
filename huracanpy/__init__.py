@@ -2,7 +2,7 @@
 
 __version__ = "0.1.0"
 __author__ = "Leo Saffin <l.saffin@reading.ac.uk>, Stella Bourdin <stella.bourdin@physics.ox.ac.uk>, Kelvin Ng "
-__all__ = ["load", "save"]
+__all__ = ["load", "save", "utils"]
 
 import pathlib
 
@@ -27,7 +27,7 @@ example_TRACK_netcdf_file = str(
 
 def load(filename, tracker=None, **kwargs):
     # If tracker is not given, try to derive the right function from the file extension
-    if tracker == None:
+    if tracker is None:
         if filename[-3:] == "csv":
             return csv.load(filename)
         elif filename.split(".")[-1] == "nc":
