@@ -103,6 +103,10 @@ def test_seasons():
     assert season.astype(int).max() == 19961997
     np.testing.assert_approx_equal(season.astype(int).mean(), 7039001.37598945, 1)
     
-    
-    
-    
+def test_simple_track_density():
+    data= huracanpy.load(huracanpy.example_year_file)
+    D = huracanpy.diags.track_density.simple_global_histogram(data.lon, data.lat)
+    assert D.min() == 1.
+    assert D.max() == 43.
+    assert D.median() == 4.
+    assert np.isnan(D).sum() == 2240

@@ -8,6 +8,7 @@ import pathlib
 
 from ._tracker_specific import TRACK, csv, netcdf
 from . import utils
+from . import diags
 
 
 here = pathlib.Path(__file__).parent
