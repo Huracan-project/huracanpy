@@ -68,10 +68,13 @@ def _find_trajectory_id(dataset):
     if len(trajectory_id) == 1:
         return trajectory_id[0]
     else:
-        raise ValueError(
-            f"Found {len(trajectory_id)} variables with cf_role=trajectory_id. Should "
-            f"be exactly one."
-        )
+        if "track_id" in dataset:
+            return dataset["track_id"]
+        else:
+            raise ValueError(
+                f"Found {len(trajectory_id)} variables with cf_role=trajectory_id."
+                f"Should be exactly one."
+            )
 
 
 def _find_rowsize(dataset):

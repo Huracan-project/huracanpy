@@ -27,6 +27,7 @@ def test_load_netcdf():
 @pytest.mark.parametrize("filename,tracker", [
     (huracanpy.example_TRACK_file, "TRACK"),
     (huracanpy.example_TRACK_netcdf_file, None),
+    (huracanpy.example_csv_file, None),
 ])
 def test_save_netcdf(filename, tracker, tmp_path):
     data = huracanpy.load(filename, tracker=tracker)
