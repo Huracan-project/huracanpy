@@ -87,9 +87,26 @@ def test_categorise():
 
     expected = np.array([-1, -1, 0, 1, 2, 3, 4, 5, 5, np.nan])
     result = huracanpy.utils.category.categorise(
-        data, huracanpy.utils.category._wind_thresholds["Saffir-Simpson"]
+        data, huracanpy.utils.category._thresholds["Saffir-Simpson"]
     )
 
     # Separate test for last value (nan)
     assert (result[:-1] == expected[:-1]).all()
     assert np.isnan(result[-1])
+
+
+@pytest.mark.parametrize("convention", ["Klotzbach", "Simpson"])
+def test_categorise_pressure(convention):
+    data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
+
+    orig = huracanpy.utils.category.get_pressure_cat(
+        data.slp / 100,
+        convention=convention,
+    )
+    new = huracanpy.utils.category.categorise(
+        data.slp / 100,
+        huracanpy.utils.category._thresholds[convention]
+
+    )
+
+    assert (new == orig).all()

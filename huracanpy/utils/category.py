@@ -17,8 +17,10 @@ def categorise(variable, thresholds):
     return categories
 
 
-_wind_thresholds = {
-    "Saffir-Simpson": {-1: 16, 0: 29, 1: 38, 2: 44, 3: 52, 4: 63, 5: np.inf}
+_thresholds = {
+    "Klotzbach": {5: 925, 4: 945, 3: 960, 2: 975, 1: 990, 0: 1005, -1: np.inf},
+    "Simpson": {5: 920, 4: 945, 3: 965, 2: 970, 1: 980, 0: 990, -1: np.inf},
+    "Saffir-Simpson": {-1: 16, 0: 29, 1: 38, 2: 44, 3: 52, 4: 63, 5: np.inf},
 }
 
 
@@ -38,7 +40,7 @@ def get_sshs_cat(wind):  # TODO : Manage units properly (with pint?)
         You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
     """
 
-    sshs = categorise(wind, _wind_thresholds["Saffir-Simpson"])
+    sshs = categorise(wind, _thresholds["Saffir-Simpson"])
     return xr.DataArray(sshs, dims="obs", coords={"obs": wind.obs})
 
 
