@@ -26,25 +26,36 @@ example_TRACK_netcdf_file = str(
 )
 
 
-def load(filename, tracker=None, **kwargs):
+def load(filename, tracker=None, add_info = False, **kwargs):
 
     # If tracker is not given, try to derive the right function from the file extension
     if (tracker == None):
         if filename.split(".")[-1] == "csv":
-            return csv.load(filename)
+            data = csv.load(filename)
         elif filename.split(".")[-1] == "nc":
-            return netcdf.load(filename, **kwargs)
+            data = netcdf.load(filename, **kwargs)
         else :
             raise ValueError(f"{tracker} is set to None and file type is not detected")
 
     # If tracker is given, use the relevant function
     else :
         if tracker.lower() == "track":
-            return TRACK.load(filename, **kwargs)
+            data = TRACK.load(filename, **kwargs)
         elif tracker.lower() in ["csv", "te", "tempestextremes", "uz"]  :
-            return csv.load(filename)
+            data = csv.load(filename)
         else:
             raise ValueError(f"Tracker {tracker} unsupported or misspelled")
+            
+    if add_info :  # TODO : Manage potentially different variable names
+        data["hemisphere"] = utils.geography.get_hemisphere(data.lat)
+        data["basin"] = utils.geographyget_basin(data.lon, data.lat)
+        data["season"] = utils.time.get_season(data.track_id, data.lat, data.time) 
+        if "wind10" in list(data.keys()) : # If 'wind10' is in the attributes
+            data["sshs"] = utils.category.get_sshs_cat(data.wind10)
+        if "slp" in list(data.keys()) : # If 'slp' is in the attributes
+            data["pres_cat"] = utils.category.get_pressure_cat(data.slp)
+        
+    return data
 
 
 def save(dataset, filename):
