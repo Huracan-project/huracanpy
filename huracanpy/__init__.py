@@ -30,7 +30,7 @@ def load(filename, tracker=None, **kwargs):
 
     # If tracker is not given, try to derive the right function from the file extension
     if (tracker == None):
-        if filename[-3:] == "csv":
+        if filename.split(".")[-1] == "csv":
             return csv.load(filename)
         elif filename.split(".")[-1] == "nc":
             return netcdf.load(filename, **kwargs)
@@ -53,4 +53,4 @@ def save(dataset, filename):
     elif filename.split(".")[-1] == "csv":
         dataset.to_dataframe().to_csv(filename, index= False)
     else:
-        raise NotImplementedError("CSV-style saving not implemented yet")
+        raise NotImplementedError("File format not recognized. Please use one of {.nc, .csv}")
