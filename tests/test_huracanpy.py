@@ -79,3 +79,27 @@ def test_pressure_cat():
     )
     assert Klotz.sum() == 62
     assert Simps.sum() == -23
+
+
+def test_categorise():
+    data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
+    cat_orig = huracanpy.utils.category.get_sshs_cat(data.wind10)
+
+    thresholds = huracanpy.utils.category._wind_thresholds["Saffir-Simpson"]
+    cat_new = huracanpy.utils.category.categorise(data.wind10, thresholds)
+
+    assert (cat_orig == cat_new).all()
+
+
+def test_categorise_full():
+    # Test with made up data for each category
+    data = np.array([-1e24, 0, 20, 30, 40, 50, 60, 70, 1e24, np.nan])
+
+    expected = np.array([-1, -1, 0, 1, 2, 3, 4, 5, 5, np.nan])
+    result = huracanpy.utils.category.categorise(
+        data, huracanpy.utils.category._wind_thresholds["Saffir-Simpson"]
+    )
+
+    # Separate test for last value (nan)
+    assert (result[:-1] == expected[:-1]).all()
+    assert np.isnan(result[-1])
