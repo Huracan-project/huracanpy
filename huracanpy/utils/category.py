@@ -5,8 +5,6 @@ Utils related to storm category
 import numpy as np
 import xarray as xr
 
-# TODO : More generic "get category" version
-
 
 def categorise(variable, thresholds):
 
@@ -44,13 +42,7 @@ def get_sshs_cat(wind):  # TODO : Manage units properly (with pint?)
     return xr.DataArray(sshs, dims="obs", coords={"obs": wind.obs})
 
 
-_slp_thresholds = {
-    "Simpson": [990, 980, 970, 965, 945, 920],
-    "Klotzbach": [1005, 990, 975, 960, 945, 925],
-}
-
-
-def get_pressure_cat(p, convention="Klotzbach"):
+def get_pressure_cat(slp, convention="Klotzbach"):
     """
     Determine the pressure category according to selected convention.
 
@@ -71,13 +63,5 @@ def get_pressure_cat(p, convention="Klotzbach"):
 
     """
 
-    p0, p1, p2, p3, p4, p5 = _slp_thresholds[convention]
-    cat = np.where(p > p0, -1, None)
-    cat = np.where((cat == None) & (p >= p1), 0, cat)
-    cat = np.where((cat == None) & (p >= p2), 1, cat)
-    cat = np.where((cat == None) & (p >= p3), 2, cat)
-    cat = np.where((cat == None) & (p >= p4), 3, cat)
-    cat = np.where((cat == None) & (p >= p5), 4, cat)
-    cat = np.where((cat == None) & (~np.isnan(p)), 5, cat)
-    cat = np.where(cat == None, np.nan, cat)
-    return xr.DataArray(cat, dims="obs", coords={"obs": p.obs})
+    cat = categorise(slp, thresholds=_thresholds[convention])
+    return xr.DataArray(cat, dims="obs", coords={"obs": slp.obs})
