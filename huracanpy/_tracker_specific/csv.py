@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 import pandas as pd
 
-from .utils.time import get_time
+from .. import utils
 
 def load(filename,):
     """Load csv tracks data as an xarray.Dataset
@@ -33,13 +33,10 @@ def load(filename,):
 
     ## Geographical attributes
     tracks.loc[tracks.lon < 0, "lon"] += 360 # Longitude are converted to [0,360] if necessary
-    # TODO : Move it (^) to the wrapper level ?
-    #tracks["hemisphere"] = np.where(tracks.lat > 0, "N", "S")
-    # TODO : Determine basin (wrapper level?)
 
     ## Time attribute
     if "time" not in tracks.columns :
-        tracks["time"] = get_time(tracks.year, tracks.month, tracks.day, tracks.hour)
+        tracks["time"] = utils.time.get_time(tracks.year, tracks.month, tracks.day, tracks.hour)
     else :
         tracks["time"] = pd.to_datetime(tracks.time)
     # TODO : Determine season (wrapper level?)
