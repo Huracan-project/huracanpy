@@ -24,9 +24,12 @@ def test_load_netcdf():
     assert len(np.unique(track_id)) == 86
 
 
-@pytest.mark.parametrize("filename", [huracanpy.example_TRACK_file, huracanpy.example_TRACK_netcdf_file])
-def test_save_netcdf(filename, tmp_path):
-    data = huracanpy.load(filename, tracker="TRACK")
+@pytest.mark.parametrize("filename,tracker", [
+    (huracanpy.example_TRACK_file, "TRACK"),
+    (huracanpy.example_TRACK_netcdf_file, None),
+])
+def test_save_netcdf(filename, tracker, tmp_path):
+    data = huracanpy.load(filename, tracker=tracker)
     # Copy the data because save modifies the dataset at the moment
     huracanpy.save(data.copy(), str(tmp_path / "tmp_file.nc"))
 
