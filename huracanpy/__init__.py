@@ -50,5 +50,7 @@ def load(filename, tracker=None, **kwargs):
 def save(dataset, filename):
     if filename.split(".")[-1] == "nc":
         netcdf.save(dataset, filename)
+    elif filename.split(".")[-1] == "csv":
+        dataset.to_dataframe().to_csv(filename, index= False)
     else:
         raise NotImplementedError("CSV-style saving not implemented yet")
