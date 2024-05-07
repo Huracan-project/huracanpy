@@ -5,7 +5,30 @@ Utils related to storm category
 import numpy as np
 import xarray as xr
 
-# TODO : More generic "get category" version
+bins_sshs = [0,16,29,38,44,52,63,np.inf]
+labels_sshs = [-1,0,1,2,3,4,5]
+
+def categorize(var, bins, labels=None):
+    """
+    Provides category according to provided bins and labels
+
+    Parameters
+    ----------
+    var : xr.DataArray
+        The variable to categorize
+    bins : list or np.array
+        bins boundaries
+    labels : list or np.array, optional
+        Name of the categories. len(labels) = len(bins) -1
+
+    Returns
+    -------
+    None.
+
+    """
+    cat = pd.cut(var, bins_sshs, labels=labels_sshs)
+    return xr.DataArray(cat, dims = "obs", coords = {"obs":var.obs})
+    
 
 def get_sshs_cat(wind): # TODO : Manage units properly (with pint?)
     """
