@@ -7,6 +7,7 @@ __all__ = ["load", "save"]
 import pathlib
 
 from ._tracker_specific import TRACK, csv, netcdf
+from . import utils
 
 
 here = pathlib.Path(__file__).parent
@@ -26,15 +27,24 @@ example_TRACK_netcdf_file = str(
 
 
 def load(filename, tracker=None, **kwargs):
-    if filename.split(".")[-1] == "nc":
-        return netcdf.load(filename, **kwargs)
 
-    if tracker.lower() == "track":
-        return TRACK.load(filename, **kwargs)
-    if tracker.lower() in ["csv", "te", "tempestextremes", "uz"]:
-        return csv.load(filename)
-    else:
-        raise ValueError(f"Tracker {tracker} unsupported or misspelled")
+    # If tracker is not given, try to derive the right function from the file extension
+    if (tracker == None):
+        if filename[-3:] == "csv":
+            return csv.load(filename)
+        elif filename.split(".")[-1] == "nc":
+            return netcdf.load(filename, **kwargs)
+        else :
+            raise ValueError(f"{tracker} is set to None and file type is not detected")
+
+    # If tracker is given, use the relevant function
+    else :
+        if tracker.lower() == "track":
+            return TRACK.load(filename, **kwargs)
+        elif tracker.lower() in ["csv", "te", "tempestextremes", "uz"]  :
+            return csv.load(filename)
+        else:
+            raise ValueError(f"Tracker {tracker} unsupported or misspelled")
 
 
 def save(dataset, filename):

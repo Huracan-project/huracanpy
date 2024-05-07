@@ -43,3 +43,25 @@ def test_save_netcdf(filename, tmp_path):
             np.testing.assert_allclose(data[var].data.astype(data_[var].dtype), data_[var].data, rtol=1e-6)
         else:
             np.testing.assert_allclose(data[var].data, data_[var].data, rtol=0)
+
+
+def test_hemisphere():
+    data = huracanpy.load(huracanpy.example_csv_file, tracker = "csv")
+    assert np.unique(huracanpy.utils.geography.get_hemisphere(data)) == np.array(["S"])
+
+def test_basin():
+    data = huracanpy.load(huracanpy.example_csv_file, tracker = "csv")
+    assert huracanpy.utils.geography.get_basin(data)[0] == "AUS"
+    assert huracanpy.utils.geography.get_basin(data)[-1] == "SI"
+
+def test_sshs():
+    data = huracanpy.load(huracanpy.example_csv_file, tracker = "csv")
+    assert huracanpy.utils.category.get_sshs_cat(data.wind10).min() == -1
+    assert huracanpy.utils.category.get_sshs_cat(data.wind10).max() == 0
+
+def test_pressure_cat():
+    data = huracanpy.load(huracanpy.example_csv_file, tracker = "csv")
+    Klotz = huracanpy.utils.category.get_pressure_cat(data.slp/100)
+    Simps = huracanpy.utils.category.get_pressure_cat(data.slp/100, convention = "Simpson")
+    assert Klotz.sum() == 62
+    assert Simps.sum() == -23
