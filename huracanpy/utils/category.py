@@ -38,14 +38,7 @@ def get_sshs_cat(wind):  # TODO : Manage units properly (with pint?)
         You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
     """
 
-    sshs = np.where(wind <= 16, -1, None)
-    sshs = np.where((sshs == None) & (wind < 29), 0, sshs)
-    sshs = np.where((sshs == None) & (wind < 38), 1, sshs)
-    sshs = np.where((sshs == None) & (wind < 44), 2, sshs)
-    sshs = np.where((sshs == None) & (wind < 52), 3, sshs)
-    sshs = np.where((sshs == None) & (wind < 63), 4, sshs)
-    sshs = np.where((sshs == None) & (~np.isnan(wind)), 5, sshs)
-    sshs = np.where(sshs == None, np.nan, sshs)
+    sshs = categorise(wind, _wind_thresholds["Saffir-Simpson"])
     return xr.DataArray(sshs, dims="obs", coords={"obs": wind.obs})
 
 
