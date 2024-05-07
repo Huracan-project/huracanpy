@@ -75,12 +75,12 @@ def test_save_csv(filename, tracker, tmp_path):
 
 def test_hemisphere():
     data = huracanpy.load(huracanpy.example_csv_file, tracker = "csv")
-    assert np.unique(huracanpy.utils.geography.get_hemisphere(data)) == np.array(["S"])
+    assert np.unique(huracanpy.utils.geography.get_hemisphere(data.lat)) == np.array(["S"])
 
 def test_basin():
     data = huracanpy.load(huracanpy.example_csv_file, tracker = "csv")
-    assert huracanpy.utils.geography.get_basin(data)[0] == "AUS"
-    assert huracanpy.utils.geography.get_basin(data)[-1] == "SI"
+    assert huracanpy.utils.geography.get_basin(data.lon, data.lat)[0] == "AUS"
+    assert huracanpy.utils.geography.get_basin(data.lon, data.lat)[-1] == "SI"
 
 def test_sshs():
     data = huracanpy.load(huracanpy.example_csv_file, tracker = "csv")
