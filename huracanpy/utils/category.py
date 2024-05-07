@@ -8,6 +8,20 @@ import xarray as xr
 # TODO : More generic "get category" version
 
 
+def categorise(variable, thresholds):
+
+    categories = np.zeros_like(variable) * np.nan
+    for category, threshold in thresholds.items():
+        categories[(variable < threshold) & (np.isnan(categories))] = category
+
+    return categories
+
+
+_wind_thresholds = {
+    "Saffir-Simpson": {-1: 16, 0: 29, 1: 38, 2: 44, 3: 52, 4: 63, 5: np.inf}
+}
+
+
 def get_sshs_cat(wind):  # TODO : Manage units properly (with pint?)
     """
     Function to determine the Saffir-Simpson Hurricane Scale (SSHS) category.
