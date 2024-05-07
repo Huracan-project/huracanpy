@@ -68,7 +68,7 @@ def get_season(track_id, lat, time, convention = "long"):
     df = pd.DataFrame({"hemi":hemi, "year":year, "month":month, "track_id":track_id})
     # Most frequent year, month and hemisphere for each track
     # Grouping is done to avoid labelling differently points in a track that might cross hemisphere or seasons.
-    group = df.groupby("track_id")[["year", "month", "hemi"]].agg(pd.Series.mode)
+    group = df.groupby("track_id")[["year", "month", "hemi"]].agg(lambda x: pd.Series.mode(x)[0])
     
     # Assign season
     if convention == "short" :
