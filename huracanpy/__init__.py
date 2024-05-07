@@ -17,31 +17,29 @@ example_TRACK_file = str(
     testdata_dir / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind.tcident.new"
 )
 
-example_csv_file = str(
-    testdata_dir / "sample.csv"
-)
+example_csv_file = str(testdata_dir / "sample.csv")
 
 example_TRACK_netcdf_file = str(
-    testdata_dir / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind.tcident.new.nc"
+    testdata_dir
+    / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind.tcident.new.nc"
 )
 
 
 def load(filename, tracker=None, **kwargs):
-
     # If tracker is not given, try to derive the right function from the file extension
-    if (tracker == None):
+    if tracker == None:
         if filename[-3:] == "csv":
             return csv.load(filename)
         elif filename.split(".")[-1] == "nc":
             return netcdf.load(filename, **kwargs)
-        else :
+        else:
             raise ValueError(f"{tracker} is set to None and file type is not detected")
 
     # If tracker is given, use the relevant function
-    else :
+    else:
         if tracker.lower() == "track":
             return TRACK.load(filename, **kwargs)
-        elif tracker.lower() in ["csv", "te", "tempestextremes", "uz"]  :
+        elif tracker.lower() in ["csv", "te", "tempestextremes", "uz"]:
             return csv.load(filename)
         else:
             raise ValueError(f"Tracker {tracker} unsupported or misspelled")

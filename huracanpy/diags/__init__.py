@@ -1,1 +1,1 @@
-""" Huracanpy module for tracks diagnostics """
+"""Huracanpy module for tracks diagnostics"""

@@ -1,1 +1,1 @@
-""" Huracanpy module for tracker assessment """
+"""Huracanpy module for tracker assessment"""
