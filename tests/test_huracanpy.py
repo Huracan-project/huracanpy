@@ -34,6 +34,12 @@ def test_save_netcdf(filename, tmp_path):
     data_ = huracanpy.load(str(tmp_path / "tmp_file.nc"))
 
     for var in data_.variables:
-        isnan = np.isnan(data[var].data)
-        assert np.isnan(data_[var][isnan].data).all()
-        assert (data[var].data[~isnan] == data_[var].data[~isnan]).all()
+        # Work around for xarray inconsistent loading the data as float or double
+        # depending on fill_value and scale_factor
+        # np.testing.assert_allclose doesn't work for datetime64
+        if np.issubdtype(data[var].dtype, np.datetime64):
+            assert (data[var].data == data_[var].data).all()
+        elif data[var].dtype != data_[var].dtype:
+            np.testing.assert_allclose(data[var].data.astype(data_[var].dtype), data_[var].data, rtol=1e-6)
+        else:
+            np.testing.assert_allclose(data[var].data, data_[var].data, rtol=0)
