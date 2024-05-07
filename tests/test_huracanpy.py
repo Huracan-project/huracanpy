@@ -81,13 +81,30 @@ def test_pressure_cat():
     assert Simps.sum() == -23
 
 
-def test_categorise():
+@pytest.mark.parametrize(
+    "convention, data, expected",
+    [
+        (
+            "Saffir-Simpson",
+            np.array([-1e24, 0, 20, 30, 40, 50, 60, 70, 1e24, np.nan]),
+            np.array([-1, -1, 0, 1, 2, 3, 4, 5, 5, np.nan])
+        ),
+        (
+            "Klotzbach",
+            np.array([1e24, 1006, 1000, 985, 971, 961, 950, 930, 921, 900, 1e-24, -1, np.nan]),
+            np.array([-1, -1, 0, 1, 2, 2, 3, 4, 5, 5, 5, 5, np.nan]),
+        ),
+        (
+            "Simpson",
+            np.array([1e24, 1006, 1000, 985, 971, 961, 950, 930, 921, 900, 1e-24, -1, np.nan]),
+            np.array([-1, -1, -1, 0, 1, 3, 3, 4, 4, 5, 5, 5, np.nan]),
+        )
+    ]
+)
+def test_categorise(convention, data, expected):
     # Test with made up data for each category
-    data = np.array([-1e24, 0, 20, 30, 40, 50, 60, 70, 1e24, np.nan])
-
-    expected = np.array([-1, -1, 0, 1, 2, 3, 4, 5, 5, np.nan])
     result = huracanpy.utils.category.categorise(
-        data, huracanpy.utils.category._thresholds["Saffir-Simpson"]
+        data, huracanpy.utils.category._thresholds[convention]
     )
 
     # Separate test for last value (nan)
