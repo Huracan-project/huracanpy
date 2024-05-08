@@ -66,7 +66,7 @@ def load(filename, calendar=None, variable_names=None):
         # The first lines can contain extra information bounded by two extra lines
         # Just skip to the main header line for now
         line = ""
-        while not line.startswith('TRACK_NUM'):
+        while not line.startswith("TRACK_NUM"):
             line = f.readline().strip()
 
         # Load information about tracks from header line

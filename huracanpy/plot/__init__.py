@@ -1,1 +1,1 @@
-""" Huracanpy module for plots """
+"""Huracanpy module for plots"""
