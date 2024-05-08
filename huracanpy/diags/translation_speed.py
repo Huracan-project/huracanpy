@@ -2,7 +2,7 @@
 Module containing functions to compute translation speed
 """
 
-from haversine import haversine, Unit
+from haversine import haversine
 import numpy as np
 import xarray as xr
 

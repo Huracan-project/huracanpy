@@ -32,7 +32,7 @@ example_TRACK_netcdf_file = str(
 
 def load(filename, tracker=None, add_info = False, **kwargs):
     # If tracker is not given, try to derive the right function from the file extension
-    if (tracker == None):
+    if (tracker is None):
         if filename.split(".")[-1] == "csv":
             data = csv.load(filename)
         elif filename.split(".")[-1] == "nc":

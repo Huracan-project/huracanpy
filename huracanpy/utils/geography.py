@@ -5,7 +5,7 @@ Utils related to geographical attributes
 import numpy as np
 import xarray as xr
 import pandas as pd
-from shapely.geometry import Polygon, MultiPolygon, Point
+from shapely.geometry import Point
 import geopandas as gpd
 
 from ._basins import basins_def
