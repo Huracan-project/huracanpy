@@ -2,7 +2,7 @@
 
 __version__ = "0.1.0"
 __author__ = "Leo Saffin <l.saffin@reading.ac.uk>, Stella Bourdin <stella.bourdin@physics.ox.ac.uk>, Kelvin Ng "
-__all__ = ["load", "save", "utils"]
+__all__ = ["load", "save", "utils", "diags"]
 
 import pathlib
 
