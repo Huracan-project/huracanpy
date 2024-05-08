@@ -1,1 +1,6 @@
-""" Huracanpy module for tracks diagnostics """from . import track_densityfrom . import track_statsfrom . import translation_speedfrom . import lifecycle
+""" Huracanpy module for tracks diagnostics """
+
+from . import track_density
+from . import track_stats
+from . import translation_speed
+from . import lifecycle

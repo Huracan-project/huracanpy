@@ -10,7 +10,7 @@ def test_load_track():
 
 
 def test_load_csv():
-    data = huracanpy.load(huracanpy.example_csv_file, tracker = "tempestextremes")
+    data = huracanpy.load(huracanpy.example_csv_file, tracker="tempestextremes")
     assert len(data) == 13
     assert len(data.obs) == 99
     assert len(data.groupby("track_id")) == 3
@@ -24,11 +24,14 @@ def test_load_netcdf():
     assert len(np.unique(track_id)) == 86
 
 
-@pytest.mark.parametrize("filename,tracker", [
-    (huracanpy.example_TRACK_file, "TRACK"),
-    (huracanpy.example_TRACK_netcdf_file, None),
-    (huracanpy.example_csv_file, None),
-])
+@pytest.mark.parametrize(
+    "filename,tracker",
+    [
+        (huracanpy.example_TRACK_file, "TRACK"),
+        (huracanpy.example_TRACK_netcdf_file, None),
+        (huracanpy.example_csv_file, None),
+    ],
+)
 def test_save_netcdf(filename, tracker, tmp_path):
     data = huracanpy.load(filename, tracker=tracker)
     # Copy the data because save modifies the dataset at the moment
@@ -44,7 +47,9 @@ def test_save_netcdf(filename, tracker, tmp_path):
         if np.issubdtype(data[var].dtype, np.datetime64):
             assert (data[var].data == data_[var].data).all()
         elif data[var].dtype != data_[var].dtype:
-            np.testing.assert_allclose(data[var].data.astype(data_[var].dtype), data_[var].data, rtol=1e-6)
+            np.testing.assert_allclose(
+                data[var].data.astype(data_[var].dtype), data_[var].data, rtol=1e-6
+            )
         else:
             np.testing.assert_allclose(data[var].data, data_[var].data, rtol=0)
 
@@ -82,18 +87,7 @@ def test_basin():
     assert huracanpy.utils.geography.get_basin(data.lon, data.lat)[0] == "AUS"
     assert huracanpy.utils.geography.get_basin(data.lon, data.lat)[-1] == "SI"
 
-def test_sshs():
-    data = huracanpy.load(huracanpy.example_csv_file, tracker = "csv")
-    assert huracanpy.utils.category.get_sshs_cat(data.wind10).min() == -1
-    assert huracanpy.utils.category.get_sshs_cat(data.wind10).max() == 0
-
-def test_pressure_cat():
-    data = huracanpy.load(huracanpy.example_csv_file, tracker = "csv")
-    Klotz = huracanpy.utils.category.get_pressure_cat(data.slp/100)
-    Simps = huracanpy.utils.category.get_pressure_cat(data.slp/100, convention = "Simpson")
-    assert Klotz.sum() == 62
-    assert Simps.sum() == -23
-    
+  
 def test_seasons():
     data= huracanpy.load(huracanpy.example_year_file)
     season = huracanpy.utils.time.get_season(data.track_id, data.lat, data.time)
@@ -147,3 +141,49 @@ def test_time_from_extremum():
     t = huracanpy.diags.lifecycle.time_from_extremum(data, "wind10", "max")
     assert t.min() == -972000000000000
     assert t.max() == 367200000000000
+
+
+@pytest.mark.parametrize(
+    "convention, data, expected",
+    [
+        (
+            "Saffir-Simpson",
+            np.array([-1e24, 0, 20, 30, 40, 50, 60, 70, 1e24, np.nan]),
+            np.array([-1, -1, 0, 1, 2, 3, 4, 5, 5, np.nan])
+        ),
+        (
+            "Klotzbach",
+            np.array([1e24, 1006, 1000, 985, 971, 961, 950, 930, 921, 900, 1e-24, -1, np.nan]),
+            np.array([-1, -1, 0, 1, 2, 2, 3, 4, 5, 5, 5, 5, np.nan]),
+        ),
+        (
+            "Simpson",
+            np.array([1e24, 1006, 1000, 985, 971, 961, 950, 930, 921, 900, 1e-24, -1, np.nan]),
+            np.array([-1, -1, -1, 0, 1, 3, 3, 4, 4, 5, 5, 5, np.nan]),
+        )
+    ]
+)
+def test_categorise(convention, data, expected):
+    # Test with made up data for each category
+    result = huracanpy.utils.category.categorise(
+        data, huracanpy.utils.category._thresholds[convention]
+    )
+
+    # Separate test for last value (nan)
+    assert (result[:-1] == expected[:-1]).all()
+    assert np.isnan(result[-1])
+
+    def test_sshs():
+    data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
+    assert huracanpy.utils.category.get_sshs_cat(data.wind10).min() == -1
+    assert huracanpy.utils.category.get_sshs_cat(data.wind10).max() == 0
+
+
+def test_pressure_cat():
+    data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
+    Klotz = huracanpy.utils.category.get_pressure_cat(data.slp / 100)
+    Simps = huracanpy.utils.category.get_pressure_cat(
+        data.slp / 100, convention="Simpson"
+    )
+    assert Klotz.sum() == 62
+    assert Simps.sum() == -23

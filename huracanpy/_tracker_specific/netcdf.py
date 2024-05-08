@@ -61,8 +61,10 @@ def save(dataset, filename):
 def _find_trajectory_id(dataset):
     # Find the variable with cf_role=trajectory_id
     trajectory_id = [
-        dataset[var] for var in dataset.variables
-        if "cf_role" in dataset[var].attrs and dataset[var].attrs["cf_role"] == "trajectory_id"
+        dataset[var]
+        for var in dataset.variables
+        if "cf_role" in dataset[var].attrs
+        and dataset[var].attrs["cf_role"] == "trajectory_id"
     ]
 
     if len(trajectory_id) == 1:
@@ -80,7 +82,8 @@ def _find_trajectory_id(dataset):
 def _find_rowsize(dataset):
     # Find the variable with sample_dimension="obs" (or equivalent)
     rowsize = [
-        dataset[var] for var in dataset.variables
+        dataset[var]
+        for var in dataset.variables
         if "sample_dimension" in dataset[var].attrs
     ]
 

@@ -5,8 +5,75 @@ Utils related to storm category
 import numpy as np
 import xarray as xr
 import pandas as pd
+  
+def categorise(variable, thresholds):
 
-def categorize(var, bins, labels=None):
+    categories = np.zeros_like(variable) * np.nan
+    for category, threshold in thresholds.items():
+        categories[(variable < threshold) & (np.isnan(categories))] = category
+
+    return categories
+
+
+_thresholds = {
+    "Klotzbach": {5: 925, 4: 945, 3: 960, 2: 975, 1: 990, 0: 1005, -1: np.inf},
+    "Simpson": {5: 920, 4: 945, 3: 965, 2: 970, 1: 980, 0: 990, -1: np.inf},
+    "Saffir-Simpson": {-1: 16, 0: 29, 1: 38, 2: 44, 3: 52, 4: 63, 5: np.inf},
+}
+
+categorize=categorise # American spelling  
+
+def get_sshs_cat(wind):  # TODO : Manage units properly (with pint?)
+    """
+    Function to determine the Saffir-Simpson Hurricane Scale (SSHS) category.
+
+    Parameters
+    ----------
+    wind : xr.DataArray
+        10-minutes averaged 10m wind in m/s
+
+    Returns
+    -------
+    xarray.DataArray
+        The category series.
+        You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
+    """
+
+    sshs = categorise(wind, _thresholds["Saffir-Simpson"])
+    return xr.DataArray(sshs, dims="obs", coords={"obs": wind.obs})
+
+
+def get_pressure_cat(slp, convention="Klotzbach"):
+
+    """
+    Determine the pressure category according to selected convention.
+
+    Parameters
+    ----------
+    slp : xr.DataArray
+        Minimum Sea-level Pressure series in hPa
+    convention : str
+        Name of the classification convention you want to use.
+            * Klotzbach (default)
+            * Simpson
+
+    Returns
+    -------
+    xarray.DataArray
+        The category series.
+        You can append it to your tracks by running tracks["cat"] = get_pressure_cat(tracks.slp)
+
+    """
+
+    if slp.min() > 10000:
+        print("Caution, pressure are likely in Pa, they are being converted to hPa for categorization")
+        slp = slp/100
+
+    cat = categorise(slp, thresholds=_thresholds[convention])
+    return xr.DataArray(cat, dims="obs", coords={"obs": slp.obs})
+
+  # [Stella] Leaving that here as an alternative method memo if we encounter performance issues.
+  def categorize_alt(var, bins, labels=None):
     """
     Provides category according to provided bins and labels
 
@@ -27,55 +94,3 @@ def categorize(var, bins, labels=None):
     """
     cat = pd.cut(var, bins, labels=labels)
     return xr.DataArray(cat, dims = "obs", coords = {"obs":var.obs})
-    
-
-def get_sshs_cat(wind): # TODO : Manage units properly (with pint?)
-    """
-    Function to determine the Saffir-Simpson Hurricane Scale (SSHS) category.
-
-    Parameters
-    ----------
-    wind : xr.DataArray
-        10-minutes averaged 10m wind in m/s
-
-    Returns
-    -------
-    xarray.DataArray
-        The category series. 
-        You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
-    """
-    
-    bins_sshs = [0,16,29,38,44,52,63,np.inf]
-    labels_sshs = [-1,0,1,2,3,4,5]
-    
-    return categorize(wind, bins_sshs, labels_sshs)
-
-_slp_thresholds = {
-    "Simpson" : np.flip([+np.inf, 990, 980, 970, 965, 945, 920, 0]),
-    "Klotzbach" : np.flip([+np.inf, 1005, 990, 975, 960, 945, 925, 0])
-    }
-
-def get_pressure_cat(p, convention = "Klotzbach"):
-    """
-    Determine the pressure category according to selected convention.
-
-    Parameters
-    ----------
-    slp : xr.DataArray
-        Minimum Sea-level Pressure series in hPa
-    convention : str
-        Name of the classification convention you want to use. 
-            * Klotzbach (default)
-            * Simpson
-
-    Returns
-    -------
-    xarray.DataArray
-        The category series. 
-        You can append it to your tracks by running tracks["cat"] = get_pressure_cat(tracks.slp)
-
-    """
-    if p.min() > 10000:
-        print("Caution, pressure are likely in Pa, they are being converted to hPa for categorization")
-        p = p/100
-    return categorize(p, _slp_thresholds[convention], labels=np.flip(np.arange(-1,5+1)))
