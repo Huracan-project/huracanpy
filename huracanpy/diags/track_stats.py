@@ -2,7 +2,6 @@
 Module containing functions to compute track statistics
 """
 
-
 def duration(tracks):
     """
     Compute the duration of each track
@@ -70,4 +69,3 @@ def extremum_vals(tracks, var, stat = "max"):
         raise NotImplementedError("stat not recognized. Please use one of {min, max}")
         
     return tracks.sortby(var, ascending = asc).groupby("track_id").first()
-    
