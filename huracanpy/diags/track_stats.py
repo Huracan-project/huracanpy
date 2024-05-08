@@ -35,7 +35,7 @@ def gen_vals(tracks):
     
     return tracks.sortby("time").groupby("track_id").first()
 
-def extremum_vals(tracks, var, stat = "max"):
+def extremum_vals(tracks, varname, stat = "max"):
     """
     Shows the attribute for the extremum point of each track
 
@@ -68,4 +68,4 @@ def extremum_vals(tracks, var, stat = "max"):
     else :
         raise NotImplementedError("stat not recognized. Please use one of {min, max}")
         
-    return tracks.sortby(var, ascending = asc).groupby("track_id").first()
+    return tracks.sortby(varname, ascending = asc).groupby("track_id").first()
