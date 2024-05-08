@@ -129,3 +129,9 @@ def test_extremum_vals():
     m = huracanpy.diags.track_stats.extremum_vals(data, "slp", "min")
     assert M.day.mean() == 15
     assert m.lat.mean() == -27
+    
+def test_translation_speed():
+    data = huracanpy.load(huracanpy.example_csv_file, tracker = "csv")
+    v = huracanpy.diags.translation_speed.translation_speed(data)
+    assert 6 <= v.translation_speed.mean() <= 6.1
+    assert len(v.mid_obs) == len(data.obs) - data.track_id.to_dataframe().nunique()
