@@ -72,8 +72,8 @@ def get_pressure_cat(slp, convention="Klotzbach"):
     cat = categorise(slp, thresholds=_thresholds[convention])
     return xr.DataArray(cat, dims="obs", coords={"obs": slp.obs})
 
-  # [Stella] Leaving that here as an alternative method memo if we encounter performance issues.
-  def categorize_alt(var, bins, labels=None):
+# [Stella] Leaving that here as an alternative method memo if we encounter performance issues.
+def categorize_alt(var, bins, labels=None):
     """
     Provides category according to provided bins and labels
 

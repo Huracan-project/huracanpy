@@ -173,7 +173,7 @@ def test_categorise(convention, data, expected):
     assert (result[:-1] == expected[:-1]).all()
     assert np.isnan(result[-1])
 
-    def test_sshs():
+def test_sshs():
     data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
     assert huracanpy.utils.category.get_sshs_cat(data.wind10).min() == -1
     assert huracanpy.utils.category.get_sshs_cat(data.wind10).max() == 0
