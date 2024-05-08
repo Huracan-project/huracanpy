@@ -128,7 +128,7 @@ def test_translation_speed():
     data = huracanpy.load(huracanpy.example_csv_file, tracker = "csv")
     v = huracanpy.diags.translation_speed.translation_speed(data)
     assert 6 <= v.translation_speed.mean() <= 6.1
-    assert len(v.mid_obs) == len(data.obs) - data.track_id.to_dataframe().nunique()
+    assert (len(v.mid_obs) == len(data.obs) - data.track_id.to_dataframe().nunique().values)[0]
     
 def test_time_from_genesis():
     data = huracanpy.load(huracanpy.example_csv_file, tracker = "csv")
