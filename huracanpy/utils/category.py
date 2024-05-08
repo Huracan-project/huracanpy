@@ -21,8 +21,9 @@ def categorize(var, bins, labels=None):
 
     Returns
     -------
-    None.
-
+    xarray.DataArray
+        The category series. 
+        You can append it to your tracks by running tracks["cat"] = categorize(tracks.var, bins)
     """
     cat = pd.cut(var, bins, labels=labels)
     return xr.DataArray(cat, dims = "obs", coords = {"obs":var.obs})
