@@ -37,7 +37,8 @@ def load(
     )  # Rename lon & lat columns if necessary
 
     ## Geographical attributes
-    tracks.loc[tracks.lon < 0, "lon"] += 360 # Longitude are converted to [0,360] if necessary
+    if "lon" in  tracks.columns :
+        tracks.loc[tracks.lon < 0, "lon"] += 360 # Longitude are converted to [0,360] if necessary
 
     ## Time attribute
     if "time" not in tracks.columns :
