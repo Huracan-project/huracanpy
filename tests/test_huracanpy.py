@@ -28,7 +28,6 @@ def test_load_netcdf():
     "filename,tracker",
     [
         (huracanpy.example_TRACK_file, "TRACK"),
-        (huracanpy.example_TRACK_netcdf_file, None),
         (huracanpy.example_csv_file, None),
     ],
 )
