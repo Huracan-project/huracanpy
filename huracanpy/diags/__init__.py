@@ -1,4 +1,4 @@
-""" Huracanpy module for tracks diagnostics """
+"""Huracanpy module for tracks diagnostics"""
 
 __all__ = ["track_density", "track_stats", "translation_speed", "lifecycle"]
 
