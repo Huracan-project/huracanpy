@@ -10,63 +10,49 @@ import geopandas as gpd
 
 from ._basins import basins_def
 
-
-def get_hemisphere(tracks):
+def get_hemisphere(lat):
     """
     Function to detect which hemisphere each point corresponds to
 
     Parameters
     ----------
-    tracks : xr.Dataset
-        tracks dataset obtained with the `load`function.
+    lat : xr.DataArray
 
     Returns
     -------
     xarray.DataArray
-        The hemisphere series.
+        The hemisphere series. 
         You can append it to your tracks by running tracks["hemisphere"] = get_hemisphere(tracks)
     """
+    
+    H = np.where(lat >= 0, "N", "S")
+    return xr.DataArray(H, dims = "obs", coords = {"obs":lat.obs})
 
-    H = np.where(tracks.lat >= 0, "N", "S")
-    return xr.DataArray(H, dims="obs", coords={"obs": tracks.obs})
-
-
-def get_basin(tracks, convention="WMO"):
+def get_basin(lon, lat, convention = "WMO"):
     """
     Function to determine the basin of each point, according to the selected convention.
 
     Parameters
     ----------
-    tracks : xr.Dataset
-        tracks dataset obtained with the `load`function.
+    lon : xr.DataArray 
+        Longitude series
+    lat : xr.DataArray
+        Latitude series
     convention : str
-        Name of the basin convention you want to use.
-            * WMO
+        Name of the basin convention you want to use. 
+            * WMO 
 
     Returns
     -------
     xarray.DataArray
-        The basin series.
+        The basin series. 
         You can append it to your tracks by running tracks["basin"] = get_basin(tracks)
     """
-
-    B = basins_def[convention]  # Select GeoDataFrame for the convention
-    points = pd.DataFrame(
-        dict(coords=list(zip(tracks.lon.values, tracks.lat.values)))
-    )  # Create dataframe of points coordinates
-    points = gpd.GeoDataFrame(
-        points.coords.apply(Point), geometry="coords", crs=B.crs
-    )  # Transform into Points within a GeoDataFrame
-    basin = (
-        gpd.tools.sjoin(
-            points,
-            B,
-            how="left",  # Identify basins
-        )
-        .reset_index()
-        .groupby("index")
-        .first(  # Deal with points at borders
-        )
-        .index_right
-    )  # Select basin names
-    return xr.DataArray(basin, dims="obs", coords={"obs": tracks.obs})
+    
+    B = basins_def[convention] # Select GeoDataFrame for the convention
+    points = pd.DataFrame(dict(coords = list(zip(lon.values, lat.values)))) # Create dataframe of points coordinates
+    points = gpd.GeoDataFrame(points.coords.apply(Point), geometry="coords", crs=B.crs) # Transform into Points within a GeoDataFrame
+    basin = gpd.tools.sjoin(points, B, how="left" # Identify basins
+                            ).reset_index().groupby("index").first( # Deal with points at borders
+                            ).index_right # Select basin names
+    return xr.DataArray(basin, dims = "obs", coords = {"obs":lon.obs})

@@ -18,6 +18,7 @@ dependencies = [
     "matplotlib",
     "seaborn",
     "netcdf4",
+    "haversine",
 ]
 
 [project.optional-dependencies]

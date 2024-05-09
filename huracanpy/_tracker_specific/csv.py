@@ -5,34 +5,7 @@ Module to load tracks stored as csv files, including TempestExtremes output.
 import pandas as pd
 
 
-def get_time(year, month, day, hour):
-    """
-    Get np.datetime64 array corresponding to year, month, day and hour arrays
-
-    Parameters
-    ----------
-    year (np.array or pd.Series)
-    month (np.array or pd.Series)
-    day (np.array or pd.Series)
-    hour (np.array or pd.Series)
-
-    Returns
-    -------
-    np.array or pd.Series
-        The corresponding np.datetime64
-    """
-    time = pd.to_datetime(
-        year.astype(str)
-        + "-"
-        + month.astype(str)
-        + "-"
-        + day.astype(str)
-        + " "
-        + hour.astype(str)
-        + ":00"
-    )
-    return time
-
+from .. import utils
 
 def load(
     filename,
@@ -64,19 +37,14 @@ def load(
     )  # Rename lon & lat columns if necessary
 
     ## Geographical attributes
-    tracks.loc[tracks.lon < 0, "lon"] += (
-        360  # Longitude are converted to [0,360] if necessary
-    )
-    # TODO : Move it (^) to the wrapper level ?
-    # tracks["hemisphere"] = np.where(tracks.lat > 0, "N", "S")
-    # TODO : Determine basin (wrapper level?)
+    if "lon" in  tracks.columns :
+        tracks.loc[tracks.lon < 0, "lon"] += 360 # Longitude are converted to [0,360] if necessary
 
     ## Time attribute
-    if "time" not in tracks.columns:
-        tracks["time"] = get_time(tracks.year, tracks.month, tracks.day, tracks.hour)
-    else:
+    if "time" not in tracks.columns :
+        tracks["time"] = utils.time.get_time(tracks.year, tracks.month, tracks.day, tracks.hour)
+    else :
         tracks["time"] = pd.to_datetime(tracks.time)
-    # TODO : Determine season (wrapper level?)
 
     # Output xr dataset
     return tracks.to_xarray().rename({"index": "obs"})
