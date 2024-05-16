@@ -23,12 +23,27 @@ def _map_values(values, vmin, vmax, vrange, clip):
 
 
 def fancyline(
-        x, y,
-        colors=None, vmin=None, vmax=None, cmap=None, clip_colors=False,
-        linewidths=None, wmin=None, wmax=None, wrange=(1, 5), clip_linewidths=True,
-        alphas=None, amin=None, amax=None, arange=(0, 1), clip_alphas=True,
-        linestyles=None,
-        ax=None, transform=None, autoscale=True,
+    x,
+    y,
+    colors=None,
+    vmin=None,
+    vmax=None,
+    cmap=None,
+    clip_colors=False,
+    linewidths=None,
+    wmin=None,
+    wmax=None,
+    wrange=(1, 5),
+    clip_linewidths=True,
+    alphas=None,
+    amin=None,
+    amax=None,
+    arange=(0, 1),
+    clip_alphas=True,
+    linestyles=None,
+    ax=None,
+    transform=None,
+    autoscale=True,
 ):
     """
     A line plot of x vs y that can show extra information by having a variable color,

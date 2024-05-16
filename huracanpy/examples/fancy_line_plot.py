@@ -45,7 +45,7 @@ fancyline(
     arange=(0.5, 1),
     colors="k",
     linewidths=3,
-    ax=axes[1, 0]
+    ax=axes[1, 0],
 )
 
 # Use the linestyle as categorical whether 10m wind is greater than a threshold
