@@ -10,6 +10,7 @@ from .. import utils
 
 def load(
     filename,
+    read_csv_kws=None,
 ):
     """Load csv tracks data as an xarray.Dataset
     These tracks may come from TempestExtremes StitchNodes, or any other source.
@@ -28,11 +29,12 @@ def load(
     """
 
     ## Read file
-    tracks = pd.read_csv(filename)
+    tracks = pd.read_csv(filename, **read_csv_kws)
     if (
         tracks.columns.str[0][1] == " "
     ):  # Sometimes columns names are read starting with a space, which we remove
         tracks = tracks.rename(columns={c: c[1:] for c in tracks.columns[1:]})
+    tracks.columns = tracks.columns.str.lower()  # Make all column names lowercase
     tracks = tracks.rename(
         {"longitude": "lon", "latitude": "lat"}
     )  # Rename lon & lat columns if necessary
@@ -44,12 +46,15 @@ def load(
         )
 
     ## Time attribute
-    if "time" not in tracks.columns:
+    if "iso_time" in tracks.columns:
+        tracks["time"] = pd.to_datetime(tracks.iso_time)
+        tracks = tracks.drop(columns="iso_time")
+    elif "time" in tracks.columns:
+        tracks["time"] = pd.to_datetime(tracks.time)
+    else:
         tracks["time"] = utils.time.get_time(
             tracks.year, tracks.month, tracks.day, tracks.hour
         )
-    else:
-        tracks["time"] = pd.to_datetime(tracks.time)
 
     # Output xr dataset
     return tracks.to_xarray().rename({"index": "record"})

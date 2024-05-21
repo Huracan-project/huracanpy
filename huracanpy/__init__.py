@@ -2,7 +2,7 @@
 
 __version__ = "0.1.0"
 __author__ = "Leo Saffin <l.saffin@reading.ac.uk>, Stella Bourdin <stella.bourdin@physics.ox.ac.uk>, Kelvin Ng "
-__all__ = ["load", "save", "utils", "diags", "plot"]
+__all__ = ["load", "save", "utils", "diags", "plot", "data"]
 
 import pathlib
 
@@ -45,6 +45,8 @@ def load(filename, tracker=None, add_info=False, **kwargs):
             data = TRACK.load(filename, **kwargs)
         elif tracker.lower() in ["csv", "te", "tempestextremes", "uz"]:
             data = csv.load(filename)
+        elif tracker.lower() == "ibtracs":
+            data = csv.load(filename, read_csv_kws=dict(header=0, skiprows=[1]))
         else:
             raise ValueError(f"Tracker {tracker} unsupported or misspelled")
 
@@ -69,3 +71,6 @@ def save(dataset, filename):
         raise NotImplementedError(
             "File format not recognized. Please use one of {.nc, .csv}"
         )
+
+
+# from . import data
