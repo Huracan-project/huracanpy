@@ -9,7 +9,7 @@ from .. import load
 from .. import save
 
 here = pathlib.Path(__file__).parent
-data_dir = here / "_ibtracs_file"
+data_dir = here / "_ibtracs_files/"
 
 
 def online(subset, filename="ibtracs.csv", clean=True):
@@ -132,12 +132,14 @@ def offline(subset="wmo"):
                       which means in particular that wind speeds are in knots and averaged over different time periods.\n\
                     For more information, see the IBTrACS column documentation at https://www.ncei.noaa.gov/sites/default/files/2021-07/IBTrACS_v04_column_documentation.pdf"
         )
-        load(data_dir + "wmo.csv")
+        return load(str(data_dir / "wmo.csv"))
     if subset.lower() in ["usa", "jtwc"]:
-        load(data_dir + "usa.csv")
+        return load(str(data_dir / "usa.csv"))
 
 
 # TODOS:
+# Deal with NA being read as NaN
+# Make smaller files
 # Make warnings better
 # Deal with units, in general
 # Remove lines with no data from WMO and USA
