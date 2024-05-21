@@ -19,6 +19,7 @@ dependencies = [
     "seaborn",
     "netcdf4",
     "haversine",
+    "cartopy"
 ]
 
 [project.optional-dependencies]
