@@ -40,5 +40,5 @@ def simple_global_histogram(lon, lat, bin_size=5, N_seasons=1):
         coords={"lon": (X[:-1] + X[1:]) / 2, "lat": (Y[:-1] + Y[1:]) / 2},
     )
     # Format
-    da = da.transpose() / N_seasons
+    da = da.where(da > 0).transpose() / N_seasons
     return da
