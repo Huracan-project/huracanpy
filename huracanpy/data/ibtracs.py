@@ -2,7 +2,14 @@
 
 from urllib.request import urlretrieve
 import os
+import numpy as np
+import warnings
+import pathlib
 from .. import load
+from .. import save
+
+here = pathlib.Path(__file__).parent
+data_dir = here / "_ibtracs_file"
 
 
 def online(subset, filename="ibtracs.csv", clean=True):
@@ -42,3 +49,95 @@ def online(subset, filename="ibtracs.csv", clean=True):
     if clean:
         os.remove(filename)  # Somehow, this is slower than the rest ofthe function (??)
     return ib
+
+
+def _prepare_offline():
+    ib = online("since1980", "tmp/ib3years.csv")
+
+    # Remove season with tracks that are still provisional
+    first_season_provi = ib.where(
+        ib.track_type == "PROVISIONAL", drop=True
+    ).season.min()
+    ib = ib.where(ib.season < first_season_provi, drop=True)
+
+    # Remove spur tracks
+    ib = ib.where(ib.track_type == "main", drop=True)
+
+    # - WMO subset
+    print("... WMO ...")
+    ## Select WMO variables
+    ib_wmo = ib[
+        ["sid", "season", "basin", "name", "time", "lon", "lat", "wmo_wind", "wmo_pres"]
+    ]
+
+    # Deal with missing values
+    # ib_wmo = ib_wmo.where(ib_wmo != ' ')
+
+    ## Deal with var types to reduce size ( at the moment, reduces by 25% ) -> TODO : Manage wind and slp data...
+    for var in ["lat", "lon"]:
+        ib_wmo[var] = ib[var].astype(np.float16)
+    for var in ["season"]:
+        ib_wmo[var] = ib[var].astype(np.int16)
+
+    ## Save WMO file
+    save(ib_wmo, "huracanpy/data/_ibtracs_files/wmo.csv")
+
+    # - USA subset
+    print("... USA ...")
+    ## Select USA variables
+    # C = np.array(list(ib.keys())) # Variable names
+    # C = C[[s.startswith("usa") for s in C]] # Variable names starting with usa
+    # ib_usa = ib[["sid", "season", "basin", "name",] + list(C)]
+    ib_usa = ib[
+        [
+            "sid",
+            "season",
+            "basin",
+            "name",
+            "time",
+            "usa_lat",
+            "usa_lon",
+            "usa_status",
+            "usa_wind",
+            "usa_pres",
+            "usa_sshs",
+        ]
+    ]
+
+    ## Deal with var types to reduce size ( at the moment, reduces by 25% ) -> TODO : Manage wind and slp data...
+    for var in ["lat", "lon"]:
+        ib_usa[var] = ib[var].astype(np.float16)
+    for var in ["season"]:
+        ib_usa[var] = ib[var].astype(np.int16)
+
+    ## Save
+    save(ib_usa, "huracanpy/data/_ibtracs_files/usa.csv")
+
+    warnings.warn(
+        "If you just updated the offline files within the package, do not forget to update information in offline loader warnings"
+    )
+
+
+def offline(subset="wmo"):
+    warnings.warn(
+        "This offline function loads a light version of IBTrACS which is embedded within the package, based on a file produced manually by the developers.\n\
+                  It was last updated on the 21st May 2024, based on the IBTrACS file at that date.\n\
+                  It contains only data from 1980 up to the last year with no provisional tracks. All spur tracks were removed."
+    )
+    if subset.lower() == "wmo":
+        warnings.warn(
+            "You are loading the IBTrACS-WMO subset. \
+                      This dataset contains the positions and intensity reported by the WMO agency responsible for each basin\n\
+                      Be aware of the fact that wind and pressure data is provided as they are in IBTrACS, \
+                      which means in particular that wind speeds are in knots and averaged over different time periods.\n\
+                    For more information, see the IBTrACS column documentation at https://www.ncei.noaa.gov/sites/default/files/2021-07/IBTrACS_v04_column_documentation.pdf"
+        )
+        load(data_dir + "wmo.csv")
+    if subset.lower() in ["usa", "jtwc"]:
+        load(data_dir + "usa.csv")
+
+
+# TODOS:
+# Make warnings better
+# Deal with units, in general
+# Remove lines with no data from WMO and USA

@@ -10,6 +10,7 @@ from ._tracker_specific import TRACK, csv, netcdf
 from . import utils
 from . import diags
 from . import plot
+# from . import data  # TODO : Make it work
 
 
 here = pathlib.Path(__file__).parent
@@ -71,6 +72,3 @@ def save(dataset, filename):
         raise NotImplementedError(
             "File format not recognized. Please use one of {.nc, .csv}"
         )
-
-
-# from . import data

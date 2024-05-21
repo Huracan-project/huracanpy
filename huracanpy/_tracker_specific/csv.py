@@ -10,7 +10,7 @@ from .. import utils
 
 def load(
     filename,
-    read_csv_kws=None,
+    read_csv_kws=dict(),
 ):
     """Load csv tracks data as an xarray.Dataset
     These tracks may come from TempestExtremes StitchNodes, or any other source.
