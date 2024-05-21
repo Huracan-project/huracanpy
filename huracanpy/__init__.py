@@ -2,13 +2,14 @@
 
 __version__ = "0.1.0"
 __author__ = "Leo Saffin <l.saffin@reading.ac.uk>, Stella Bourdin <stella.bourdin@physics.ox.ac.uk>, Kelvin Ng "
-__all__ = ["load", "save", "utils", "diags"]
+__all__ = ["load", "save", "utils", "diags", "plot"]
 
 import pathlib
 
 from ._tracker_specific import TRACK, csv, netcdf
 from . import utils
 from . import diags
+from . import plot
 
 
 here = pathlib.Path(__file__).parent
@@ -49,7 +50,7 @@ def load(filename, tracker=None, add_info=False, **kwargs):
 
     if add_info:  # TODO : Manage potentially different variable names
         data["hemisphere"] = utils.geography.get_hemisphere(data.lat)
-        data["basin"] = utils.geographyget_basin(data.lon, data.lat)
+        data["basin"] = utils.geography.get_basin(data.lon, data.lat)
         data["season"] = utils.time.get_season(data.track_id, data.lat, data.time)
         if "wind10" in list(data.keys()):  # If 'wind10' is in the attributes
             data["sshs"] = utils.category.get_sshs_cat(data.wind10)

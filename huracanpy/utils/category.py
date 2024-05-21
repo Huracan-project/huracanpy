@@ -41,7 +41,7 @@ def get_sshs_cat(wind):  # TODO : Manage units properly (with pint?)
     """
 
     sshs = categorise(wind, _thresholds["Saffir-Simpson"])
-    return xr.DataArray(sshs, dims="obs", coords={"obs": wind.obs})
+    return xr.DataArray(sshs, dims="record", coords={"record": wind.record})
 
 
 def get_pressure_cat(slp, convention="Klotzbach"):
@@ -72,7 +72,7 @@ def get_pressure_cat(slp, convention="Klotzbach"):
         slp = slp / 100
 
     cat = categorise(slp, thresholds=_thresholds[convention])
-    return xr.DataArray(cat, dims="obs", coords={"obs": slp.obs})
+    return xr.DataArray(cat, dims="record", coords={"record": slp.record})
 
 
 # [Stella] Leaving that here as an alternative method memo if we encounter performance issues.
@@ -96,4 +96,4 @@ def categorize_alt(var, bins, labels=None):
         You can append it to your tracks by running tracks["cat"] = categorize(tracks.var, bins)
     """
     cat = pd.cut(var, bins, labels=labels)
-    return xr.DataArray(cat, dims="obs", coords={"obs": var.obs})
+    return xr.DataArray(cat, dims="record", coords={"record": var.record})

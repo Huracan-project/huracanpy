@@ -12,7 +12,7 @@ def test_load_track():
 def test_load_csv():
     data = huracanpy.load(huracanpy.example_csv_file, tracker="tempestextremes")
     assert len(data) == 13
-    assert len(data.obs) == 99
+    assert len(data.record) == 99
     assert len(data.groupby("track_id")) == 3
 
 
@@ -142,7 +142,8 @@ def test_translation_speed():
     v = huracanpy.diags.translation_speed.translation_speed(data)
     assert 6 <= v.translation_speed.mean() <= 6.1
     assert (
-        len(v.mid_obs) == len(data.obs) - data.track_id.to_dataframe().nunique().values
+        len(v.mid_record)
+        == len(data.record) - data.track_id.to_dataframe().nunique().values
     )[0]
 
 

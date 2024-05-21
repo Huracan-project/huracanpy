@@ -1,5 +1,10 @@
 """Huracanpy module for plots"""
 
+__all__ = ["plot_tracks_basic", "plot_density"]
+
+from .tracks import plot_tracks_basic
+from .density import plot_density
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection

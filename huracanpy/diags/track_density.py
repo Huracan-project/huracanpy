@@ -29,14 +29,16 @@ def simple_global_histogram(lon, lat, bin_size=5, N_seasons=1):
 
     """
 
+    # compute 2D histogram
     x = np.arange(0, 360 + bin_size, bin_size)
     y = np.arange(-90, 90 + bin_size, bin_size)
     H, X, Y = np.histogram2d(lon, lat, bins=[x, y])
-    da = xr.Dataset(
-        dict(hist2d=(["lon", "lat"], np.array(H))),
-        coords=dict(
-            lon=(["lon"], (X[:-1] + X[1:]) / 2), lat=(["lat"], (Y[:-1] + Y[1:]) / 2)
-        ),
-    ).hist2d
-    da = da / N_seasons
-    return da.where(da != 0).T
+    # Turn into xarray
+    da = xr.DataArray(
+        H,
+        dims=["lon", "lat"],
+        coords={"lon": (X[:-1] + X[1:]) / 2, "lat": (Y[:-1] + Y[1:]) / 2},
+    )
+    # Format
+    da = da.where(da > 0).transpose() / N_seasons
+    return da
