@@ -54,7 +54,7 @@ track_id1 = track_groups[1]
 
 # Iterating over all tracks
 # Each track will be a subset of the xarray Dataset with a unique track_id
-for track in track_groups:
+for n, track in track_groups:
     # Do something with the track
 ```
 

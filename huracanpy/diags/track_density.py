@@ -13,9 +13,9 @@ def simple_global_histogram(lon, lat, bin_size=5, N_seasons=1):
 
     Parameters
     ----------
-    lon : xr.DataArray
+    lon : xarray.DataArray
         longitude series
-    lat : xr.DataArray
+    lat : xarray.DataArray
         latitude series
     bin_size : int or float, optional
         The size in degree of the bins. The default is 5.
@@ -24,7 +24,7 @@ def simple_global_histogram(lon, lat, bin_size=5, N_seasons=1):
 
     Returns
     -------
-    xr.DataArray
+    xarray.DataArray
         Histogram representing number of point per bin per season.
 
     """

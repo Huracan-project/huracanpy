@@ -27,6 +27,11 @@ dev = [
   "pytest",
   "ruff",
 ]
+docs = [
+    "pydata-sphinx-theme",
+    "sphinx-copybutton",
+    "nbsphinx",
+]
 
 [build-system]
 requires = ["setuptools>=61.0"]
@@ -35,6 +40,8 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.package-data]
 huracanpy = ["example_data/*"]
 
+[tool.ruff]
+extend-include = ["*.ipynb"]
 
 # - How to distribute the package
 

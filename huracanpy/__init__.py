@@ -29,6 +29,20 @@ example_TRACK_netcdf_file = str(
 
 
 def load(filename, tracker=None, add_info=False, **kwargs):
+    """
+
+    Parameters
+    ----------
+    filename : str
+    tracker : str
+    add_info : bool, default=False
+    **kwargs
+
+    Returns
+    -------
+    xarray.Dataset
+
+    """
     # If tracker is not given, try to derive the right function from the file extension
     if tracker is None:
         if filename.split(".")[-1] == "csv":
@@ -49,7 +63,7 @@ def load(filename, tracker=None, add_info=False, **kwargs):
 
     if add_info:  # TODO : Manage potentially different variable names
         data["hemisphere"] = utils.geography.get_hemisphere(data.lat)
-        data["basin"] = utils.geographyget_basin(data.lon, data.lat)
+        data["basin"] = utils.geography.get_basin(data.lon, data.lat)
         data["season"] = utils.time.get_season(data.track_id, data.lat, data.time)
         if "wind10" in list(data.keys()):  # If 'wind10' is in the attributes
             data["sshs"] = utils.category.get_sshs_cat(data.wind10)
@@ -60,6 +74,18 @@ def load(filename, tracker=None, add_info=False, **kwargs):
 
 
 def save(dataset, filename):
+    """
+
+    Parameters
+    ----------
+    dataset : xarray.Dataset
+    filename : str
+
+    Returns
+    -------
+    None
+
+    """
     if filename.split(".")[-1] == "nc":
         netcdf.save(dataset, filename)
     elif filename.split(".")[-1] == "csv":
