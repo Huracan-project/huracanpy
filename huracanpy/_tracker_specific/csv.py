@@ -7,6 +7,7 @@ import pandas as pd
 
 from .. import utils
 
+
 def load(
     filename,
 ):
@@ -37,13 +38,17 @@ def load(
     )  # Rename lon & lat columns if necessary
 
     ## Geographical attributes
-    if "lon" in  tracks.columns :
-        tracks.loc[tracks.lon < 0, "lon"] += 360 # Longitude are converted to [0,360] if necessary
+    if "lon" in tracks.columns:
+        tracks.loc[tracks.lon < 0, "lon"] += (
+            360  # Longitude are converted to [0,360] if necessary
+        )
 
     ## Time attribute
-    if "time" not in tracks.columns :
-        tracks["time"] = utils.time.get_time(tracks.year, tracks.month, tracks.day, tracks.hour)
-    else :
+    if "time" not in tracks.columns:
+        tracks["time"] = utils.time.get_time(
+            tracks.year, tracks.month, tracks.day, tracks.hour
+        )
+    else:
         tracks["time"] = pd.to_datetime(tracks.time)
 
     # Output xr dataset

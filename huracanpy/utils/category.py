@@ -5,9 +5,9 @@ Utils related to storm category
 import numpy as np
 import xarray as xr
 import pandas as pd
-  
-def categorise(variable, thresholds):
 
+
+def categorise(variable, thresholds):
     categories = np.zeros_like(variable) * np.nan
     for category, threshold in thresholds.items():
         categories[(variable < threshold) & (np.isnan(categories))] = category
@@ -21,7 +21,8 @@ _thresholds = {
     "Saffir-Simpson": {-1: 16, 0: 29, 1: 38, 2: 44, 3: 52, 4: 63, 5: np.inf},
 }
 
-categorize=categorise # American spelling  
+categorize = categorise  # American spelling
+
 
 def get_sshs_cat(wind):  # TODO : Manage units properly (with pint?)
     """
@@ -44,7 +45,6 @@ def get_sshs_cat(wind):  # TODO : Manage units properly (with pint?)
 
 
 def get_pressure_cat(slp, convention="Klotzbach"):
-
     """
     Determine the pressure category according to selected convention.
 
@@ -66,11 +66,14 @@ def get_pressure_cat(slp, convention="Klotzbach"):
     """
 
     if slp.min() > 10000:
-        print("Caution, pressure are likely in Pa, they are being converted to hPa for categorization")
-        slp = slp/100
+        print(
+            "Caution, pressure are likely in Pa, they are being converted to hPa for categorization"
+        )
+        slp = slp / 100
 
     cat = categorise(slp, thresholds=_thresholds[convention])
     return xr.DataArray(cat, dims="obs", coords={"obs": slp.obs})
+
 
 # [Stella] Leaving that here as an alternative method memo if we encounter performance issues.
 def categorize_alt(var, bins, labels=None):
@@ -89,8 +92,8 @@ def categorize_alt(var, bins, labels=None):
     Returns
     -------
     xarray.DataArray
-        The category series. 
+        The category series.
         You can append it to your tracks by running tracks["cat"] = categorize(tracks.var, bins)
     """
     cat = pd.cut(var, bins, labels=labels)
-    return xr.DataArray(cat, dims = "obs", coords = {"obs":var.obs})
+    return xr.DataArray(cat, dims="obs", coords={"obs": var.obs})
