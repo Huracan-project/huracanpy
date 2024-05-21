@@ -5,13 +5,17 @@ To compute the density, see huracanpy.diags.track_density
 """
 
 import matplotlib.pyplot as plt
-import seaborn as sns
 import cartopy.crs as ccrs
 
-def plot_density(d, projection = ccrs.PlateCarree(180), cmap = "magma_r", levels=None):
-    
-    fig, ax = plt.subplots(subplot_kw = dict(projection = projection))
-    ax.coastlines() 
-    d.where(d > 0).plot(ax = ax, transform = ccrs.PlateCarree(), cmap = cmap, levels = levels)
-    
+
+def plot_density(
+    d,
+    contourf_kws=dict(cmap="magma_r", levels=10),
+    subplot_kws=dict(projection=ccrs.PlateCarree(180)),
+    fig_kws=None,
+):
+    fig, ax = plt.subplots(subplot_kw=subplot_kws, **fig_kws)
+    ax.coastlines()
+    d.where(d > 0).plot.contourf(ax=ax, transform=ccrs.PlateCarree(), **contourf_kws)
+
     return fig, ax
