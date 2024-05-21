@@ -116,12 +116,12 @@ def load(filename, calendar=None, variable_names=None):
             # Other variables are a dictionary mapping variable name to a tuple of
             # (time, data_array) as this is what is passed to xarray.Dataset
             times = [None] * npoints
-            track_data = {label: ("obs", np.zeros(npoints)) for label in var_labels}
+            track_data = {label: ("record", np.zeros(npoints)) for label in var_labels}
 
-            # Add track ID as a variable along the obs dimension so that it can be used
+            # Add track ID as a variable along the record dimension so that it can be used
             # for groupby
             track_id = np.array([track_info["track_id"]] * npoints)
-            track_data["track_id"] = ("obs", track_id)
+            track_data["track_id"] = ("record", track_id)
 
             # Populate time and data line by line
             for m in range(npoints):
@@ -139,10 +139,10 @@ def load(filename, calendar=None, variable_names=None):
             # Add time separately so xarray can deal with the awkward np.datetime64
             # format
             ds = xr.Dataset(track_data)
-            ds["time"] = ("obs", times)
+            ds["time"] = ("record", times)
             output.append(ds)
 
-    output = xr.concat(output, dim="obs")
+    output = xr.concat(output, dim="record")
     output.track_id.attrs["cf_role"] = "trajectory_id"
 
     return output

@@ -52,4 +52,4 @@ def load(
         tracks["time"] = pd.to_datetime(tracks.time)
 
     # Output xr dataset
-    return tracks.to_xarray().rename({"index": "obs"})
+    return tracks.to_xarray().rename({"index": "record"})
