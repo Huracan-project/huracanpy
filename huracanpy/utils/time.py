@@ -101,4 +101,4 @@ def get_season(track_id, lat, time, convention="long"):
     group["season"] = season
     df = df.merge(group[["season"]], on="track_id")
 
-    return xr.DataArray(df.season.values, dims="obs", coords={"obs": lat.obs})
+    return xr.DataArray(df.season.values, dims="record", coords={"record": lat.record})
