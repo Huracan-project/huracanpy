@@ -100,16 +100,28 @@ def _prepare_offline():
             "usa_pres",
             "usa_sshs",
         ]
-    ]  # 23MB
+    ].rename(
+        {
+            "sid": "track_id",
+            "usa_lat": "lat",
+            "usa_lon": "lon",
+            "usa_status": "status",
+            "usa_wind": "wind",
+            "usa_pres": "slp",
+            "usa_sshs": "sshs_cat",
+        }
+    )  # 23MB
 
     ## Select only 6-hourly time steps
     ib_usa = ib_usa.where(ib_usa.time.dt.hour % 6 == 0, drop=True)  # 11MB
 
     ## Deal with var types to reduce size ( at the moment, reduces by 25% ) -> TODO : Manage wind and slp data...
-    for var in ["lat", "lon"]:
+    for var in ["lat", "lon", "wind", "slp"]:
         ib_usa[var] = ib[var].astype(np.float16)
     for var in ["season"]:
         ib_usa[var] = ib[var].astype(np.int16)
+    for var in ["sshs_cat"]:
+        ib_usa[var] = ib[var].astype(np.int8)
 
     ## Save
     save(ib_usa, "huracanpy/data/_ibtracs_files/usa.csv")
@@ -122,7 +134,7 @@ def _prepare_offline():
 def offline(subset="wmo"):
     warnings.warn(
         "This offline function loads a light version of IBTrACS which is embedded within the package, based on a file produced manually by the developers.\n\
-                  It was last updated on the 21st May 2024, based on the IBTrACS file at that date.\n\
+                  It was last updated on the 22nd May 2024, based on the IBTrACS file at that date.\n\
                   It contains only data from 1980 up to the last year with no provisional tracks. All spur tracks were removed. Only 6-hourly time steps were kept."
     )
     if subset.lower() == "wmo":
