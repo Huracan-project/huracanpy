@@ -52,7 +52,7 @@ def online(subset, filename="ibtracs.csv", clean=True):
 
 
 def _prepare_offline():
-    ib = online("since1980", "tmp/ib3years.csv")
+    ib = online("since1980", "tmp/ibtracs.csv")
 
     # Remove season with tracks that are still provisional
     first_season_provi = ib.where(
@@ -61,23 +61,25 @@ def _prepare_offline():
     ib = ib.where(ib.season < first_season_provi, drop=True)
 
     # Remove spur tracks
-    ib = ib.where(ib.track_type == "main", drop=True)
+    ib = ib.where(ib.track_type == "main", drop=True)  # 348MB
 
     # - WMO subset
     print("... WMO ...")
     ## Select WMO variables
     ib_wmo = ib[
-        ["sid", "season", "basin", "name", "time", "lon", "lat", "wmo_wind", "wmo_pres"]
-    ]
+        ["sid", "season", "basin", "time", "lon", "lat", "wmo_wind", "wmo_pres"]
+    ].rename({"sid": "track_id", "wmo_wind": "wind", "wmo_pres": "slp"})  # 19MB
 
-    # Deal with missing values
-    # ib_wmo = ib_wmo.where(ib_wmo != ' ')
+    ## Select only 6-hourly time steps
+    ib_wmo = ib_wmo.where(ib_wmo.time.dt.hour % 6 == 0, drop=True)  # 9MB
 
-    ## Deal with var types to reduce size ( at the moment, reduces by 25% ) -> TODO : Manage wind and slp data...
-    for var in ["lat", "lon"]:
-        ib_wmo[var] = ib[var].astype(np.float16)
-    for var in ["season"]:
-        ib_wmo[var] = ib[var].astype(np.int16)
+    ## Deal with var types to reduce size ( at the moment, reduces by 42% )
+    for var in ["lat", "lon", "slp", "wind"]:
+        ib_wmo[var] = ib_wmo[var].astype(np.float16)
+    for var in [
+        "season",
+    ]:
+        ib_wmo[var] = ib_wmo[var].astype(np.int16)
 
     ## Save WMO file
     save(ib_wmo, "huracanpy/data/_ibtracs_files/wmo.csv")
@@ -85,15 +87,11 @@ def _prepare_offline():
     # - USA subset
     print("... USA ...")
     ## Select USA variables
-    # C = np.array(list(ib.keys())) # Variable names
-    # C = C[[s.startswith("usa") for s in C]] # Variable names starting with usa
-    # ib_usa = ib[["sid", "season", "basin", "name",] + list(C)]
     ib_usa = ib[
         [
             "sid",
             "season",
             "basin",
-            "name",
             "time",
             "usa_lat",
             "usa_lon",
@@ -102,7 +100,10 @@ def _prepare_offline():
             "usa_pres",
             "usa_sshs",
         ]
-    ]
+    ]  # 23MB
+
+    ## Select only 6-hourly time steps
+    ib_usa = ib_usa.where(ib_usa.time.dt.hour % 6 == 0, drop=True)  # 11MB
 
     ## Deal with var types to reduce size ( at the moment, reduces by 25% ) -> TODO : Manage wind and slp data...
     for var in ["lat", "lon"]:
@@ -122,7 +123,7 @@ def offline(subset="wmo"):
     warnings.warn(
         "This offline function loads a light version of IBTrACS which is embedded within the package, based on a file produced manually by the developers.\n\
                   It was last updated on the 21st May 2024, based on the IBTrACS file at that date.\n\
-                  It contains only data from 1980 up to the last year with no provisional tracks. All spur tracks were removed."
+                  It contains only data from 1980 up to the last year with no provisional tracks. All spur tracks were removed. Only 6-hourly time steps were kept."
     )
     if subset.lower() == "wmo":
         warnings.warn(
