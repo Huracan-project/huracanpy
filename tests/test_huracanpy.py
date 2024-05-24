@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 
 import huracanpy
+from huracanpy.load._netcdf import _find_trajectory_id
 
 
 def test_load_track():
@@ -19,7 +20,7 @@ def test_load_csv():
 def test_load_netcdf():
     data = huracanpy.load(huracanpy.example_TRACK_netcdf_file)
     assert len(data.time) == 4580
-    track_id = huracanpy._tracker_specific.netcdf._find_trajectory_id(data)
+    track_id = _find_trajectory_id(data)
     assert len(track_id) == 4580
     assert len(np.unique(track_id)) == 86
 
@@ -210,3 +211,19 @@ def test_pressure_cat():
     )
     assert Klotz.sum() == 62
     assert Simps.sum() == -23
+
+
+@pytest.mark.parametrize(
+    "subset,length",
+    [
+        ("wmo", 8),
+        ("usa", 10),
+    ],
+)
+def test_ibtracs_offline(subset, length):
+    ib = huracanpy.data.ibtracs.offline(subset)
+    assert ib.season.min() == 1980
+    assert (
+        len(ib.record) > 0
+    )  # Can't assert on dataset length, because it might change with updates.
+    assert (len(ib)) == length
