@@ -2,7 +2,7 @@
 
 __version__ = "0.1.0"
 __author__ = "Leo Saffin <l.saffin@reading.ac.uk>, Stella Bourdin <stella.bourdin@physics.ox.ac.uk>, Kelvin Ng "
-__all__ = ["load", "save", "utils", "diags", "plot", "data"]
+__all__ = ["load", "save", "utils", "diags", "plot", "data", "assess"]
 
 import pathlib
 
@@ -12,6 +12,7 @@ from .save import save
 from . import diags
 from . import plot
 from . import data
+from . import assess
 
 
 here = pathlib.Path(__file__).parent
