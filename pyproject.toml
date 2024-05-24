@@ -19,7 +19,8 @@ dependencies = [
     "seaborn",
     "netcdf4",
     "haversine",
-    "cartopy"
+    "cartopy",
+    "matplotlib-venn",
 ]
 
 [project.optional-dependencies]
