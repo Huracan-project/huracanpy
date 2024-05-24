@@ -9,7 +9,10 @@ from .. import load
 from .. import save
 
 here = pathlib.Path(__file__).parent
-data_dir = here / "_ibtracs_files/"
+ibdata_dir = here / "_ibtracs_files/"
+
+wmo_file = str(ibdata_dir / "wmo.csv")
+usa_file = str(ibdata_dir / "usa.csv")
 
 
 def online(subset, filename="ibtracs.csv", clean=True):
@@ -83,7 +86,7 @@ def _prepare_offline(wmo=True, usa=True):
             ib_wmo[var] = ib_wmo[var].astype(np.int16)
 
         ## Save WMO file
-        save(ib_wmo, "huracanpy/data/_ibtracs_files/wmo.csv")
+        save(ib_wmo, wmo_file)
 
     if usa:
         # - USA subset
@@ -129,7 +132,7 @@ def _prepare_offline(wmo=True, usa=True):
             ib_usa[var] = ib_usa[var].astype(np.int8)
 
         ## Save
-        save(ib_usa, "huracanpy/data/_ibtracs_files/usa.csv")
+        save(ib_usa, usa_file)
 
     warnings.warn(
         "If you just updated the offline files within the package, do not forget to update information in offline loader warnings"
@@ -178,9 +181,9 @@ def offline(subset="wmo"):
                       which means in particular that wind speeds are in knots and averaged over different time periods.\n\
                     For more information, see the IBTrACS column documentation at https://www.ncei.noaa.gov/sites/default/files/2021-07/IBTrACS_v04_column_documentation.pdf"
         )
-        return load(str(data_dir / "wmo.csv"))
+        return load(wmo_file)
     if subset.lower() in ["usa", "jtwc"]:
-        return load(str(data_dir / "usa.csv"))
+        return load(usa_file)
 
 
 # TODOS:
