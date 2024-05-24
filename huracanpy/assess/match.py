@@ -75,15 +75,18 @@ def match_multiple(
     names=None,
     max_dist=300,
     min_overlap=0,
-):
-    M = pd.DataFrame(columns=["id_" + n for n in names])
+):  # TODO : Error raised when two first datasets have no match.
+    M = pd.DataFrame(columns=["id_" + n for n in names[:2]])
     for names_pair, dataset_pair in zip(
         combinations(names, 2), combinations(datasets, 2)
     ):
         m = match_pair(*dataset_pair, *names_pair, max_dist, min_overlap)
-        print(len(m))
+        if len(m) == 0:
+            raise NotImplementedError(
+                "For the moment, the case where two datasets have no match is not handled. Problem raised by datasets "
+                + str(names_pair)
+            )
         M = M.merge(m[["id_" + names_pair[0], "id_" + names_pair[1]]], how="outer")
-        print(len(M))
     return M
 
 
