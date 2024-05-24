@@ -23,9 +23,9 @@ def translation_speed(data):
     """
     data = data.sortby(["track_id", "time"])
     V, lat, lon, t, tid = [], [], [], [], []  # To store results temporarily
-    for i in range(len(data.obs) - 1):
-        p = data.isel(obs=i)  # Current point
-        q = data.isel(obs=i + 1)  # Next point
+    for i in range(len(data.record) - 1):
+        p = data.isel(record=i)  # Current point
+        q = data.isel(record=i + 1)  # Next point
         if p.track_id == q.track_id:  # If both points belong to the same track
             dt = np.timedelta64((q.time - p.time).values, "s")  # Temporal interval in s
             dx = haversine(
@@ -40,11 +40,17 @@ def translation_speed(data):
             tid.append(p.track_id.values)
 
     # Transform into clean dataset
-    V = xr.DataArray(V, dims="mid_obs", coords={"mid_obs": np.arange(len(V))})
-    lon = xr.DataArray(lon, dims="mid_obs", coords={"mid_obs": np.arange(len(lon))})
-    lat = xr.DataArray(lat, dims="mid_obs", coords={"mid_obs": np.arange(len(lat))})
-    t = xr.DataArray(t, dims="mid_obs", coords={"mid_obs": np.arange(len(t))})
-    tid = xr.DataArray(tid, dims="mid_obs", coords={"mid_obs": np.arange(len(tid))})
+    V = xr.DataArray(V, dims="mid_record", coords={"mid_record": np.arange(len(V))})
+    lon = xr.DataArray(
+        lon, dims="mid_record", coords={"mid_record": np.arange(len(lon))}
+    )
+    lat = xr.DataArray(
+        lat, dims="mid_record", coords={"mid_record": np.arange(len(lat))}
+    )
+    t = xr.DataArray(t, dims="mid_record", coords={"mid_record": np.arange(len(t))})
+    tid = xr.DataArray(
+        tid, dims="mid_record", coords={"mid_record": np.arange(len(tid))}
+    )
 
     return xr.Dataset(
         {"lon": lon, "lat": lat, "time": t, "track_id": tid, "translation_speed": V}

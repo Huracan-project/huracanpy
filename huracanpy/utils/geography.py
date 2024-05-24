@@ -27,7 +27,7 @@ def get_hemisphere(lat):
     """
 
     H = np.where(lat >= 0, "N", "S")
-    return xr.DataArray(H, dims="obs", coords={"obs": lat.obs})
+    return xr.DataArray(H, dims="record", coords={"record": lat.record})
 
 
 def get_basin(lon, lat, convention="WMO"):
@@ -70,4 +70,4 @@ def get_basin(lon, lat, convention="WMO"):
         )
         .index_right
     )  # Select basin names
-    return xr.DataArray(basin, dims="obs", coords={"obs": lon.obs})
+    return xr.DataArray(basin, dims="record", coords={"record": lon.record})
