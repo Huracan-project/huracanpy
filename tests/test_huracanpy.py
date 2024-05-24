@@ -211,3 +211,16 @@ def test_pressure_cat():
     )
     assert Klotz.sum() == 62
     assert Simps.sum() == -23
+
+
+def test_ibtracs_offline():
+    wmo = huracanpy.data.ibtracs.offline("wmo")
+    assert wmo.season.min() == 1980
+    assert (
+        len(wmo.record) > 0
+    )  # Can't assert on dataset length, because it might change with updates.
+    assert (len(wmo)) == 8
+    usa = huracanpy.data.ibtracs.offline("usa")
+    assert usa.season.min() == 1980
+    assert len(usa.record) > 0
+    assert len(usa) == 10
