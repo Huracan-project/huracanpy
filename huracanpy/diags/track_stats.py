@@ -9,11 +9,11 @@ def duration(tracks):
 
     Parameters
     ----------
-    ttracks : xr.DataSet
+    tracks : xarray.Dataset
 
     Returns
     -------
-    xr.DataArray
+    xarray.DataArray
         Duration of each track
 
     """
@@ -30,11 +30,11 @@ def gen_vals(tracks):
 
     Parameters
     ----------
-    tracks : xr.DataSet
+    tracks : xarray.DataSet
 
     Returns
     -------
-    xr.Dataset
+    xarray.Dataset
         Dataset containing only genesis points, with track_id as index.
 
     """
@@ -48,7 +48,7 @@ def extremum_vals(tracks, varname, stat="max"):
 
     Parameters
     ----------
-    tracks : xr.DataSet
+    tracks : xarray.DataSet
     var : str
         The extremum variable
     stat : str, optional
@@ -61,7 +61,7 @@ def extremum_vals(tracks, varname, stat="max"):
 
     Returns
     -------
-    xr.Dataset
+    xarray.Dataset
         Dataset containing only extremum points, with track_id as index.
 
     """

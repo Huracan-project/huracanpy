@@ -14,14 +14,11 @@ def get_time(year, month, day, hour):
 
     Parameters
     ----------
-    year (np.array or pd.Series)
-    month (np.array or pd.Series)
-    day (np.array or pd.Series)
-    hour (np.array or pd.Series)
+    year, month, day, hour : numpy.ndarray or pandas.Series
 
     Returns
     -------
-    np.array or pd.Series
+    numpy.ndarray or pandas.Series
         The corresponding np.datetime64
     """
     time = pd.to_datetime(
@@ -43,9 +40,9 @@ def get_season(track_id, lat, time, convention="long"):
 
     Parameters
     ----------
-    track_id : xr.DataArray
-    lat : xr.DataArray
-    time : xr.DataArray
+    track_id : xarray.DataArray
+    lat : xarray.DataArray
+    time : xarray.DataArray
     convention : str
         * 'short' : In the southern hemisphere, the season n corresponds to July n-1 to June n
         * 'long' : In the southern hemisphere, the season from July n-1 to June n is named "(n-1)n"
@@ -57,7 +54,7 @@ def get_season(track_id, lat, time, convention="long"):
 
     Returns
     -------
-    xr.DataArray
+    xarray.DataArray
         The season series.
         You can append it to your tracks by running tracks["season"] = get_season(tracks.track_id, tracks.lat, tracks.time)
     """

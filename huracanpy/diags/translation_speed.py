@@ -13,11 +13,11 @@ def translation_speed(data):
 
     Parameters
     ----------
-    data : xr.Dataset
+    data : xarray.Dataset
 
     Returns
     -------
-    xr.Dataset
+    xarray.Dataset
         Translation speeds. Output is stored for points that correspond to the middle of two consecutive points in the initial dataset.
 
     """

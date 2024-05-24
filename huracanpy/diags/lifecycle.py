@@ -32,6 +32,18 @@ def time_from_genesis(data):
 
 
 def time_from_extremum(data, varname, stat=max):
+    """
+
+    Parameters
+    ----------
+    data
+    varname
+    stat
+
+    Returns
+    -------
+
+    """
     if stat == "max":
         asc = False
     elif stat == "min":
