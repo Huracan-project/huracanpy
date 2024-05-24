@@ -72,10 +72,38 @@ def match_pair(
 
 def match_multiple(
     datasets,
-    names=None,
+    names,
     max_dist=300,
     min_overlap=0,
-):  # TODO : Error raised when two first datasets have no match.
+):
+    """
+    Function to match any number of tracks sets
+
+    Parameters
+    ----------
+    datasets : list of xr.Dataset
+        list of the sets to be matched.
+    names : list of str
+        labels for the datasets. names must have the same length as datasets
+    max_dist : float
+        Threshold for maximum distance between two tracks
+    min_overlap : int
+        Minimum number of overlapping time steps for matching
+
+    Raises
+    ------
+    NotImplementedError
+        If two datasets have no match.
+
+    Returns
+    -------
+    M : pd.dataframe
+        table of matching tracks among all the datasets
+
+    """
+
+    assert len(datasets) == len(names), "datasets and names must have the same length."
+
     M = pd.DataFrame(columns=["id_" + n for n in names[:2]])
     for names_pair, dataset_pair in zip(
         combinations(names, 2), combinations(datasets, 2)
@@ -83,7 +111,7 @@ def match_multiple(
         m = match_pair(*dataset_pair, *names_pair, max_dist, min_overlap)
         if len(m) == 0:
             raise NotImplementedError(
-                "For the moment, the case where two datasets have no match is not handled. Problem raised by datasets "
+                "For the moment, the case where two datasets have no match is not handled. Problem raised by datasets "  # TODO
                 + str(names_pair)
             )
         M = M.merge(m[["id_" + names_pair[0], "id_" + names_pair[1]]], how="outer")
@@ -91,4 +119,3 @@ def match_multiple(
 
 
 # TODO: Deal with duplicates: merge, max...?
-# TODO: Allow matching of more than two tables
