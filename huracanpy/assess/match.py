@@ -3,9 +3,10 @@
 import pandas as pd
 import numpy as np
 from haversine import haversine_vector, Unit
+from itertools import combinations
 
 
-def match_tracks(
+def match_pair(
     tracks1,
     tracks2,
     name1="1",
@@ -67,6 +68,23 @@ def match_tracks(
         columns={"track_id_x": "id_" + name1, "track_id_y": "id_" + name2}
     )
     return matches
+
+
+def match_multiple(
+    datasets,
+    names=None,
+    max_dist=300,
+    min_overlap=0,
+):
+    M = pd.DataFrame(columns=["id_" + n for n in names])
+    for names_pair, dataset_pair in zip(
+        combinations(names, 2), combinations(datasets, 2)
+    ):
+        m = match_pair(*dataset_pair, *names_pair, max_dist, min_overlap)
+        print(len(m))
+        M = M.merge(m[["id_" + names_pair[0], "id_" + names_pair[1]]], how="outer")
+        print(len(M))
+    return M
 
 
 # TODO: Deal with duplicates: merge, max...?
