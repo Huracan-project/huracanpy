@@ -1,12 +1,3 @@
-"""Huracanpy module for plots"""
-
-__all__ = ["plot_tracks_basic", "plot_density", "fancyline", "venn"]
-
-from ._fancyline import fancyline
-from .tracks import plot_tracks_basic
-from .density import plot_density
-from .venn import venn
-
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
@@ -57,21 +48,25 @@ def fancyline(
     linewidth, alpha, linestyle, or any combination of the four.
 
     For variable color set a vmin, vmax, and cmap (similar to pcolormesh/contourf)
-    > fancyline(x, y, colors=z, vmin=0, vmax=10, cmap="viridis")
+
+    >>> fancyline(x, y, colors=z, vmin=0, vmax=10, cmap="viridis")
 
     For variable linewidth, set a wmin, wmax, and wrange. Like with vmin/vmax, wmin/wmax
     specify the data values for the smallest and largest linewidth with variables
     outside that range being clipping to wmin/wmax. The wrange specifies the range of
     linewidths that you actually want to display
-    > fancyline(x, y, linewidths=z, wmin=0, wmin=10, wrange=(1, 5))
+
+    >>> fancyline(x, y, linewidths=z, wmin=0, wmax=10, wrange=(1, 5))
 
     For a variable alpha, set an amin, amax, and arange
-    > fancyline(x, y, alphas=z, amin=0, amax=10, arange=(0, 1))
+
+    >>> fancyline(x, y, alphas=z, amin=0, amax=10, arange=(0, 1))
 
     For a variable linestyle, pass an array of linestyles specified as strings. e.g. to
     show whether z is above a threshold
-    > linestyles = ["--" if value < 5 else "-" for value in z]
-    > fancyline(x, y, linestyles=linestyles)
+
+    >>> linestyles = ["--" if value < 5 else "-" for value in z]
+    >>> fancyline(x, y, linestyles=linestyles)
 
     https://matplotlib.org/stable/gallery/lines_bars_and_markers/multicolored_line
 

@@ -17,7 +17,7 @@ def get_hemisphere(lat):
 
     Parameters
     ----------
-    lat : xr.DataArray
+    lat : xarray.DataArray
 
     Returns
     -------
@@ -36,9 +36,9 @@ def get_basin(lon, lat, convention="WMO"):
 
     Parameters
     ----------
-    lon : xr.DataArray
+    lon : xarray.DataArray
         Longitude series
-    lat : xr.DataArray
+    lat : xarray.DataArray
         Latitude series
     convention : str
         Name of the basin convention you want to use.

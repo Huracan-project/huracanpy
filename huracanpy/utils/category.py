@@ -30,7 +30,7 @@ def get_sshs_cat(wind):  # TODO : Manage units properly (with pint?)
 
     Parameters
     ----------
-    wind : xr.DataArray
+    wind : xarray.DataArray
         10-minutes averaged 10m wind in m/s
 
     Returns
@@ -50,7 +50,7 @@ def get_pressure_cat(slp, convention="Klotzbach"):
 
     Parameters
     ----------
-    slp : xr.DataArray
+    slp : xarray.DataArray
         Minimum Sea-level Pressure series in hPa
     convention : str
         Name of the classification convention you want to use.
@@ -82,11 +82,11 @@ def categorize_alt(var, bins, labels=None):
 
     Parameters
     ----------
-    var : xr.DataArray
+    var : xarray.DataArray
         The variable to categorize
-    bins : list or np.array
+    bins : array_like
         bins boundaries
-    labels : list or np.array, optional
+    labels : array_like, optional
         Name of the categories. len(labels) = len(bins) -1
 
     Returns

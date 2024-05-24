@@ -34,3 +34,9 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Sphinx documentation
+docs/_*/
+
+# Jupyter notebook
+.ipynb_checkpoints/
