@@ -15,4 +15,3 @@ To install huracanpy run::
     :hidden:
 
     self
-    installing
