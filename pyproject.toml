@@ -34,7 +34,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
-huracanpy = ["example_data/*", "huracanpy/data/_ibtracs_files/*"]
+huracanpy = ["example_data/*", "data/_ibtracs_files/*"]
 
 
 # - How to distribute the package
