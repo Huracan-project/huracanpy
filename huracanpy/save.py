@@ -4,6 +4,18 @@ from .load import _netcdf
 
 
 def save(dataset, filename):
+    """
+
+    Parameters
+    ----------
+    dataset : xarray.Dataset
+    filename : str
+
+    Returns
+    -------
+    None
+
+    """
     if filename.split(".")[-1] == "nc":
         _netcdf.save(dataset, filename)
     elif filename.split(".")[-1] == "csv":
