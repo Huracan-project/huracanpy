@@ -3,4 +3,5 @@ Examples
 
 .. nbgallery::
 
-    fancy_line_plot.ipynb
+    fancy_line_plot
+    basins
