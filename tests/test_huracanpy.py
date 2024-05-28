@@ -221,7 +221,7 @@ def test_pressure_cat():
     ],
 )
 def test_ibtracs_offline(subset, length):
-    ib = huracanpy.data.ibtracs.offline(subset)
+    ib = huracanpy.load(tracker="ibtracs", ibtracs_subset=subset)
     assert ib.season.min() == 1980
     assert (
         len(ib.record) > 0
@@ -230,7 +230,7 @@ def test_ibtracs_offline(subset, length):
 
 
 def test_match():
-    ib = huracanpy.data.ibtracs.offline("wmo")
+    ib = huracanpy.load(tracker="ibtracs", ibtracs_subset="wmo")
     ref_1996 = ib.where(ib.time.dt.year == 1996, drop=True)
     UZ = huracanpy.load(huracanpy.example_year_file)
     UZ1 = UZ.where(UZ.track_id.isin([1207, 1208, 1210, 1212, 1220, 1238]), drop=True)
@@ -253,7 +253,7 @@ def test_match():
 
 
 def test_scores():
-    ib = huracanpy.data.ibtracs.offline("wmo")
+    ib = huracanpy.load(tracker="ibtracs", ibtracs_subset="wmo")
     ref_1996 = ib.where(ib.time.dt.year == 1996, drop=True)
     UZ = huracanpy.load(huracanpy.example_year_file)
     M = huracanpy.assess.match_multiple([UZ, ref_1996], ["UZ", "ib"])
