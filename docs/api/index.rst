@@ -8,4 +8,3 @@ API
     diags
     utils
     plot
-    data

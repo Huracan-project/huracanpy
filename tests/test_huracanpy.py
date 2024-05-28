@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 
 import huracanpy
-from huracanpy.load._netcdf import _find_trajectory_id
+from huracanpy._data._netcdf import _find_trajectory_id
 
 
 def test_load_track():
