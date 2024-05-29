@@ -31,9 +31,7 @@ import huracanpy
 )
 def test_categorise(convention, data, expected):
     # Test with made up data for each category
-    result = huracanpy.utils.category.categorize(
-        data, huracanpy.utils.category._thresholds[convention]
-    )
+    result = huracanpy.utils.category.categorize(data, convention=convention)
 
     # Separate test for last value (nan)
     assert (result[:-1] == expected[:-1]).all()

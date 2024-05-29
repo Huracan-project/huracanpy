@@ -11,48 +11,70 @@ from metpy.xarray import preprocess_and_wrap
 from metpy.units import units
 
 
-def categorize(variable, thresholds):
+@preprocess_and_wrap(wrap_like="variable")
+def categorize(variable, bins=None, labels=None, convention=None, variable_units=None):
     """Calculate a generic category from a variable and a set of thresholds
 
     Parameters
     ----------
     variable : array_like
         The variable to be categorized
-    thresholds : dict
-        Mapping of category value to lower bound
+    bins : array_like
+        Bounds for the categories, including upper and lower bounds
+    labels : array_like
+        Name of the categories. len(labels) = len(bins) -1
+    convention : str
+        * Klotzbach
+        * Simpson
+        * Saffir-Simpson
+    variable_units : str
+        The units of the input variable. Only needs to be specified if they are
+        different to the units of the bins and they are not already in the attributes of
+        the variable.
 
     Returns
     -------
     numpy.ndarray
-        The category value for each value in the input variable
+        The category label for each value in the input variable
 
     """
+    if bins is None and labels is None:
+        if convention is None:
+            raise ValueError("Must specify either bins/labels or convention")
+        else:
+            bins = _thresholds[convention]["bins"]
+            labels = _thresholds[convention]["labels"]
+
+    if not isinstance(variable, pint.Quantity) or variable.unitless:
+        if variable_units is None and isinstance(bins, pint.Quantity):
+            variable_units = str(bins.units)
+        variable = variable * units(variable_units)
+
     categories = np.zeros_like(variable) * np.nan
-    for category, threshold in thresholds.items():
-        categories[(variable < threshold) & (np.isnan(categories))] = category
+    for n, label in enumerate(labels):
+        categories[(bins[n] < variable) & (variable <= bins[n + 1])] = label
 
     return categories
 
 
 _thresholds = {
-    "Klotzbach": {5: 925, 4: 945, 3: 960, 2: 975, 1: 990, 0: 1005, -1: np.inf},
-    "Simpson": {5: 920, 4: 945, 3: 965, 2: 970, 1: 980, 0: 990, -1: np.inf},
-    "Saffir-Simpson": {-1: 16, 0: 29, 1: 38, 2: 44, 3: 52, 4: 63, 5: np.inf},
+    "Klotzbach": dict(
+        bins=np.array([-np.inf, 925, 945, 960, 975, 990, 1005, np.inf]) * units("hPa"),
+        labels=[5, 4, 3, 2, 1, 0, -1],
+    ),
+    "Simpson": dict(
+        bins=np.array([-np.inf, 920, 945, 965, 970, 980, 990, np.inf]) * units("hPa"),
+        labels=[5, 4, 3, 2, 1, 0, -1],
+    ),
+    "Saffir-Simpson": dict(
+        bins=np.array([-np.inf, 16, 29, 38, 44, 52, 63, np.inf]) * units("m s-1"),
+        labels=[-1, 0, 1, 2, 3, 4, 5],
+    ),
 }
 
 
-# There is probably a better way of defining the thresholds
-for name, threshold_unit in [
-    ("Klotzbach", units("hPa")),
-    ("Simpson", units("hPa")),
-    ("Saffir-Simpson", units("m s-1")),
-]:
-    for threshold in _thresholds[name]:
-        _thresholds[name][threshold] = _thresholds[name][threshold] * threshold_unit
-
-
 @preprocess_and_wrap(wrap_like="wind")
-def get_sshs_cat(wind, wind_units="m s-1"):
+def get_sshs_cat(wind, convention="Saffir-Simpson", wind_units="m s-1"):
     """
     Function to determine the Saffir-Simpson Hurricane Scale (SSHS) category.
 
@@ -70,10 +92,7 @@ def get_sshs_cat(wind, wind_units="m s-1"):
         The category series.
         You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
     """
-    if not isinstance(wind, pint.Quantity) or wind.unitless:
-        wind = wind * units(wind_units)
-
-    return categorize(wind, _thresholds["Saffir-Simpson"])
+    return categorize(wind, convention=convention, variable_units=wind_units)
 
 
 @preprocess_and_wrap(wrap_like="slp")
@@ -109,9 +128,7 @@ def get_pressure_cat(slp, convention="Klotzbach", slp_units="hPa"):
             )
             slp = slp / 100
 
-        slp = slp * units(slp_units)
-
-    return categorize(slp, thresholds=_thresholds[convention])
+    return categorize(slp, convention=convention, variable_units=slp_units)
 
 
 # [Stella] Leaving that here as an alternative method memo if we encounter performance issues.
