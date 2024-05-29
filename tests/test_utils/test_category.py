@@ -30,7 +30,7 @@ import huracanpy
 )
 def test_categorise(convention, data, expected):
     # Test with made up data for each category
-    result = huracanpy.utils.category.categorise(
+    result = huracanpy.utils.category.categorize(
         data, huracanpy.utils.category._thresholds[convention]
     )
 

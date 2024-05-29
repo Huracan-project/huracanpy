@@ -7,7 +7,22 @@ import xarray as xr
 import pandas as pd
 
 
-def categorise(variable, thresholds):
+def categorize(variable, thresholds):
+    """Calculate a generic category from a variable and a set of thresholds
+
+    Parameters
+    ----------
+    variable : array_like
+        The variable to be categorized
+    thresholds : dict
+        Mapping of category value to lower bound
+
+    Returns
+    -------
+    numpy.ndarray
+        The category value for each value in the input variable
+
+    """
     categories = np.zeros_like(variable) * np.nan
     for category, threshold in thresholds.items():
         categories[(variable < threshold) & (np.isnan(categories))] = category
@@ -20,8 +35,6 @@ _thresholds = {
     "Simpson": {5: 920, 4: 945, 3: 965, 2: 970, 1: 980, 0: 990, -1: np.inf},
     "Saffir-Simpson": {-1: 16, 0: 29, 1: 38, 2: 44, 3: 52, 4: 63, 5: np.inf},
 }
-
-categorize = categorise  # American spelling
 
 
 def get_sshs_cat(wind):  # TODO : Manage units properly (with pint?)
@@ -40,7 +53,7 @@ def get_sshs_cat(wind):  # TODO : Manage units properly (with pint?)
         You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
     """
 
-    sshs = categorise(wind, _thresholds["Saffir-Simpson"])
+    sshs = categorize(wind, _thresholds["Saffir-Simpson"])
     return xr.DataArray(sshs, dims="record", coords={"record": wind.record})
 
 
@@ -71,7 +84,7 @@ def get_pressure_cat(slp, convention="Klotzbach"):
         )
         slp = slp / 100
 
-    cat = categorise(slp, thresholds=_thresholds[convention])
+    cat = categorize(slp, thresholds=_thresholds[convention])
     return xr.DataArray(cat, dims="record", coords={"record": slp.record})
 
 
