@@ -3,8 +3,12 @@ Utils related to storm category
 """
 
 import numpy as np
+import pint
 import xarray as xr
 import pandas as pd
+
+from metpy.xarray import preprocess_and_wrap
+from metpy.units import units
 
 
 def categorize(variable, thresholds):
@@ -37,7 +41,18 @@ _thresholds = {
 }
 
 
-def get_sshs_cat(wind):  # TODO : Manage units properly (with pint?)
+# There is probably a better way of defining the thresholds
+for name, threshold_unit in [
+    ("Klotzbach", units("hPa")),
+    ("Simpson", units("hPa")),
+    ("Saffir-Simpson", units("m s-1")),
+]:
+    for threshold in _thresholds[name]:
+        _thresholds[name][threshold] = _thresholds[name][threshold] * threshold_unit
+
+
+@preprocess_and_wrap(wrap_like="wind")
+def get_sshs_cat(wind, wind_units="m s-1"):
     """
     Function to determine the Saffir-Simpson Hurricane Scale (SSHS) category.
 
@@ -46,18 +61,23 @@ def get_sshs_cat(wind):  # TODO : Manage units properly (with pint?)
     wind : xarray.DataArray
         10-minutes averaged 10m wind in m/s
 
+    wind_units : str, default="m s-1"
+        The units of the input array if they are not already provided by the attributes
+
     Returns
     -------
     xarray.DataArray
         The category series.
         You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
     """
+    if not isinstance(wind, pint.Quantity) or wind.unitless:
+        wind = wind * units(wind_units)
 
-    sshs = categorize(wind, _thresholds["Saffir-Simpson"])
-    return xr.DataArray(sshs, dims="record", coords={"record": wind.record})
+    return categorize(wind, _thresholds["Saffir-Simpson"])
 
 
-def get_pressure_cat(slp, convention="Klotzbach"):
+@preprocess_and_wrap(wrap_like="slp")
+def get_pressure_cat(slp, convention="Klotzbach", slp_units="hPa"):
     """
     Determine the pressure category according to selected convention.
 
@@ -69,6 +89,8 @@ def get_pressure_cat(slp, convention="Klotzbach"):
         Name of the classification convention you want to use.
             * Klotzbach (default)
             * Simpson
+    slp_units : str, default="hPa"
+        The units of the input array if they are not already provided by the attributes
 
     Returns
     -------
@@ -77,15 +99,19 @@ def get_pressure_cat(slp, convention="Klotzbach"):
         You can append it to your tracks by running tracks["cat"] = get_pressure_cat(tracks.slp)
 
     """
+    if not isinstance(slp, pint.Quantity) or slp.unitless:
+        if slp.min() > 10000:
+            print(
+                "Caution, pressure are likely in Pa, they are being converted to hPa "
+                "for categorization. In future specify the units explicitly by passing "
+                'slp_units="hPa" to this function or setting '
+                'slp.attrs["units"] = "hPa"'
+            )
+            slp = slp / 100
 
-    if slp.min() > 10000:
-        print(
-            "Caution, pressure are likely in Pa, they are being converted to hPa for categorization"
-        )
-        slp = slp / 100
+        slp = slp * units(slp_units)
 
-    cat = categorize(slp, thresholds=_thresholds[convention])
-    return xr.DataArray(cat, dims="record", coords={"record": slp.record})
+    return categorize(slp, thresholds=_thresholds[convention])
 
 
 # [Stella] Leaving that here as an alternative method memo if we encounter performance issues.

@@ -21,6 +21,7 @@ dependencies = [
     "haversine",
     "cartopy",
     "matplotlib-venn",
+    "metpy",
 ]
 
 [project.optional-dependencies]

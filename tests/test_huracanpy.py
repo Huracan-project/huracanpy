@@ -13,7 +13,7 @@ def test_load_track():
 def test_load_csv():
     data = huracanpy.load(huracanpy.example_csv_file, tracker="tempestextremes")
     assert len(data) == 13
-    assert len(data.record) == 99
+    assert len(data.time) == 99
     assert len(data.groupby("track_id")) == 3
 
 
@@ -95,6 +95,6 @@ def test_ibtracs_offline(subset, length):
     ib = huracanpy.load(tracker="ibtracs", ibtracs_subset=subset)
     assert ib.season.min() == 1980
     assert (
-        len(ib.record) > 0
+        len(ib.time) > 0
     )  # Can't assert on dataset length, because it might change with updates.
     assert (len(ib)) == length
