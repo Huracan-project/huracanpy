@@ -33,7 +33,9 @@ def translation_speed(data):
         if p.track_id == q.track_id:  # If both points belong to the same track
             dt = np.timedelta64((q.time - p.time).values, "s")  # Temporal interval in s
             dx = haversine(
-                (p.lat, p.lon), (q.lat, q.lon), unit="m"
+                (p.lat.values[()], p.lon.values[()]),
+                (q.lat.values[()], q.lon.values[()]),
+                unit="m",
             )  # Displacement in m
             v = dx / dt.astype(float)  # translation speed in m/s
             V.append(v)
