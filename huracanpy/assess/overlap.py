@@ -1,6 +1,6 @@
 """Overlap function"""
 
-from .match import match_pair
+from ._match import match_pair
 
 
 def overlap(tracks1, tracks2, matches=None):
