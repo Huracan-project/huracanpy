@@ -5,7 +5,7 @@ API
     :maxdepth: 2
 
     loading
+    assess
     diags
     utils
     plot
-    data

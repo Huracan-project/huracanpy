@@ -4,7 +4,8 @@ Utils related to time
 
 import pandas as pd
 import numpy as np
-import xarray as xr
+from metpy.xarray import preprocess_and_wrap
+
 from .geography import get_hemisphere
 
 
@@ -34,6 +35,7 @@ def get_time(year, month, day, hour):
     return time
 
 
+@preprocess_and_wrap(wrap_like="track_id")
 def get_season(track_id, lat, time, convention="long"):
     """
 
@@ -61,8 +63,10 @@ def get_season(track_id, lat, time, convention="long"):
 
     # Derive values
     hemi = get_hemisphere(lat)
-    year = time.dt.year
-    month = time.dt.month
+
+    time = pd.to_datetime(time)
+    year = time.year
+    month = time.month
     # Store in a dataframe
     df = pd.DataFrame(
         {"hemi": hemi, "year": year, "month": month, "track_id": track_id}
@@ -98,4 +102,4 @@ def get_season(track_id, lat, time, convention="long"):
     group["season"] = season
     df = df.merge(group[["season"]], on="track_id")
 
-    return xr.DataArray(df.season.values, dims="record", coords={"record": lat.record})
+    return df.season.values

@@ -1,6 +1,6 @@
 """huracanpy module for saving tracks data"""
 
-from .load import _netcdf
+from . import _netcdf
 
 
 def save(dataset, filename):
