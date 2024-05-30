@@ -8,4 +8,5 @@ API
     assess
     diags
     utils
+    subset
     plot
