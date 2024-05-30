@@ -82,3 +82,4 @@ If your tracks are in TRACK format, use the `tracker="TRACK"` option
     :hidden:
 
     self
+    extract
