@@ -124,6 +124,28 @@ def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, cr
 
 
 def get_land_or_ocean(lon, lat, resolution="10m", crs=None):
+    """
+    Detect whether each point is over land or ocean
+
+    Parameters
+    ----------
+    lon, lat : float or array_like
+    resolution : str
+        The resolution of the Land/Sea outlines dataset to use. One of
+
+        * 10m (1:10,000,000)
+        * 50m (1:50,000,000)
+        * 110m (1:110,000,000)
+
+    crs : cartopy.crs.CRS
+
+    Returns
+    -------
+    array_like
+        Array of "Land" or "Ocean" for each lon/lat point. Should return the same type
+        of array as the input lon/lat, or a length 1 :py:class:`numpy.ndarray` if
+        lon/lat are floats
+    """
     is_ocean = _get_natural_earth_feature(
         lon,
         lat,
@@ -140,6 +162,27 @@ def get_land_or_ocean(lon, lat, resolution="10m", crs=None):
 
 
 def get_country(lon, lat, resolution="10m", crs=None):
+    """Detect the country each point is over
+
+    Parameters
+    ----------
+    lon, lat : float or array_like
+    resolution : str
+        The resolution of the Land/Sea outlines dataset to use. One of
+
+        * 10m (1:10,000,000)
+        * 50m (1:50,000,000)
+        * 110m (1:110,000,000)
+
+    crs : cartopy.crs.CRS
+
+    Returns
+    -------
+    array_like
+        Array of country names (or empty string for no country) for each lon/lat point.
+        Should return the same type of array as the input lon/lat, or a length 1
+        :py:class:`numpy.ndarray` if lon/lat are floats
+    """
     return _get_natural_earth_feature(
         lon,
         lat,
@@ -152,6 +195,27 @@ def get_country(lon, lat, resolution="10m", crs=None):
 
 
 def get_continent(lon, lat, resolution="10m", crs=None):
+    """Detect the continent each point is over
+
+    Parameters
+    ----------
+    lon, lat : float or array_like
+    resolution : str
+        The resolution of the Land/Sea outlines dataset to use. One of
+
+        * 10m (1:10,000,000)
+        * 50m (1:50,000,000)
+        * 110m (1:110,000,000)
+
+    crs : cartopy.crs.CRS
+
+    Returns
+    -------
+    array_like
+        Array of continent names (or empty string for no continent) for each lon/lat
+        point. Should return the same type of array as the input lon/lat, or a length 1
+        :py:class:`numpy.ndarray` if lon/lat are floats
+    """
     return _get_natural_earth_feature(
         lon,
         lat,
