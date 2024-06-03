@@ -1,4 +1,5 @@
 # huracanpy
+[![Documentation Status](https://readthedocs.org/projects/huracanpy/badge/?version=latest)](https://huracanpy.readthedocs.io/en/latest/?badge=latest)
 
 A python package for working with various forms of feature tracking data
 

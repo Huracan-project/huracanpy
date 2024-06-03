@@ -121,3 +121,43 @@ def test_get_country(data, expected, request):
     data = request.getfixturevalue(data)
     result = huracanpy.utils.geography.get_country(data.lon, data.lat)
     assert (result == expected).all()
+
+
+@pytest.mark.parametrize(
+    "data, expected",
+    [
+        (
+            "tracks_minus180_plus180",
+            np.array(
+                ["Antarctica"]
+                + [""] * 6
+                + ["South America"] * 2
+                + [""] * 4
+                + ["Africa"]
+                + [""]
+                + ["Asia"] * 4
+                + ["Europe"] * 2
+                + [""] * 3
+            ),
+        ),
+        (
+            "tracks_0_360",
+            np.array(
+                ["Antarctica"]
+                + [""] * 6
+                + ["South America"] * 2
+                + [""] * 4
+                + ["Africa"]
+                + [""]
+                + ["Asia"] * 4
+                + ["Europe"] * 2
+                + [""] * 3
+            ),
+        ),
+        ("tracks_csv", np.array([""] * 15 + ["Oceania"] * 15 + [""] * 69)),
+    ],
+)
+def test_get_continent(data, expected, request):
+    data = request.getfixturevalue(data)
+    result = huracanpy.utils.geography.get_continent(data.lon, data.lat)
+    assert (result == expected).all()

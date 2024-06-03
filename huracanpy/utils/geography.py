@@ -149,3 +149,15 @@ def get_country(lon, lat, resolution="10m", crs=None):
         resolution=resolution,
         crs=crs,
     )
+
+
+def get_continent(lon, lat, resolution="10m", crs=None):
+    return _get_natural_earth_feature(
+        lon,
+        lat,
+        feature="CONTINENT",
+        category="cultural",
+        name="admin_0_countries",
+        resolution=resolution,
+        crs=crs,
+    )
