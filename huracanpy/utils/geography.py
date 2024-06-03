@@ -90,7 +90,7 @@ def get_basin(lon, lat, convention="WMO", crs=None):
 
 
 @preprocess_and_wrap(wrap_like="lon")
-def _get_natural_earth_feature(lon, lat, feature, category, name, resolution):
+def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, crs=None):
     fname = natural_earth(resolution=resolution, category=category, name=name)
     df = gpd.read_file(fname)
 
@@ -102,6 +102,12 @@ def _get_natural_earth_feature(lon, lat, feature, category, name, resolution):
             warnings.filterwarnings("ignore", category=UnitStrippedWarning)
             lon = np.array(lon)
             lat = np.array(lat)
+
+    if crs is None:
+        crs = Geodetic()
+    xyz = PlateCarree().transform_points(crs, lon, lat)
+    lon = xyz[:, 0]
+    lat = xyz[:, 1]
 
     # Any strings are loaded in as objects. Use the specific string type with the
     # maximum possible length for the output instead
@@ -117,7 +123,7 @@ def _get_natural_earth_feature(lon, lat, feature, category, name, resolution):
     return result
 
 
-def get_land_or_ocean(lon, lat, resolution="10m"):
+def get_land_or_ocean(lon, lat, resolution="10m", crs=None):
     is_ocean = _get_natural_earth_feature(
         lon,
         lat,
@@ -125,6 +131,7 @@ def get_land_or_ocean(lon, lat, resolution="10m"):
         category="physical",
         name="ocean",
         resolution=resolution,
+        crs=crs,
     )
 
     is_ocean[is_ocean == ""] = "Land"
@@ -132,7 +139,7 @@ def get_land_or_ocean(lon, lat, resolution="10m"):
     return is_ocean
 
 
-def get_country(lon, lat, resolution="10m"):
+def get_country(lon, lat, resolution="10m", crs=None):
     return _get_natural_earth_feature(
         lon,
         lat,
@@ -140,4 +147,5 @@ def get_country(lon, lat, resolution="10m"):
         category="cultural",
         name="admin_0_countries",
         resolution=resolution,
+        crs=crs,
     )
