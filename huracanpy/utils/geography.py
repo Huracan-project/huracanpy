@@ -12,6 +12,7 @@ from shapely.geometry import Point
 import geopandas as gpd
 from cartopy.io.shapereader import natural_earth
 from metpy.xarray import preprocess_and_wrap
+from cartopy.crs import Geodetic, PlateCarree
 
 from ._basins import basins_def
 
@@ -36,7 +37,7 @@ def get_hemisphere(lat):
 
 
 @preprocess_and_wrap(wrap_like="lon")
-def get_basin(lon, lat, convention="WMO"):
+def get_basin(lon, lat, convention="WMO", crs=None):
     """
     Function to determine the basin of each point, according to the selected convention.
 
@@ -49,6 +50,12 @@ def get_basin(lon, lat, convention="WMO"):
     convention : str
         Name of the basin convention you want to use.
             * WMO
+    crs : cartopy.crs.CRS, optional
+        The coordinate reference system of the lon, lat inputs. The basins are defined
+        in PlateCarree (-180, 180), so this will transform lon/lat to this projection
+        before checking the basin. If None is given, it will use cartopy.crs.Geodetic
+        which is essentially the same, but allows the longitudes to be defined in ranges
+        broader than -180, 180
 
     Returns
     -------
@@ -56,10 +63,13 @@ def get_basin(lon, lat, convention="WMO"):
         The basin series.
         You can append it to your tracks by running tracks["basin"] = get_basin(tracks)
     """
+    if crs is None:
+        crs = Geodetic()
+    xyz = PlateCarree().transform_points(crs, lon, lat)
 
     B = basins_def[convention]  # Select GeoDataFrame for the convention
     points = pd.DataFrame(
-        dict(coords=list(zip(lon, lat)))
+        dict(coords=list(zip(xyz[:, 0], xyz[:, 1])))
     )  # Create dataframe of points coordinates
     points = gpd.GeoDataFrame(
         points.coords.apply(Point), geometry="coords", crs=B.crs
