@@ -1,14 +1,12 @@
-import numpy as np
-
 import huracanpy
 
 
 def test_duration():
     data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
     d = huracanpy.diags.track_stats.duration(data)
-    assert np.timedelta64(d.min().values, "h") == np.timedelta64(126, "h")
-    assert np.timedelta64(d.max().values, "h") == np.timedelta64(324, "h")
-    assert np.timedelta64(d.mean().values, "h") == np.timedelta64(210, "h")
+    assert d.min() == 126
+    assert d.max() == 324
+    assert d.mean() == 210
 
 
 def test_gen_vals():
