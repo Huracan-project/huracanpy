@@ -9,6 +9,7 @@ __all__ = [
     "diags",
     "plot",
     "assess",
+    "subset",
     "example_csv_file",
     "example_year_file",
     "example_TRACK_file",
@@ -28,3 +29,4 @@ from ._data import (
 from . import diags
 from . import plot
 from . import assess
+from . import subset

@@ -119,12 +119,12 @@ def get_pressure_cat(slp, convention="Klotzbach", slp_units="hPa"):
 
     """
     if not isinstance(slp, pint.Quantity) or slp.unitless:
-        if slp.min() > 10000:
+        if slp.min() > 10000 and slp_units == "hPa":
             print(
                 "Caution, pressure are likely in Pa, they are being converted to hPa "
                 "for categorization. In future specify the units explicitly by passing "
-                'slp_units="hPa" to this function or setting '
-                'slp.attrs["units"] = "hPa"'
+                'slp_units="Pa" to this function or setting '
+                'slp.attrs["units"] = "Pa"'
             )
             slp = slp / 100
 

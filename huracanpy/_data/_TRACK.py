@@ -30,12 +30,12 @@ def _parse(fmt, string, **kwargs):
 
 def parse_date(date, calendar=None):
     if len(date) == 10:  # i.e., YYYYMMDDHH
-        if calendar == "netcdftime":
+        if calendar is not None:
             yr = int(date[0:4])
             mn = int(date[4:6])
             dy = int(date[6:8])
             hr = int(date[8:10])
-            return cftime.datetime(yr, mn, dy, hour=hr, calendar="360_day")
+            return cftime.datetime(yr, mn, dy, hr, calendar=calendar)
         else:
             return datetime.datetime.strptime(date.strip(), "%Y%m%d%H")
     else:

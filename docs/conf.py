@@ -29,6 +29,8 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # Autodoc options
 autodoc_member_order = "bysource"
 
+nbsphinx_prompt_width = "88"
+
 # Options for intersphinx.
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
@@ -45,3 +47,4 @@ intersphinx_mapping = {
 html_theme = "pydata_sphinx_theme"
 html_theme_options = {"github_url": "https://github.com/Huracan-project/huracanpy"}
 html_static_path = ["_static"]
+html_css_files = ["css/custom.css"]
