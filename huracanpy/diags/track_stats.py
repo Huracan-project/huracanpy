@@ -17,11 +17,14 @@ def duration(tracks):
         Duration of each track
 
     """
-    return (
+    duration = (
         tracks.groupby("track_id")
         .map(lambda x: x.time.max() - x.time.min())
         .rename("duration")
     )
+    duration = (duration * 1e-9 / 3600).astype(float)
+    duration.attrs["units"] = "h"
+    return duration
 
 
 def gen_vals(tracks):
