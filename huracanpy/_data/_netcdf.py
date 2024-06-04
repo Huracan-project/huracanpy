@@ -71,6 +71,7 @@ def _find_trajectory_id(dataset):
         return trajectory_id[0]
     else:
         if "track_id" in dataset:
+            dataset["track_id"].attrs["cf_role"] = "trajectory_id"
             return dataset["track_id"]
         else:
             raise ValueError(
