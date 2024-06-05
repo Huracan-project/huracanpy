@@ -4,12 +4,13 @@ from . import _netcdf
 
 
 def save(dataset, filename):
-    """
+    """Save the dataset as either NetCDF or CSV
 
     Parameters
     ----------
     dataset : xarray.Dataset
     filename : str
+        Must end in ".nc" or ".csv"
 
     Returns
     -------
