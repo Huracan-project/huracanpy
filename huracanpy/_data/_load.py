@@ -14,27 +14,69 @@ def load(
     ibtracs_clean=True,
     **kwargs,
 ):
-    """
+    """Load track data
+
+    The optional parameters for different trackers (currently **IBTrACS** and **TRACK**)
+    are named {tracker}_{parameter} (in lower case), e.g. "ibtracs_online".
 
     Parameters
     ----------
-    filename : str
-    tracker : str
+    filename : str, optional
+        The file to be loaded. If `tracker="ibtracs"`, this is not needed as the data is
+        either included in huracanpy or downloaded when called
+    tracker : str, optional
+        If the file is not a CSV or NetCDF (identified by the file extension) then the
+        tracker needs to be specified to decide how to load the data
+
+        * **track**
+        * **csv**, **te**, **tempestextremes**, **uz**:
+        * **ibtracs**
+
     add_info : bool, default=False
     ibtracs_online : bool, default=False
-        * False: Use a small subset of the IBTrACS data included in this package
-        * True: Download the IBTrACS data
+        * **False**: Use a small subset of the IBTrACS data included in this package
+        * **True**: Download the IBTrACS data
     ibtracs_subset : str, default="ALL"
-        IBTrACS subset. Can be one of
-        * ACTIVE: TCs currently active
-        * ALL: Entire IBTrACS database
-        * Specific basins: EP, NA, NI, SA, SI, SP, WP
-        * last3years: self-explanatory
-        * since1980: Entire IBTrACS database since 1980 (advent of satellite era, considered reliable from then on)
+        IBTrACS subset. When loading offline data it is one of
+
+        * **WMO**: Data with the wmo_* variables. The data as reported by the WMO agency
+          responsible for each basin, so methods are not consistent across basins
+        * **USA** or **JTWC**: Data with the usa_* variables. The data as recorded by
+          the USA/Joint Typhoon Warning Centre. Methods are consistent across basins,
+          but may not be complete.
+
+        If you are downloading the online data, the subsets are the different files
+        provided by IBTrACS
+
+        * **ACTIVE**: TCs currently active
+        * **ALL**: Entire IBTrACS database
+        * Specific basins: **EP**, **NA**, **NI**, **SA**, **SI**, **SP**, **WP**
+        * **last3years**: self-explanatory
+        * **since1980**: Entire IBTrACS database since 1980 (advent of satellite era,
+          considered reliable from then on)
+
     ibtracs_clean : bool, default=True
         If downloading IBTrACS data, this parameter says whether to delete the
         downloaded file after loading it into memory.
     **kwargs
+        When loading tracks from a netCDF file, these keyword arguments will be passed
+        to :func:`xarray.open_dataset`
+
+        When loading tracks from a TRACK ASCII file, the following arguments can be used
+
+        * variable_names : list of str, optional
+
+          When loading data from a TRACK ASCII file, specify the list of variables that
+          have been added to the tracks. This does not include time/lon/lat/vorticity
+          which are in the track by default. If vorticity at multiple levels has been
+          added to the tracks, then a variable name for each level needs to be included.
+          If the variable names are not given, then any additional variables will be
+          named variable_n, where n goes from 0 to the number of variables
+        * track_calendar : str, optional
+
+          When loading data from a TRACK ASCII file, if the data uses a different calendar
+          to the default :class:`datetime.datetime`, then you can pass this argument to
+          load the times in as :class:`cftime.datetime` with the given calendar instead
 
     Returns
     -------
