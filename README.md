@@ -1,9 +1,10 @@
 # huracanpy
+[![Documentation Status](https://readthedocs.org/projects/huracanpy/badge/?version=latest)](https://huracanpy.readthedocs.io/en/latest/?badge=latest)
 
 A python package for working with various forms of feature tracking data
 
 ## Installation
-To install the package, you can use `pip`: `pip install huracanpy`.
+To install the package, you can use `pip`: `pip install --pre huracanpy`.
 
 This can fail with older python versions due to issues with installing cartopy through
 pip. If this happens, use conda to install cartopy first
