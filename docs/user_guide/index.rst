@@ -67,20 +67,10 @@ allows us to easily loop over or index tracks in this format.
    for track_id, track in track_groups:
        # Do something with the track
 
-
-csv tracks data
-^^^^^^^^^^^^^^^
-If you tracks are stored in csv (including if they were outputed from TempestExtremes' StitchNodes),
-you can specify the ``tracker="csv"`` argument, or, if your filename ends with *csv*, it will be detected automatically.
-
-TRACK tracks data
-^^^^^^^^^^^^^^^^^
-If your tracks are in TRACK format, use the `tracker="TRACK"` option
-
 .. toctree::
     :maxdepth: 4
     :hidden:
 
     self
-    extract
     data
+    extract
