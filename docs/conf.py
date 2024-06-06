@@ -40,6 +40,7 @@ intersphinx_mapping = {
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
     "xarray": ("https://docs.xarray.dev/en/stable/", None),
     "cartopy": ("https://scitools.org.uk/cartopy/docs/latest", None),
+    "cftime": ("https://unidata.github.io/cftime/", None),
 }
 
 # -- Options for HTML output -------------------------------------------------
