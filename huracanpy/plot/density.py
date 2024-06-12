@@ -12,7 +12,7 @@ def plot_density(
     d,
     contourf_kws=dict(cmap="magma_r", levels=10),
     subplot_kws=dict(projection=ccrs.PlateCarree(180)),
-    fig_kws=None,
+    fig_kws=dict(),
 ):
     fig, ax = plt.subplots(subplot_kw=subplot_kws, **fig_kws)
     ax.coastlines()
