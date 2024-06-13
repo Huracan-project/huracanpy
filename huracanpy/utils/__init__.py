@@ -29,16 +29,40 @@ def add_all_info(
 
     Parameters
     ----------
-    data : TYPE
-        DESCRIPTION.
-    lat_name : TYPE, optional
-        DESCRIPTION. The default is "lat".
-    lon_name : TYPE, optional
-        DESCRIPTION. The default is "lon".
+    data : the tracks xarray object
+    lat_name : str, optional
+        Name of the latitude variable. The default is "lat".
+    lon_name : str, optional
+        Name of the longitude variable. The default is "lon".
+    track_id_name : str, optional
+        Name of the track ID variable.. The default is "track_id".
+    time_name : str, optional
+        Name of the time variable. If set to None, no time-related attributes are computed. The default is "time".
+    year_name : str, optional
+        Name of the year variable. The default is "year".
+    month_name : str, optional
+        Name of the month variable. The default is "month".
+    day_name : str, optional
+        Name of the day variable. The default is "day".
+    hour_name : str, optional
+        Name of the hour variable. The default is "hour".
+    wind_name : str, optional
+        Name of the winf variable. The default is "wind10".
+    wind_units : str, optional
+        The default is "m s-1".
+    slp_name : str, optional
+        Name of the SLP variable. The default is "slp".
+    slp_units : str, optional
+        The default is "hPa".
+    sshs_convention : str, optional
+        The default is "Saffir-Simpson".
+    pres_cat_convention : str, optional
+        The default is "Klotzbach".
 
     Returns
     -------
-    None.
+    data : xr.DataSet
+        Input dataset with additional info.
 
     """
 
