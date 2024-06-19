@@ -10,7 +10,7 @@ def load(
     tracker=None,
     add_info=False,
     ibtracs_online=False,
-    ibtracs_subset="ALL",
+    ibtracs_subset="wmo",
     ibtracs_clean=True,
     **kwargs,
 ):
