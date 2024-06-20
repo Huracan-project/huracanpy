@@ -20,7 +20,13 @@ def plot_tracks_basic(
     fig, ax = plt.subplots(subplot_kw=subplot_kws, **fig_kws)
     ax.coastlines()
     sns.scatterplot(
-        data=tracks, x="lon", y="lat", hue=intensity_var, ax=ax, **scatter_kws
+        data=tracks,
+        x="lon",
+        y="lat",
+        hue=intensity_var,
+        ax=ax,
+        **scatter_kws,
+        transform=ccrs.PlateCarree(),
     )
 
     return fig, ax
