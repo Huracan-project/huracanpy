@@ -20,7 +20,7 @@ dependencies = [
     "netcdf4",
     "haversine",
     "cartopy",
-    "matplotlib-venn",
+    "matplotlib-venn<1",
     "metpy",
 ]
 
