@@ -14,6 +14,7 @@ __all__ = [
     "example_year_file",
     "example_TRACK_file",
     "example_TRACK_netcdf_file",
+    "example_TE_file",
 ]
 
 
@@ -25,6 +26,7 @@ from ._data import (
     example_year_file,
     example_TRACK_file,
     example_TRACK_netcdf_file,
+    example_TE_file,
 )
 from . import diags
 from . import plot
