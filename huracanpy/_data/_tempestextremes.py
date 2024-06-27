@@ -5,7 +5,10 @@ import xarray as xr
 
 
 def load(
-    filename, variable_names=None, is_unstructured_grid=False, header_delim_str="start"
+    filename,
+    variable_names=None,
+    tempest_extremes_unstructured=False,
+    tempest_extremes_header_str="start",
 ):
     output = list()
 
@@ -18,7 +21,7 @@ def load(
 
     # Just in case there are any empty lines at the start of the file
     # This can probably be deleted
-    while not data[lineno].split()[0] == header_delim_str:
+    while not data[lineno].split()[0] == tempest_extremes_header_str:
         lineno += 1
 
     nfields = len(data[lineno + 1].split())
@@ -27,7 +30,7 @@ def load(
     # i, j for structures grid. Single index for unstructured
     # Last four variables are year, month, day, hour
     varnames = ["i", "lon", "lat"]
-    if not is_unstructured_grid:
+    if not tempest_extremes_unstructured:
         varnames.insert(1, "j")
 
     if variable_names is None:

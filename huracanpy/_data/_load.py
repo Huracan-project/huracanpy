@@ -10,12 +10,15 @@ def load(
     ibtracs_online=False,
     ibtracs_subset="wmo",
     ibtracs_clean=True,
+    tempest_extremes_unstructured=False,
+    tempest_extremes_header_str="start",
     **kwargs,
 ):
     """Load track data
 
-    The optional parameters for different trackers (currently **IBTrACS** and **TRACK**)
-    are named {tracker}_{parameter} (in lower case), e.g. "ibtracs_online".
+    The optional parameters for different trackers (currently **IBTrACS**, **TRACK** and
+    **TempestExtremes**) are named {tracker}_{parameter} (in lower case),
+    e.g. "ibtracs_online".
 
     Parameters
     ----------
@@ -56,6 +59,14 @@ def load(
     ibtracs_clean : bool, default=True
         If downloading IBTrACS data, this parameter says whether to delete the
         downloaded file after loading it into memory.
+
+    tempest_extremes_unstructured : bool, default=False,
+        By default the first two columns in TempestExtremes files are the i, j indices
+        of the closest gridpoint, but for unstructured grids it is a single lookup index
+        so there is one less column
+    tempest_extremes_header_str : str, default="start"
+        This is an option in the Colin's load function, so I assume this can change
+        between files
     **kwargs
         When loading tracks from a netCDF file, these keyword arguments will be passed
         to :func:`xarray.open_dataset`
