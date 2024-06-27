@@ -11,7 +11,7 @@ def test_load_track():
 
 
 def test_load_csv():
-    data = huracanpy.load(huracanpy.example_csv_file, tracker="tempestextremes")
+    data = huracanpy.load(huracanpy.example_csv_file)
     assert len(data) == 13
     assert len(data.time) == 99
     assert len(data.groupby("track_id")) == 3
@@ -25,12 +25,21 @@ def test_load_netcdf():
     assert len(np.unique(track_id)) == 86
 
 
+def test_load_tempest():
+    data = huracanpy.load(huracanpy.example_TE_file, tracker="tempestextremes")
+
+    assert len(data.time) == 210
+    assert len(data.track_id) == 210
+    assert len(data.groupby("track_id")) == 8
+
+
 @pytest.mark.parametrize(
     "filename,tracker",
     [
         (huracanpy.example_TRACK_file, "TRACK"),
         (huracanpy.example_TRACK_netcdf_file, None),
         (huracanpy.example_csv_file, None),
+        (huracanpy.example_TE_file, "tempestextremes"),
     ],
 )
 def test_save_netcdf(filename, tracker, tmp_path):
@@ -60,6 +69,7 @@ def test_save_netcdf(filename, tracker, tmp_path):
     [
         (huracanpy.example_TRACK_file, "TRACK"),
         (huracanpy.example_csv_file, None),
+        (huracanpy.example_TE_file, "tempestextremes"),
     ],
 )
 def test_save_csv(filename, tracker, tmp_path):

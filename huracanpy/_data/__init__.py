@@ -29,3 +29,5 @@ example_TRACK_netcdf_file = str(
     testdata_dir
     / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind.tcident.new.nc"
 )
+
+example_TE_file = str(testdata_dir / "TempestExtremes-sample.txt")

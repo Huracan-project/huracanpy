@@ -1,6 +1,4 @@
-from . import _csv
-from . import _TRACK
-from . import _netcdf
+from . import _csv, _TRACK, _netcdf, _tempestextremes
 from . import ibtracs
 from huracanpy import utils
 
@@ -12,12 +10,15 @@ def load(
     ibtracs_online=False,
     ibtracs_subset="wmo",
     ibtracs_clean=True,
+    tempest_extremes_unstructured=False,
+    tempest_extremes_header_str="start",
     **kwargs,
 ):
     """Load track data
 
-    The optional parameters for different trackers (currently **IBTrACS** and **TRACK**)
-    are named {tracker}_{parameter} (in lower case), e.g. "ibtracs_online".
+    The optional parameters for different trackers (currently **IBTrACS**, **TRACK** and
+    **TempestExtremes**) are named {tracker}_{parameter} (in lower case),
+    e.g. "ibtracs_online".
 
     Parameters
     ----------
@@ -29,7 +30,7 @@ def load(
         tracker needs to be specified to decide how to load the data
 
         * **track**
-        * **csv**, **te**, **tempestextremes**, **uz**:
+        * **te**, **tempest**, **tempestextremes**, **uz**:
         * **ibtracs**
 
     add_info : bool, default=False
@@ -58,6 +59,14 @@ def load(
     ibtracs_clean : bool, default=True
         If downloading IBTrACS data, this parameter says whether to delete the
         downloaded file after loading it into memory.
+
+    tempest_extremes_unstructured : bool, default=False,
+        By default the first two columns in TempestExtremes files are the i, j indices
+        of the closest gridpoint, but for unstructured grids it is a single lookup index
+        so there is one less column
+    tempest_extremes_header_str : str, default="start"
+        This is an option in the Colin's load function, so I assume this can change
+        between files
     **kwargs
         When loading tracks from a netCDF file, these keyword arguments will be passed
         to :func:`xarray.open_dataset`
@@ -96,8 +105,10 @@ def load(
     else:
         if tracker.lower() == "track":
             data = _TRACK.load(filename, **kwargs)
-        elif tracker.lower() in ["csv", "te", "tempestextremes", "uz"]:
+        elif tracker.lower() in ["csv", "uz"]:
             data = _csv.load(filename)
+        elif tracker.lower() in ["te", "tempest", "tempestextremes"]:
+            data = _tempestextremes.load(filename, **kwargs)
         elif tracker.lower() == "ibtracs":
             if ibtracs_online:
                 if filename is None:
