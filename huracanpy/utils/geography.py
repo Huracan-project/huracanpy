@@ -89,10 +89,21 @@ def get_basin(lon, lat, convention="WMO", crs=None):
     return basin
 
 
+# Running this on lots of tracks was very slow if the file is reopened every time this
+# is called
+_natural_earth_feature_cache = {}
+
+
 @preprocess_and_wrap(wrap_like="lon")
 def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, crs=None):
-    fname = natural_earth(resolution=resolution, category=category, name=name)
-    df = gpd.read_file(fname)
+    key = f"{category}_{name}_{resolution}_{feature}"
+    if key in _natural_earth_feature_cache:
+        df = _natural_earth_feature_cache[key]
+    else:
+        fname = natural_earth(resolution=resolution, category=category, name=name)
+        df = gpd.read_file(fname)
+        df = df[["geometry", feature]]
+        _natural_earth_feature_cache[key] = df
 
     # The metpy wrapper converting to pint causes errors, but I'm still going to use it
     # because it lets me pass different array_like types for lon/lat without writing
