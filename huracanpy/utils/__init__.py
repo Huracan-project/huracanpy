@@ -1,10 +1,17 @@
 """Huracanpy module for useful auxilliary functions"""
 
-__all__ = ["geography", "category", "time", "add_all_info"]
+__all__ = [
+    "geography",
+    "category",
+    "time",
+    "add_all_info",
+    "interp",
+]
 
 from . import geography
 from . import category
 from . import time
+from . import interp
 
 
 def add_all_info(
