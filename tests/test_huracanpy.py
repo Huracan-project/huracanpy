@@ -33,6 +33,14 @@ def test_load_tempest():
     assert len(data.groupby("track_id")) == 8
 
 
+def test_load_CHAZ():
+    data = huracanpy.load(huracanpy.example_CHAZ_file, tracker="CHAZ")
+
+    assert len(data.record) == 1078
+    assert data.lifelength.max() == 124
+    assert data.stormID.max() == 19
+
+
 @pytest.mark.parametrize(
     "filename,tracker",
     [
