@@ -7,6 +7,7 @@ __all__ = [
     "example_year_file",
     "example_TRACK_file",
     "example_TRACK_netcdf_file",
+    "example_CHAZ_file",
 ]
 
 import pathlib
@@ -31,3 +32,5 @@ example_TRACK_netcdf_file = str(
 )
 
 example_TE_file = str(testdata_dir / "TempestExtremes-sample.txt")
+
+example_CHAZ_file = str(testdata_dir / "CHAZ_sample.nc")

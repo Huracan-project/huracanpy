@@ -22,6 +22,7 @@ dependencies = [
     "cartopy",
     "matplotlib-venn<1",
     "metpy",
+    "tqdm",
 ]
 
 [project.optional-dependencies]
