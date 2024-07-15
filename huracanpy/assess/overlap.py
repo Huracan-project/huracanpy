@@ -19,7 +19,7 @@ def overlap(tracks1, tracks2, matches=None):
     pd.Dataframe
         Match dataset with added deltas in days
     """
-    if type(matches) == type(None):
+    if matches is None:
         matches = match_pair(tracks1, tracks2)
     c1, c2 = matches.columns[:2].str.slice(3)
     tracks1, tracks2 = tracks1.to_dataframe(), tracks2.to_dataframe()
