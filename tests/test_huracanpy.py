@@ -41,6 +41,14 @@ def test_load_CHAZ():
     assert data.stormID.max() == 19
 
 
+def test_load_MIT():
+    data = huracanpy.load(huracanpy.example_MIT_file, tracker="MIT")
+
+    assert len(data.record) == 3138
+    assert data.time.max() == 1296000
+    assert data.n_trk.max() == 10
+
+
 @pytest.mark.parametrize(
     "filename,tracker",
     [

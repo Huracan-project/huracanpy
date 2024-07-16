@@ -1,4 +1,4 @@
-from . import _csv, _TRACK, _netcdf, _tempestextremes, _CHAZ
+from . import _csv, _TRACK, _netcdf, _tempestextremes, _CHAZ, _MIT
 from . import ibtracs
 from huracanpy import utils
 
@@ -32,7 +32,7 @@ def load(
         * **track**
         * **te**, **tempest**, **tempestextremes**, **uz**:
         * **ibtracs**
-        * **CHAZ**
+        * **CHAZ**, **MIT**
 
     add_info : bool, default=False
     ibtracs_online : bool, default=False
@@ -112,6 +112,8 @@ def load(
             data = _tempestextremes.load(filename, **kwargs)
         elif tracker.lower() == "chaz":
             data = _CHAZ.load(filename)
+        elif tracker.lower() == "mit":
+            data = _MIT.load(filename)
         elif tracker.lower() == "ibtracs":
             if ibtracs_online:
                 if filename is None:
