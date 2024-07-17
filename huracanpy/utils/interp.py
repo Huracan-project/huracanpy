@@ -32,12 +32,15 @@ def interp_time(
     """
 
     T = []
+
     if prog_bar:
         iter = tqdm(np.unique(data[track_id_name].values))
     else:
         iter = np.unique(data[track_id_name].values)
+
     for tid in iter:
         t = data.where(data[track_id_name] == tid, drop=True)
+        t = t.interpolate_na("record")
         T.append(
             t.set_coords("time")
             .swap_dims({"record": "time"})
