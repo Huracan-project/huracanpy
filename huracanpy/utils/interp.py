@@ -40,7 +40,6 @@ def interp_time(
 
     for tid in iter:
         t = data.where(data[track_id_name] == tid, drop=True)
-        t = t.interpolate_na("record")
         T.append(
             t.set_coords("time")
             .swap_dims({"record": "time"})
