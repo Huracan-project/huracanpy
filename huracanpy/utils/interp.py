@@ -10,6 +10,7 @@ def interp_time(
     data,
     freq="1h",
     track_id_name="track_id",
+    prog_bar=False,
 ):
     """
     Function to interpolate track data at a given frequency.
@@ -31,7 +32,11 @@ def interp_time(
     """
 
     T = []
-    for tid in tqdm(np.unique(data[track_id_name].values)):
+    if prog_bar:
+        iter = tqdm(np.unique(data[track_id_name].values))
+    else:
+        iter = np.unique(data[track_id_name].values)
+    for tid in iter:
         t = data.where(data[track_id_name] == tid, drop=True)
         T.append(
             t.set_coords("time")
