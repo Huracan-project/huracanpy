@@ -40,51 +40,29 @@ def test_load_MIT():
 
 
 @pytest.mark.parametrize(
-    "filename,tracker",
+    "filename, tracker",
     [
         (huracanpy.example_TRACK_file, "TRACK"),
         (huracanpy.example_TRACK_netcdf_file, None),
         (huracanpy.example_csv_file, None),
+        (huracanpy.example_parquet_file, None),
         (huracanpy.example_TE_file, "tempestextremes"),
     ],
 )
-def test_save_netcdf(filename, tracker, tmp_path):
+@pytest.mark.parametrize("extension", ["csv", "nc"])
+def test_save(filename, tracker, extension, tmp_path):
+    if filename == huracanpy.example_TRACK_netcdf_file and extension == "csv":
+        pytest.skip(
+            "The netCDF file has multiple dimensions so fails because converting to a"
+            " dataframe leads to having rows equal to the product of the dimensions"
+            " even though the dimensions cover different variables"
+        )
     data = huracanpy.load(filename, tracker=tracker)
     # Copy the data because save modifies the dataset at the moment
-    huracanpy.save(data.copy(), str(tmp_path / "tmp_file.nc"))
+    huracanpy.save(data.copy(), str(tmp_path / f"tmp_file.{extension}"))
 
     # Reload the data and check it is still the same
-    data_ = huracanpy.load(str(tmp_path / "tmp_file.nc"))
-
-    for var in list(data_.variables) + list(data_.coords):
-        # Work around for xarray inconsistent loading the data as float or double
-        # depending on fill_value and scale_factor
-        # np.testing.assert_allclose doesn't work for datetime64
-        if np.issubdtype(data[var].dtype, np.datetime64):
-            assert (data[var].data == data_[var].data).all()
-        elif data[var].dtype != data_[var].dtype:
-            np.testing.assert_allclose(
-                data[var].data.astype(data_[var].dtype), data_[var].data, rtol=1e-6
-            )
-        else:
-            np.testing.assert_allclose(data[var].data, data_[var].data, rtol=0)
-
-
-@pytest.mark.parametrize(
-    "filename,tracker",
-    [
-        (huracanpy.example_TRACK_file, "TRACK"),
-        (huracanpy.example_csv_file, None),
-        (huracanpy.example_TE_file, "tempestextremes"),
-    ],
-)
-def test_save_csv(filename, tracker, tmp_path):
-    data = huracanpy.load(filename, tracker=tracker)
-    # Copy the data because save modifies the dataset at the moment
-    huracanpy.save(data.copy(), str(tmp_path / "tmp_file.csv"))
-
-    # Reload the data and check it is still the same
-    data_ = huracanpy.load(str(tmp_path / "tmp_file.csv"))
+    data_ = huracanpy.load(str(tmp_path / f"tmp_file.{extension}"))
 
     for var in list(data_.variables) + list(data_.coords):
         # Work around for xarray inconsistent loading the data as float or double
