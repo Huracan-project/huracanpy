@@ -4,37 +4,23 @@ import numpy as np
 import huracanpy
 
 
-def test_load_track():
-    data = huracanpy.load(huracanpy.example_TRACK_file, tracker="TRACK")
-    assert len(data.groupby("track_id")) == 2
+@pytest.mark.parametrize(
+    "filename, kwargs, nvars, ncoords, npoints, ntracks",
+    [
+        (huracanpy.example_TRACK_file, dict(tracker="TRACK"), 35, 0, 46, 2),
+        (huracanpy.example_csv_file, dict(), 13, 1, 99, 3),
+        (huracanpy.example_parquet_file, dict(), 13, 1, 99, 3),
+        (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86),
+        (huracanpy.example_TE_file, dict(tracker="tempestextremes"), 8, 0, 210, 8),
+    ],
+)
+def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
+    data = huracanpy.load(filename, **kwargs)
 
-
-def test_load_csv():
-    data = huracanpy.load(huracanpy.example_csv_file)
-    assert len(data) == 13
-    assert len(data.time) == 99
-    assert len(data.groupby("track_id")) == 3
-
-
-def test_load_parquet():
-    data = huracanpy.load(huracanpy.example_parquet_file)
-    assert len(data) == 13
-    assert len(data.time) == 99
-    assert len(data.groupby("track_id")) == 3
-
-
-def test_load_netcdf():
-    data = huracanpy.load(huracanpy.example_TRACK_netcdf_file)
-    assert len(data.time) == 4580
-    assert len(data.groupby("track_id")) == 86
-
-
-def test_load_tempest():
-    data = huracanpy.load(huracanpy.example_TE_file, tracker="tempestextremes")
-
-    assert len(data.time) == 210
-    assert len(data.track_id) == 210
-    assert len(data.groupby("track_id")) == 8
+    assert len(data) == nvars
+    assert len(data.coords) == ncoords
+    assert len(data.time) == npoints
+    assert len(data.groupby("track_id")) == ntracks
 
 
 def test_load_CHAZ():
@@ -70,7 +56,7 @@ def test_save_netcdf(filename, tracker, tmp_path):
     # Reload the data and check it is still the same
     data_ = huracanpy.load(str(tmp_path / "tmp_file.nc"))
 
-    for var in data_.variables:
+    for var in list(data_.variables) + list(data_.coords):
         # Work around for xarray inconsistent loading the data as float or double
         # depending on fill_value and scale_factor
         # np.testing.assert_allclose doesn't work for datetime64
@@ -100,7 +86,7 @@ def test_save_csv(filename, tracker, tmp_path):
     # Reload the data and check it is still the same
     data_ = huracanpy.load(str(tmp_path / "tmp_file.csv"))
 
-    for var in data_.variables:
+    for var in list(data_.variables) + list(data_.coords):
         # Work around for xarray inconsistent loading the data as float or double
         # depending on fill_value and scale_factor
         # np.testing.assert_allclose doesn't work for datetime64
@@ -127,4 +113,5 @@ def test_ibtracs_offline(subset, length):
     assert (
         len(ib.time) > 0
     )  # Can't assert on dataset length, because it might change with updates.
-    assert (len(ib)) == length
+    assert len(ib) == length
+    assert len(ib.coords) == 1
