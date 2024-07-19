@@ -4,40 +4,22 @@ import numpy as np
 import huracanpy
 
 
-def test_load_track():
-    data = huracanpy.load(huracanpy.example_TRACK_file, tracker="TRACK")
+@pytest.mark.parametrize(
+    "filename, kwargs, nvars, ncoords, npoints, ntracks",
+    [
+        (huracanpy.example_TRACK_file, dict(tracker="TRACK"), 33, 2, 46, 2),
+        (huracanpy.example_csv_file, dict(), 11, 3, 99, 3),
+        (huracanpy.example_TRACK_netcdf_file, dict(), 19, 18, 4580, 86),
+        (huracanpy.example_TE_file, dict(tracker="tempestextremes"), 6, 2, 210, 8),
+    ],
+)
+def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
+    data = huracanpy.load(filename, **kwargs)
 
-    assert len(data) == 33
-    assert len(data.coords) == 2
-    assert len(data.time) == 46
-    assert len(data.groupby("track_id")) == 2
-
-
-def test_load_csv():
-    data = huracanpy.load(huracanpy.example_csv_file)
-
-    assert len(data) == 11
-    assert len(data.coords) == 3
-    assert len(data.time) == 99
-    assert len(data.groupby("track_id")) == 3
-
-
-def test_load_netcdf():
-    data = huracanpy.load(huracanpy.example_TRACK_netcdf_file)
-
-    assert len(data) == 19
-    assert len(data.coords) == 18
-    assert len(data.time) == 4580
-    assert len(data.groupby("track_id")) == 86
-
-
-def test_load_tempest():
-    data = huracanpy.load(huracanpy.example_TE_file, tracker="tempestextremes")
-
-    assert len(data) == 6
-    assert len(data.coords) == 2
-    assert len(data.time) == 210
-    assert len(data.groupby("track_id")) == 8
+    assert len(data) == nvars
+    assert len(data.coords) == ncoords
+    assert len(data.time) == npoints
+    assert len(data.groupby("track_id")) == ntracks
 
 
 def test_load_CHAZ():
