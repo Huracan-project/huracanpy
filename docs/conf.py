@@ -41,6 +41,7 @@ intersphinx_mapping = {
     "xarray": ("https://docs.xarray.dev/en/stable/", None),
     "cartopy": ("https://scitools.org.uk/cartopy/docs/latest", None),
     "cftime": ("https://unidata.github.io/cftime/", None),
+    "metpy": ("https://unidata.github.io/MetPy/latest/", None),
 }
 
 # -- Options for HTML output -------------------------------------------------
