@@ -17,6 +17,13 @@ def test_load_csv():
     assert len(data.groupby("track_id")) == 3
 
 
+def test_load_parquet():
+    data = huracanpy.load(huracanpy.example_parquet_file)
+    assert len(data) == 13
+    assert len(data.time) == 99
+    assert len(data.groupby("track_id")) == 3
+
+
 def test_load_netcdf():
     data = huracanpy.load(huracanpy.example_TRACK_netcdf_file)
     assert len(data.time) == 4580
