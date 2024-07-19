@@ -23,6 +23,7 @@ dependencies = [
     "matplotlib-venn<1",
     "metpy",
     "tqdm",
+    "pyarrow",
 ]
 
 [project.optional-dependencies]
