@@ -2,7 +2,6 @@ import pytest
 import numpy as np
 
 import huracanpy
-from huracanpy._data._netcdf import _find_trajectory_id
 
 
 def test_load_track():
@@ -27,9 +26,7 @@ def test_load_parquet():
 def test_load_netcdf():
     data = huracanpy.load(huracanpy.example_TRACK_netcdf_file)
     assert len(data.time) == 4580
-    track_id = _find_trajectory_id(data)
-    assert len(track_id) == 4580
-    assert len(np.unique(track_id)) == 86
+    assert len(data.groupby("track_id")) == 86
 
 
 def test_load_tempest():
