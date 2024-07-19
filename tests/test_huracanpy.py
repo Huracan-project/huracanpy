@@ -7,18 +7,27 @@ from huracanpy._data._netcdf import _find_trajectory_id
 
 def test_load_track():
     data = huracanpy.load(huracanpy.example_TRACK_file, tracker="TRACK")
+
+    assert len(data) == 33
+    assert len(data.coords) == 2
+    assert len(data.time) == 46
     assert len(data.groupby("track_id")) == 2
 
 
 def test_load_csv():
     data = huracanpy.load(huracanpy.example_csv_file)
-    assert len(data) == 13
+
+    assert len(data) == 11
+    assert len(data.coords) == 3
     assert len(data.time) == 99
     assert len(data.groupby("track_id")) == 3
 
 
 def test_load_netcdf():
     data = huracanpy.load(huracanpy.example_TRACK_netcdf_file)
+
+    assert len(data) == 19
+    assert len(data.coords) == 18
     assert len(data.time) == 4580
     track_id = _find_trajectory_id(data)
     assert len(track_id) == 4580
@@ -28,8 +37,9 @@ def test_load_netcdf():
 def test_load_tempest():
     data = huracanpy.load(huracanpy.example_TE_file, tracker="tempestextremes")
 
+    assert len(data) == 6
+    assert len(data.coords) == 2
     assert len(data.time) == 210
-    assert len(data.track_id) == 210
     assert len(data.groupby("track_id")) == 8
 
 
@@ -66,7 +76,7 @@ def test_save_netcdf(filename, tracker, tmp_path):
     # Reload the data and check it is still the same
     data_ = huracanpy.load(str(tmp_path / "tmp_file.nc"))
 
-    for var in data_.variables:
+    for var in list(data_.variables) + list(data_.coords):
         # Work around for xarray inconsistent loading the data as float or double
         # depending on fill_value and scale_factor
         # np.testing.assert_allclose doesn't work for datetime64
@@ -96,7 +106,7 @@ def test_save_csv(filename, tracker, tmp_path):
     # Reload the data and check it is still the same
     data_ = huracanpy.load(str(tmp_path / "tmp_file.csv"))
 
-    for var in data_.variables:
+    for var in list(data_.variables) + list(data_.coords):
         # Work around for xarray inconsistent loading the data as float or double
         # depending on fill_value and scale_factor
         # np.testing.assert_allclose doesn't work for datetime64
@@ -113,8 +123,8 @@ def test_save_csv(filename, tracker, tmp_path):
 @pytest.mark.parametrize(
     "subset,length",
     [
-        ("wmo", 8),
-        ("usa", 10),
+        ("wmo", 6),
+        ("usa", 8),
     ],
 )
 def test_ibtracs_offline(subset, length):
@@ -123,4 +133,5 @@ def test_ibtracs_offline(subset, length):
     assert (
         len(ib.time) > 0
     )  # Can't assert on dataset length, because it might change with updates.
-    assert (len(ib)) == length
+    assert len(ib) == length
+    assert len(ib.coords) == 3

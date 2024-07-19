@@ -86,7 +86,7 @@ def add_all_info(
 
     # Time
     if time_name is not None:
-        if time_name not in list(data.keys()):
+        if time_name not in list(data) + list(data.coords):
             data[time_name] = time.get_time(
                 data[year_name],
                 data[month_name],

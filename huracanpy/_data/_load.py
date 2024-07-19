@@ -141,6 +141,9 @@ def load(
         else:
             raise ValueError(f"Tracker {tracker} unsupported or misspelled")
 
+    if "track_id" in list(data):
+        data = data.set_coords(["track_id", "time"])
+
     if add_info:  # TODO : Manage potentially different variable names
         data["hemisphere"] = utils.geography.get_hemisphere(data.lat)
         data["basin"] = utils.geography.get_basin(data.lon, data.lat)
