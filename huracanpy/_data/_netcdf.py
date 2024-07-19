@@ -24,11 +24,11 @@ def load(filename, **kwargs):
     for npoints, tr_id in zip(rowsize.data, trajectory_id.data):
         trajectory_id_stretched.extend([tr_id] * npoints)
 
-    dataset[trajectory_id.name] = (sample_dimension, trajectory_id_stretched)
+    dataset["track_id"] = (sample_dimension, trajectory_id_stretched)
     # Keep attributes (including cf_role)
-    dataset[trajectory_id.name].attrs = trajectory_id.attrs
+    dataset["track_id"].attrs = trajectory_id.attrs
 
-    return dataset.drop_vars(rowsize.name)
+    return dataset.drop_vars([trajectory_id.name, rowsize.name])
 
 
 def save(dataset, filename):
