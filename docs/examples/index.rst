@@ -11,4 +11,5 @@ Examples
     IBTrACS
     plot_tracks
     track_density
+    doughnuts
     utils
