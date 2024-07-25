@@ -8,16 +8,24 @@ from metpy.xarray import preprocess_and_wrap
 from metpy.units import units
 
 
-def ace(wind, threshold=34 * units("knots"), wind_units="m s-1"):
+def ace(
+    tracks,
+    wind,
+    threshold=34 * units("knots"),
+    wind_units="m s-1",
+    keep_ace_by_point=False,
+):
     r"""Calculate accumulate cyclone energy (ACE) for each track
 
     .. math:: \mathrm{ACE} = 10^{-4} \sum v_\mathrm{max}^2 \quad (v_\mathrm{max} \ge 34 \mathrm{kn})
 
     Parameters
     ----------
+    tracks : xarray.Dataset
+        Full dataset of tracks data. Must have an associated "track_id" variable to
+        allow summing for each track
     wind : array_like
-        Maximum velocity of a tropical cyclone. Must also have an associated "track_id"
-        coordinate to allow summing for each track
+        Maximum velocity of a tropical cyclone associated with the tracks dataset
     threshold : scalar, default=34 knots
         ACE is set to zero below this threshold wind speed. The default argument is in
         knots. To pass an argument with units, use :py:mod:`metpy.units`, otherwise any
@@ -26,6 +34,9 @@ def ace(wind, threshold=34 * units("knots"), wind_units="m s-1"):
     wind_units : str, default="m s-1"
         If the units of wind are not specified in the attributes then the function will
         assume it is in these units before converting to knots
+    keep_ace_by_point : bool, default=False
+        If True the ACE calculated from each point of the input wind is saved in the
+        input tracks dataset as "ace"
 
     Returns
     -------
@@ -33,9 +44,12 @@ def ace(wind, threshold=34 * units("knots"), wind_units="m s-1"):
         The ACE for each track in wind
 
     """
-    ace_ = ace_by_point(wind, threshold, wind_units)
+    tracks["ace"] = ace_by_point(wind, threshold, wind_units)
 
-    ace_by_storm = ace_.groupby("track_id").sum()
+    ace_by_storm = tracks.groupby("track_id").map(lambda x: x.ace.sum())
+
+    if not keep_ace_by_point:
+        del tracks["ace"]
 
     return ace_by_storm
 
