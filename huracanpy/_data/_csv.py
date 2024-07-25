@@ -10,6 +10,7 @@ from .. import utils
 
 def load(
     filename,
+    load_function=pd.read_csv,
     read_csv_kws=dict(),
 ):
     """Load csv tracks data as an xarray.Dataset
@@ -29,7 +30,7 @@ def load(
     """
 
     ## Read file
-    tracks = pd.read_csv(filename, **read_csv_kws)
+    tracks = load_function(filename, **read_csv_kws)
     if (
         tracks.columns.str[0][1] == " "
     ):  # Sometimes columns names are read starting with a space, which we remove

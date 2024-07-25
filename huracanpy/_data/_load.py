@@ -1,3 +1,5 @@
+import pandas as pd
+
 from . import _csv, _TRACK, _netcdf, _tempestextremes, _CHAZ, _MIT
 from . import ibtracs
 from huracanpy import utils
@@ -95,8 +97,11 @@ def load(
     """
     # If tracker is not given, try to derive the right function from the file extension
     if tracker is None:
-        if filename.split(".")[-1] == "csv":
-            data = _csv.load(filename)
+        extension = filename.split(".")[-1]
+        if extension == "csv":
+            data = _csv.load(filename, **kwargs)
+        elif extension == "parquet":
+            data = _csv.load(filename, load_function=pd.read_parquet, **kwargs)
         elif filename.split(".")[-1] == "nc":
             data = _netcdf.load(filename, **kwargs)
         else:

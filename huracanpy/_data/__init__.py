@@ -4,9 +4,11 @@ __all__ = [
     "load",
     "save",
     "example_csv_file",
+    "example_parquet_file",
     "example_year_file",
     "example_TRACK_file",
     "example_TRACK_netcdf_file",
+    "example_TE_file",
     "example_CHAZ_file",
     "example_MIT_file",
 ]
@@ -24,6 +26,8 @@ example_TRACK_file = str(
 )
 
 example_csv_file = str(testdata_dir / "sample.csv")
+
+example_parquet_file = str(testdata_dir / "sample.parquet")
 
 example_year_file = str(testdata_dir / "ERA5_1996_UZ.csv")
 
