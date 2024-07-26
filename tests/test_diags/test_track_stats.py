@@ -1,5 +1,15 @@
 import huracanpy
 
+import numpy as np
+
+
+def test_ace(tracks_csv):
+    ace = huracanpy.diags.track_stats.ace(tracks_csv, tracks_csv.wind10)
+
+    np.testing.assert_allclose(ace, np.array([3.03623809, 2.21637375, 4.83686787]))
+
+    assert isinstance(ace.values, np.ndarray)
+
 
 def test_duration():
     data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
