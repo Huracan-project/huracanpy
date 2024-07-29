@@ -8,7 +8,7 @@ def test_ace(tracks_csv):
 
     np.testing.assert_allclose(ace, np.array([3.03623809, 2.21637375, 4.83686787]))
 
-    assert isinstance(ace.values, np.ndarray)
+    assert isinstance(ace.data, np.ndarray)
 
 
 def test_duration():
