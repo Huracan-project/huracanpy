@@ -84,7 +84,7 @@ def ace_by_point(wind, threshold=34 * units("knots"), wind_units="m s-1"):
     # TODO - extend preprocess_and_wrap to include this if it is needed for more
     #  functions
     if isinstance(ace_values, xr.DataArray) and isinstance(
-        ace_values.values, pint.Quantity
+        ace_values.data, pint.Quantity
     ):
         ace_values = ace_values.metpy.dequantify()
 
