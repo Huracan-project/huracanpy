@@ -8,12 +8,14 @@ from huracanpy import utils
 def load(
     filename=None,
     tracker=None,
+    variable_names=None,
     add_info=False,
     ibtracs_online=False,
     ibtracs_subset="wmo",
     ibtracs_clean=True,
     tempest_extremes_unstructured=False,
     tempest_extremes_header_str="start",
+    track_calendar=None,
     **kwargs,
 ):
     """Load track data
@@ -35,6 +37,16 @@ def load(
         * **te**, **tempest**, **tempestextremes**, **uz**:
         * **ibtracs**
         * **CHAZ**, **MIT**
+
+    variable_names : list of str, optional
+          When loading data from an ASCII file (TRACK or TempestExtremes), specify the
+          list of variables that have been added to the tracks. This does not include
+          variables which are in the track by default (e.g. time/lon/lat/vorticity for
+          TRACK). If a variable at multiple levels has been added to the tracks, then a
+          variable name for each level needs to be included (e.g. vorticity profiles
+          with TRACK). If the variable names are not given, then any additional
+          variables will be named variable_n, where n goes from 0 to the number of
+          variables
 
     add_info : bool, default=False
     ibtracs_online : bool, default=False
@@ -70,25 +82,19 @@ def load(
     tempest_extremes_header_str : str, default="start"
         This is an option in the Colin's load function, so I assume this can change
         between files
+
+    track_calendar : str, optional
+          When loading data from a TRACK ASCII file, if the data uses a different
+          calendar to the default :class:`datetime.datetime`, then you can pass this
+          argument to load the times in as :class:`cftime.datetime` with the given
+          calendar instead
     **kwargs
-        When loading tracks from a netCDF file, these keyword arguments will be passed
-        to :func:`xarray.open_dataset`
+        When loading tracks from a standard files these will be passed to the relevant
+        load function
 
-        When loading tracks from a TRACK ASCII file, the following arguments can be used
-
-        * variable_names : list of str, optional
-
-          When loading data from a TRACK ASCII file, specify the list of variables that
-          have been added to the tracks. This does not include time/lon/lat/vorticity
-          which are in the track by default. If vorticity at multiple levels has been
-          added to the tracks, then a variable name for each level needs to be included.
-          If the variable names are not given, then any additional variables will be
-          named variable_n, where n goes from 0 to the number of variables
-        * track_calendar : str, optional
-
-          When loading data from a TRACK ASCII file, if the data uses a different calendar
-          to the default :class:`datetime.datetime`, then you can pass this argument to
-          load the times in as :class:`cftime.datetime` with the given calendar instead
+        * netCDF file - :func:`xarray.open_dataset`
+        * CSV file - :func:`pandas.read_csv`
+        * parquet file - :func:`pandas.read_parquet`
 
     Returns
     -------
@@ -110,11 +116,18 @@ def load(
     # If tracker is given, use the relevant function
     else:
         if tracker.lower() == "track":
-            data = _TRACK.load(filename, **kwargs)
+            data = _TRACK.load(
+                filename, calendar=track_calendar, variable_names=variable_names
+            )
         elif tracker.lower() in ["csv", "uz"]:
             data = _csv.load(filename)
         elif tracker.lower() in ["te", "tempest", "tempestextremes"]:
-            data = _tempestextremes.load(filename, **kwargs)
+            data = _tempestextremes.load(
+                filename,
+                variable_names,
+                tempest_extremes_unstructured,
+                tempest_extremes_header_str,
+            )
         elif tracker.lower() == "chaz":
             data = _CHAZ.load(filename)
         elif tracker.lower() == "mit":
