@@ -64,7 +64,7 @@ def test_save(filename, tracker, extension, tmp_path):
     # Reload the data and check it is still the same
     data_ = huracanpy.load(str(tmp_path / f"tmp_file.{extension}"))
 
-    for var in list(data_.variables) + list(data_.coords):
+    for var in list(data.variables) + list(data.coords):
         # Work around for xarray inconsistent loading the data as float or double
         # depending on fill_value and scale_factor
         # np.testing.assert_allclose doesn't work for datetime64
