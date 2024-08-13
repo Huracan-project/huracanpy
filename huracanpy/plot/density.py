@@ -16,6 +16,6 @@ def plot_density(
 ):
     fig, ax = plt.subplots(subplot_kw=subplot_kws, **fig_kws)
     ax.coastlines()
-    d.where(d > 0).plot.contourf(ax=ax, transform=ccrs.PlateCarree(), **contourf_kws)
+    d.plot.contourf(ax=ax, transform=ccrs.PlateCarree(), **contourf_kws)
 
     return fig, ax

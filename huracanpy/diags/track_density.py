@@ -41,4 +41,4 @@ def simple_global_histogram(lon, lat, bin_size=5, N_seasons=1):
     )
     # Format
     da = da.where(da > 0).transpose() / N_seasons
-    return da
+    return da.where(~np.isnan(da), drop=True).fillna(0)
