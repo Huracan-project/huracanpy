@@ -2,6 +2,8 @@ import pandas as pd
 import xarray as xr
 
 from .track_stats import duration
+from huracanpy.utils.ace import ace_by_point
+from metpy.units import units
 
 
 def nunique(self):
@@ -36,7 +38,7 @@ def freq(self, by=None, track_id_name="track_id"):
     if by is None:
         return xr.DataArray(self[track_id_name].nunique())
     else:
-        return xr.DataArray(self[track_id_name].nunique() / self[by].nunique())
+        self.groupby(by).apply(freq, by=None).mean()
 
 
 def TC_days(self, by=None, track_id_name="track_id", time_name="time"):
@@ -66,8 +68,40 @@ def TC_days(self, by=None, track_id_name="track_id", time_name="time"):
     if by is None:
         return xr.DataArray(duration(self[time_name], self[track_id_name]).sum() / 24)
     else:
-        return xr.DataArray(
-            duration(self[time_name], self[track_id_name]).sum()
-            / 24
-            / self[by].nunique()
-        )
+        self.groupby(by).apply(TC_days, by=None).mean()
+
+
+def ACE(
+    self, by=None, wind_name="wind", threshold=0 * units("knots"), wind_units="m s-1"
+):
+    """
+    Function to aggregate ACE.
+
+
+    Parameters
+    ----------
+    by : str, optional
+        Variable to normalize frequency. The default is None (which means the cumulated duration in the whole dataset is provided).
+    wind_name : str, optional
+        Name of the variable with wind to compute ACE. The default is "wind".
+    threshold : scalar, default=0 knots
+        ACE is set to zero below this threshold wind speed. The default argument is in
+        knots. To pass an argument with units, use :py:mod:`metpy.units`, otherwise any
+        non-default argument will be assumed to have the units of "wind_units" which is
+        "m s-1" by default.
+    wind_units : str, default="m s-1"
+        If the units of wind are not specified in the attributes then the function will
+        assume it is in these units before converting to knots
+
+    Returns
+    -------
+    xr.DataArray
+        Aggregated ACE.
+
+    """
+    ace = ace_by_point(self[wind_name], threshold, wind_units)
+
+    if by is None:
+        return ace.sum()
+    else:
+        return ace.groupby(self[by]).sum().mean()
