@@ -24,6 +24,12 @@ def translation_speed(data, lat_name="lat", lon_name="lon", time_name="time"):
     data = data.sortby(["track_id", "time"])
     V, lat, lon, t, tid = [], [], [], [], []  # To store results temporarily
 
+    # Convert longitudes beyond 180° (necessary for haversine to work)
+    data[lon_name] = xr.DataArray(
+        np.where(data[lon_name] > 180, data[lon_name] - 360, data[lon_name]),
+        dims=data.dims,
+    )
+
     dims = data.time.dims
     assert len(dims) == 1
     dim = dims[0]
