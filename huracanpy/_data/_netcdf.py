@@ -37,7 +37,10 @@ def save(dataset, filename):
     # Find the variable with cf_role=trajectory_id
     trajectory_id = _find_trajectory_id(dataset)
 
-    # Get the name of the sample dimension. The name "obs" has been used in the load
+    # Sort the dataset along track_id, or the compression-expansion will yield incorrect results
+    dataset = dataset.sortby(trajectory_id)
+
+    # Get the name of the sample dimension. The name "record" has been used in the load
     # functions, but we don't need to assume that is the name. It may be different when
     # loaded from other netCDF files
     sample_dimension = trajectory_id.dims
