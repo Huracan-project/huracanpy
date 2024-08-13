@@ -78,7 +78,7 @@ def duration(time, track_ids):
     return duration
 
 
-def gen_vals(tracks):
+def gen_vals(tracks, time_name="time", track_id_name="track_id"):
     """
     Shows the attributes for the genesis point of each track
 
@@ -93,7 +93,7 @@ def gen_vals(tracks):
 
     """
 
-    return tracks.sortby("time").groupby("track_id").first()
+    return tracks.sortby(time_name).groupby(track_id_name).first()
 
 
 def extremum_vals(tracks, varname, stat="max"):
