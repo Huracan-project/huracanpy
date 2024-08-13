@@ -1,6 +1,8 @@
 import pandas as pd
 import xarray as xr
 
+from .track_stats import duration
+
 
 def nunique(self):
     return pd.Series(self).nunique()
@@ -35,3 +37,32 @@ def freq(self, by=None, track_id_name="track_id"):
         return xr.DataArray(self[track_id_name].nunique())
     else:
         return xr.DataArray(self[track_id_name].nunique() / self[by].nunique())
+
+
+def TC_days(self, by=None, track_id_name="track_id", time_name="time"):
+    """
+    Function to compute the number of "TC days", or cumulated TC duration, potentially normalized by another variable (e.g. season to get yearly TCD).
+
+    Parameters
+    ----------
+    by : str, optional
+        Variable to normalize frequency. The default is None (which means the cumulated duration in the whole dataset is provided).
+    track_id_name : str, optional
+        Name of the unique track identifier variable. The default is "track_id".
+    time_name : str, optional
+        Name of the time variable. The default is "time".
+
+    Returns
+    -------
+    xr.DataArray
+        The number of TC days, or cumulated TC duration.
+
+    """
+    if by is None:
+        return xr.DataArray(duration(self[time_name], self[track_id_name]).sum() / 24)
+    else:
+        return xr.DataArray(
+            duration(self[time_name], self[track_id_name]).sum()
+            / 24
+            / self[by].nunique()
+        )
