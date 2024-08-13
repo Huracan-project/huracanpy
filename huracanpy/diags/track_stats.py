@@ -107,7 +107,7 @@ def _ace_by_point(wind, threshold=34 * units("knots"), wind_units="m s-1"):
     return ace_values
 
 
-def duration(tracks):
+def duration(time, track_ids):
     """
     Compute the duration of each track
 
@@ -122,9 +122,7 @@ def duration(tracks):
 
     """
     duration = (
-        tracks.groupby("track_id")
-        .map(lambda x: x.time.max() - x.time.min())
-        .rename("duration")
+        time.groupby(track_ids).map(lambda x: x.max() - x.min()).rename("duration")
     )
     duration = (duration * 1e-9 / 3600).astype(float)
     duration.attrs["units"] = "h"
