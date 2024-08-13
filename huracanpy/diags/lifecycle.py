@@ -31,7 +31,7 @@ def time_from_genesis(data):
     )
 
 
-def time_from_extremum(data, varname, stat=max):
+def time_from_extremum(data, varname, stat="max"):
     """
 
     Parameters
