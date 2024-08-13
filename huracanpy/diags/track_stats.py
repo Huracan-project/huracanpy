@@ -93,7 +93,7 @@ def ace_by_point(wind, threshold=34 * units("knots"), wind_units="m s-1"):
 
 @preprocess_and_wrap(wrap_like="wind")
 def _ace_by_point(wind, threshold=34 * units("knots"), wind_units="m s-1"):
-    if not isinstance(ace, pint.Quantity) or wind.unitless:
+    if not isinstance(wind, pint.Quantity) or wind.unitless:
         wind = wind * units(wind_units)
     wind = wind.to(units("knots"))
 
