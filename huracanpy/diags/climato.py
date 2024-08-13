@@ -38,7 +38,7 @@ def freq(self, by=None, track_id_name="track_id"):
     if by is None:
         return xr.DataArray(self[track_id_name].nunique())
     else:
-        self.groupby(by).apply(freq, by=None).mean()
+        return self.groupby(by).apply(freq, by=None).mean()
 
 
 def TC_days(self, by=None, track_id_name="track_id", time_name="time"):
@@ -68,7 +68,7 @@ def TC_days(self, by=None, track_id_name="track_id", time_name="time"):
     if by is None:
         return xr.DataArray(duration(self[time_name], self[track_id_name]).sum() / 24)
     else:
-        self.groupby(by).apply(TC_days, by=None).mean()
+        return self.groupby(by).apply(TC_days, by=None).mean()
 
 
 def ACE(
