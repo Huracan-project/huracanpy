@@ -13,6 +13,11 @@ def freq(self, by=None, track_id_name="track_id"):
     """
     Compute the frequency (number of tracks) in a dataset, potentially normalized by another variable (e.g. season to get yearly count).
 
+    If you want to keep the season dimension to get for example the frequency time series, use groupby and apply:
+    >>> data.groupby("season").apply(freq)
+    You can also use groupby and apply to get for example yearly frequency per basin
+    >>> data.groupby("basin").apply(freq, by = "season")
+
     Parameters
     ----------
     by : str, optional
