@@ -53,6 +53,7 @@ def translation_speed(data, lat_name="lat", lon_name="lon", time_name="time"):
 
     # Transform into clean dataset
     V = xr.DataArray(V, dims="mid_record", coords={"mid_record": np.arange(len(V))})
+    V.attrs["units"] = "m s**-1"
     lon = xr.DataArray(
         lon, dims="mid_record", coords={"mid_record": np.arange(len(lon))}
     )
