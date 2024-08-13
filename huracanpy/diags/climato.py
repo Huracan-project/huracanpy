@@ -43,6 +43,11 @@ def TC_days(self, by=None, track_id_name="track_id", time_name="time"):
     """
     Function to compute the number of "TC days", or cumulated TC duration, potentially normalized by another variable (e.g. season to get yearly TCD).
 
+    NB: Duration is computed over the whole lifecycle that is provided in the dataset.
+    If you want the cumulated duration of e.g. only stages with wind above a given threshold, use where to preliminary filter the dataset:
+    >>> TC_days(data.where(data.wind>64), by="season") # Cumulates the number of days with wind above 64 <units>
+    >>> TC_days(data.where(data.stage == "tropical"), by="season") # Cumulates the number of days where the stage has been identified as tropical
+
     Parameters
     ----------
     by : str, optional
