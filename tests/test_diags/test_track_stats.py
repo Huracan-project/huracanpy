@@ -13,7 +13,7 @@ def test_ace(tracks_csv):
 
 def test_duration():
     data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
-    d = huracanpy.diags.track_stats.duration(data)
+    d = huracanpy.diags.track_stats.duration(data.time, data.track_id)
     assert d.min() == 126
     assert d.max() == 324
     assert d.mean() == 210
