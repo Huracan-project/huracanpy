@@ -7,7 +7,7 @@ import numpy as np
 import xarray as xr
 
 
-def translation_speed(data):
+def translation_speed(data, lat_name="lat", lon_name="lon", time_name="time"):
     """
     Compute translation speed along tracks
 
@@ -24,6 +24,12 @@ def translation_speed(data):
     data = data.sortby(["track_id", "time"])
     V, lat, lon, t, tid = [], [], [], [], []  # To store results temporarily
 
+    # Convert longitudes beyond 180° (necessary for haversine to work)
+    data[lon_name] = xr.DataArray(
+        np.where(data[lon_name] > 180, data[lon_name] - 360, data[lon_name]),
+        dims=data.dims,
+    )
+
     dims = data.time.dims
     assert len(dims) == 1
     dim = dims[0]
@@ -33,20 +39,21 @@ def translation_speed(data):
         if p.track_id == q.track_id:  # If both points belong to the same track
             dt = np.timedelta64((q.time - p.time).values, "s")  # Temporal interval in s
             dx = haversine(
-                (p.lat.values[()], p.lon.values[()]),
-                (q.lat.values[()], q.lon.values[()]),
+                (p[lat_name].values[()], p[lon_name].values[()]),
+                (q[lat_name].values[()], q[lon_name].values[()]),
                 unit="m",
             )  # Displacement in m
             v = dx / dt.astype(float)  # translation speed in m/s
             V.append(v)
             # Results will be stored with coordinates corresponding to the middle of p and q
-            lat.append((p.lat + q.lat).values / 2)
-            lon.append((p.lon + q.lon).values / 2)
-            t.append((p.time + (q.time - p.time) / 2).values)
+            lat.append((p[lat_name] + q[lat_name]).values / 2)
+            lon.append((p[lon_name] + q[lon_name]).values / 2)
+            t.append((p[time_name] + (q[time_name] - p[time_name]) / 2).values)
             tid.append(p.track_id.values)
 
     # Transform into clean dataset
     V = xr.DataArray(V, dims="mid_record", coords={"mid_record": np.arange(len(V))})
+    V.attrs["units"] = "m s**-1"
     lon = xr.DataArray(
         lon, dims="mid_record", coords={"mid_record": np.arange(len(lon))}
     )

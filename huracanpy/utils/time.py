@@ -36,7 +36,7 @@ def get_time(year, month, day, hour):
 
 
 @preprocess_and_wrap(wrap_like="track_id")
-def get_season(track_id, lat, time, convention="long"):
+def get_season(track_id, lat, time, convention="short"):
     """
 
 

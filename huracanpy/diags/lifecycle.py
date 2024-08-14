@@ -31,7 +31,7 @@ def time_from_genesis(data):
     )
 
 
-def time_from_extremum(data, varname, stat=max):
+def time_from_extremum(data, varname, stat="max"):
     """
 
     Parameters
@@ -55,5 +55,7 @@ def time_from_extremum(data, varname, stat=max):
     data_df = data_df.merge(extr, on="track_id", suffixes=["_actual", "_extr"])
     time_from_extr = data_df.time_actual - data_df.time_extr
     return (
-        time_from_extr.to_xarray().rename({"index": "obs"}).rename("time_from_extremum")
+        time_from_extr.to_xarray()
+        .rename({"index": data[varname].dims[0]})
+        .rename("time_from_extremum")
     )

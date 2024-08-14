@@ -1,17 +1,12 @@
 """Huracanpy module for useful auxilliary functions"""
 
-__all__ = [
-    "geography",
-    "category",
-    "time",
-    "add_all_info",
-    "interp",
-]
+__all__ = ["geography", "category", "time", "add_all_info", "interp", "ace"]
 
 from . import geography
 from . import category
 from . import time
 from . import interp
+from . import ace
 
 
 def add_all_info(
@@ -30,6 +25,7 @@ def add_all_info(
     slp_units="hPa",
     sshs_convention="Saffir-Simpson",
     pres_cat_convention="Klotzbach",
+    season_convention="short",
 ):
     """
 
@@ -94,7 +90,10 @@ def add_all_info(
                 data[hour_name],
             )
         data["season"] = time.get_season(
-            data[track_id_name], data[lat_name], data[time_name]
+            data[track_id_name],
+            data[lat_name],
+            data[time_name],
+            convention=season_convention,
         )
 
     # Category

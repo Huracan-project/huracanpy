@@ -4,7 +4,7 @@ import numpy as np
 
 
 def test_ace(tracks_csv):
-    ace = huracanpy.diags.track_stats.ace(tracks_csv, tracks_csv.wind10)
+    ace = huracanpy.diags.track_stats.ace_by_track(tracks_csv, tracks_csv.wind10)
 
     np.testing.assert_allclose(ace, np.array([3.03623809, 2.21637375, 4.83686787]))
 
@@ -13,7 +13,7 @@ def test_ace(tracks_csv):
 
 def test_duration():
     data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
-    d = huracanpy.diags.track_stats.duration(data)
+    d = huracanpy.diags.track_stats.duration(data.time, data.track_id)
     assert d.min() == 126
     assert d.max() == 324
     assert d.mean() == 210

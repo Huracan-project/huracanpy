@@ -13,9 +13,13 @@ def plot_density(
     contourf_kws=dict(cmap="magma_r", levels=10),
     subplot_kws=dict(projection=ccrs.PlateCarree(180)),
     fig_kws=dict(),
+    cbar_kwargs={"label": ""},
 ):
     fig, ax = plt.subplots(subplot_kw=subplot_kws, **fig_kws)
     ax.coastlines()
-    d.where(d > 0).plot.contourf(ax=ax, transform=ccrs.PlateCarree(), **contourf_kws)
+    ax.gridlines(draw_labels=True)
+    d.plot.contourf(
+        ax=ax, transform=ccrs.PlateCarree(), cbar_kwargs=cbar_kwargs, **contourf_kws
+    )
 
     return fig, ax

@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 
 
-def rate(data, rate_var="slp"):
+def rate(data, rate_var="slp", lat_name="lat", lon_name="lon", time_name="time"):
     """
     Function to compute the evolution of a variable over time (rate). In particular, works for intensification and deepening rates.
 
@@ -27,13 +27,16 @@ def rate(data, rate_var="slp"):
 
     # Compute rate
     rate = (data[rate_var].values[1:] - data[rate_var].values[:-1]) / (
-        data.time.values[1:] - data.time.values[:-1]
+        data[time_name].values[1:] - data[time_name].values[:-1]
     ).astype("timedelta64[h]").astype(int)
 
     # Output nice dataset
-    t = data.time.values[:-1] + (data.time.values[1:] - data.time.values[:-1]) / 2
-    lon = (data.lon.values[1:] + data.lon.values[:-1]) / 2
-    lat = (data.lat.values[1:] + data.lat.values[:-1]) / 2
+    t = (
+        data[time_name].values[:-1]
+        + (data[time_name].values[1:] - data[time_name].values[:-1]) / 2
+    )
+    lon = (data[lon_name].values[1:] + data[lon_name].values[:-1]) / 2
+    lat = (data[lat_name].values[1:] + data[lat_name].values[:-1]) / 2
     mask = data.track_id.values[1:] == data.track_id.values[:-1]
 
     # Transform into clean dataset
@@ -55,7 +58,8 @@ def rate(data, rate_var="slp"):
 
     ds = xr.Dataset({"rate": rate, "lon": lon, "lat": lat, "time": t, "track_id": tid})
 
-    # Remove values for transition between two tracks
-    return ds.where(
-        mask,
-    )  # drop=True raises an error that I don't understand...
+    # Remove values for transition between two tracks (I do not understand why I cannot do it at once with drop = True in the first part)
+    ds = ds.where(mask)
+    ds = ds.where(~np.isnan(ds.rate), drop=True)
+
+    return ds
