@@ -58,7 +58,8 @@ def rate(data, rate_var="slp", lat_name="lat", lon_name="lon", time_name="time")
 
     ds = xr.Dataset({"rate": rate, "lon": lon, "lat": lat, "time": t, "track_id": tid})
 
-    # Remove values for transition between two tracks
-    return ds.where(
-        mask,
-    )  # drop=True raises an error that I don't understand...
+    # Remove values for transition between two tracks (I do not understand why I cannot do it at once with drop = True in the first part)
+    ds = ds.where(mask)
+    ds = ds.where(~np.isnan(ds.rate), drop=True)
+
+    return ds
