@@ -4,7 +4,7 @@ import numpy as np
 
 
 def test_ace(tracks_csv):
-    ace = huracanpy.diags.track_stats.ace(tracks_csv, tracks_csv.wind10)
+    ace = huracanpy.diags.track_stats.ace_by_track(tracks_csv, tracks_csv.wind10)
 
     np.testing.assert_allclose(ace, np.array([3.03623809, 2.21637375, 4.83686787]))
 
