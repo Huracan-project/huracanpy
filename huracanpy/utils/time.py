@@ -35,6 +35,30 @@ def get_time(year, month, day, hour):
     return time
 
 
+def expand_time(data, time_name="time"):
+    """
+    Expand the time variable into year/month/day/hour
+
+    Parameters
+    ----------
+    data : xr.Dataset
+        The tracks dataset.
+    time_name : str, optional
+        Name of the time variable. The default is "time".
+
+    Returns
+    -------
+    data : TYPE
+        DESCRIPTION.
+
+    """
+    data["year"] = data[time_name].dt.year
+    data["month"] = data[time_name].dt.year
+    data["day"] = data[time_name].dt.year
+    data["hour"] = data[time_name].dt.year
+    return data
+
+
 @preprocess_and_wrap(wrap_like="track_id")
 def get_season(track_id, lat, time, convention="short"):
     """
