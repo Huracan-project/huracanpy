@@ -53,9 +53,9 @@ def expand_time(data, time_name="time"):
 
     """
     data["year"] = data[time_name].dt.year
-    data["month"] = data[time_name].dt.year
-    data["day"] = data[time_name].dt.year
-    data["hour"] = data[time_name].dt.year
+    data["month"] = data[time_name].dt.month
+    data["day"] = data[time_name].dt.day
+    data["hour"] = data[time_name].dt.hour
     return data
 
 
