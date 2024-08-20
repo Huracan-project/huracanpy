@@ -96,7 +96,7 @@ def gen_vals(tracks, time_name="time", track_id_name="track_id"):
     return tracks.sortby(time_name).groupby(track_id_name).first()
 
 
-def extremum_vals(tracks, varname, stat="max"):
+def extremum_vals(tracks, varname, stat="max", track_id_name="track_id"):
     """
     Shows the attribute for the extremum point of each track
 
@@ -132,7 +132,7 @@ def extremum_vals(tracks, varname, stat="max"):
     return (
         tracks.to_dataframe()
         .sort_values(varname, ascending=asc)
-        .groupby("track_id")
+        .groupby(track_id_name)
         .first()
         .to_xarray()
     )  # It is 350 times much faster to switch to a dataframe
