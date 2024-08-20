@@ -129,4 +129,10 @@ def extremum_vals(tracks, varname, stat="max"):
     else:
         raise NotImplementedError("stat not recognized. Please use one of {min, max}")
 
-    return tracks.sortby(varname, ascending=asc).groupby("track_id").first()
+    return (
+        tracks.to_dataframe()
+        .sort_values(varname, ascending=asc)
+        .groupby("track_id")
+        .first()
+        .to_xarray()
+    )  # It is 350 times much faster to switch to a dataframe
