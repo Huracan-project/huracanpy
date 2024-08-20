@@ -93,7 +93,13 @@ def gen_vals(tracks, time_name="time", track_id_name="track_id"):
 
     """
 
-    return tracks.sortby(time_name).groupby(track_id_name).first()
+    return (
+        tracks.to_dataframe()
+        .sort_values(time_name)
+        .groupby(track_id_name)
+        .first()
+        .to_xarray()
+    )  # It is 470 times much faster to switch to a dataframe...
 
 
 def extremum_vals(tracks, varname, stat="max", track_id_name="track_id"):
@@ -135,4 +141,4 @@ def extremum_vals(tracks, varname, stat="max", track_id_name="track_id"):
         .groupby(track_id_name)
         .first()
         .to_xarray()
-    )  # It is 350 times much faster to switch to a dataframe
+    )  # It is 350 times much faster to switch to a dataframe..
