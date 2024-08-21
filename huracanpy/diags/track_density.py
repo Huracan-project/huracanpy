@@ -6,7 +6,12 @@ import numpy as np
 import xarray as xr
 
 
-def simple_global_histogram(lon, lat, bin_size=5, N_seasons=1):
+def simple_global_histogram(
+    lon,
+    lat,
+    bin_size=5,
+    N_seasons=1,
+):
     """
     Function to compute the track density, based on a simple 2D histogram.
 
@@ -29,8 +34,12 @@ def simple_global_histogram(lon, lat, bin_size=5, N_seasons=1):
 
     """
 
+    if lon.min() < 0:
+        lon_range = (-180, 180)
+    else:
+        lon_range = (0, 360)
     # compute 2D histogram
-    x = np.arange(0, 360 + bin_size, bin_size)
+    x = np.arange(lon_range[0], lon_range[1] + bin_size, bin_size)
     y = np.arange(-90, 90 + bin_size, bin_size)
     H, X, Y = np.histogram2d(lon, lat, bins=[x, y])
     # Turn into xarray
