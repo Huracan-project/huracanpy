@@ -17,8 +17,8 @@ from cartopy.crs import Geodetic, PlateCarree
 from ._basins import basins_def
 
 
-@preprocess_and_wrap(wrap_like="lat")
-def get_hemisphere(lat):
+# @preprocess_and_wrap(wrap_like="lat")
+def get_hemisphere(data, lat_name="lat"):
     """
     Function to detect which hemisphere each point corresponds to
 
@@ -33,11 +33,13 @@ def get_hemisphere(lat):
         You can append it to your tracks by running tracks["hemisphere"] = get_hemisphere(tracks)
     """
 
+    lat = data[lat_name]
+
     return np.where(lat >= 0, "N", "S")
 
 
-@preprocess_and_wrap(wrap_like="lon")
-def get_basin(lon, lat, convention="WMO", crs=None):
+# @preprocess_and_wrap(wrap_like="lon")
+def get_basin(data, lon_name="lon", lat_name="lat", convention="WMO", crs=None):
     """
     Function to determine the basin of each point, according to the selected convention.
 
@@ -63,6 +65,9 @@ def get_basin(lon, lat, convention="WMO", crs=None):
         The basin series.
         You can append it to your tracks by running tracks["basin"] = get_basin(tracks)
     """
+
+    lat, lon = data[lat_name], data[lon_name]
+
     if crs is None:
         crs = Geodetic()
     xyz = PlateCarree().transform_points(crs, lon, lat)
@@ -134,7 +139,7 @@ def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, cr
     return result
 
 
-def get_land_or_ocean(lon, lat, resolution="10m", crs=None):
+def get_land_or_ocean(data, lon_name="lon", lat_name="lat", resolution="10m", crs=None):
     """
     Detect whether each point is over land or ocean
 
@@ -157,6 +162,9 @@ def get_land_or_ocean(lon, lat, resolution="10m", crs=None):
         of array as the input lon/lat, or a length 1 :py:class:`numpy.ndarray` if
         lon/lat are floats
     """
+
+    lat, lon = data[lat_name], data[lon_name]
+
     is_ocean = _get_natural_earth_feature(
         lon,
         lat,
@@ -172,7 +180,7 @@ def get_land_or_ocean(lon, lat, resolution="10m", crs=None):
     return is_ocean
 
 
-def get_country(lon, lat, resolution="10m", crs=None):
+def get_country(data, lon_name="lon", lat_name="lat", resolution="10m", crs=None):
     """Detect the country each point is over
 
     Parameters
@@ -194,6 +202,9 @@ def get_country(lon, lat, resolution="10m", crs=None):
         Should return the same type of array as the input lon/lat, or a length 1
         :py:class:`numpy.ndarray` if lon/lat are floats
     """
+
+    lat, lon = data[lat_name], data[lon_name]
+
     return _get_natural_earth_feature(
         lon,
         lat,
@@ -205,7 +216,7 @@ def get_country(lon, lat, resolution="10m", crs=None):
     )
 
 
-def get_continent(lon, lat, resolution="10m", crs=None):
+def get_continent(data, lon_name="lon", lat_name="lat", resolution="10m", crs=None):
     """Detect the continent each point is over
 
     Parameters
@@ -227,6 +238,9 @@ def get_continent(lon, lat, resolution="10m", crs=None):
         point. Should return the same type of array as the input lon/lat, or a length 1
         :py:class:`numpy.ndarray` if lon/lat are floats
     """
+
+    lat, lon = data[lat_name], data[lon_name]
+
     return _get_natural_earth_feature(
         lon,
         lat,

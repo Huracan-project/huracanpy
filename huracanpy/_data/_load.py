@@ -1,5 +1,6 @@
 import pandas as pd
 
+from .. import Trackset
 from . import _csv, _TRACK, _netcdf, _tempestextremes, _CHAZ, _MIT
 from . import ibtracs
 from huracanpy import utils
@@ -168,4 +169,4 @@ def load(
         if "slp" in list(data.keys()):  # If 'slp' is in the attributes
             data["pres_cat"] = utils.category.get_pressure_cat(data.slp)
 
-    return data
+    return Trackset(data)

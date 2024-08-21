@@ -73,8 +73,10 @@ _thresholds = {
 }
 
 
-@preprocess_and_wrap(wrap_like="wind")
-def get_sshs_cat(wind, convention="Saffir-Simpson", wind_units="m s-1"):
+# @preprocess_and_wrap(wrap_like="wind")
+def get_sshs_cat(
+    data, wind_name="wind", convention="Saffir-Simpson", wind_units="m s-1"
+):
     """
     Function to determine the Saffir-Simpson Hurricane Scale (SSHS) category.
 
@@ -92,11 +94,12 @@ def get_sshs_cat(wind, convention="Saffir-Simpson", wind_units="m s-1"):
         The category series.
         You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
     """
+    wind = data[wind_name]
     return categorize(wind, convention=convention, variable_units=wind_units)
 
 
-@preprocess_and_wrap(wrap_like="slp")
-def get_pressure_cat(slp, convention="Klotzbach", slp_units="hPa"):
+# @preprocess_and_wrap(wrap_like="slp")
+def get_pressure_cat(data, slp_name="slp", convention="Klotzbach", slp_units="hPa"):
     """
     Determine the pressure category according to selected convention.
 
@@ -118,6 +121,9 @@ def get_pressure_cat(slp, convention="Klotzbach", slp_units="hPa"):
         You can append it to your tracks by running tracks["cat"] = get_pressure_cat(tracks.slp)
 
     """
+
+    slp = data[slp_name]
+
     if not isinstance(slp, pint.Quantity) or slp.unitless:
         if slp.min() > 10000 and slp_units == "hPa":
             print(

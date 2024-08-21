@@ -3,6 +3,7 @@
 __version__ = "0.1.0"
 __author__ = "Leo Saffin <l.saffin@reading.ac.uk>, Stella Bourdin <stella.bourdin@physics.ox.ac.uk>, Kelvin Ng "
 __all__ = [
+    "Trackset",
     "load",
     "save",
     "utils",
@@ -21,6 +22,7 @@ __all__ = [
 ]
 
 
+from .Trackset import Trackset
 from . import utils
 from ._data import (
     load,

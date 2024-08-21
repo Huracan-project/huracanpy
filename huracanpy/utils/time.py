@@ -4,9 +4,6 @@ Utils related to time
 
 import pandas as pd
 import numpy as np
-from metpy.xarray import preprocess_and_wrap
-
-from .geography import get_hemisphere
 
 
 def get_time(year, month, day, hour):
@@ -59,8 +56,10 @@ def expand_time(data, time_name="time"):
     return data
 
 
-@preprocess_and_wrap(wrap_like="track_id")
-def get_season(track_id, lat, time, convention="short"):
+# @preprocess_and_wrap(wrap_like="track_id")
+def get_season(
+    data, track_id_name="track_id", lat_name="lat", time_name="time", convention="short"
+):
     """
 
 
@@ -85,8 +84,10 @@ def get_season(track_id, lat, time, convention="short"):
         You can append it to your tracks by running tracks["season"] = get_season(tracks.track_id, tracks.lat, tracks.time)
     """
 
+    track_id, time = data[track_id_name], data[time_name]
+
     # Derive values
-    hemi = get_hemisphere(lat)
+    hemi = data.get_hemisphere(lat_name=lat_name)
 
     time = pd.to_datetime(time)
     year = time.year
