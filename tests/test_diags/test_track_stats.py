@@ -11,6 +11,24 @@ def test_ace(tracks_csv):
     assert isinstance(ace.data, np.ndarray)
 
 
+def test_pace(tracks_csv):
+    # Pass wind values to fit a (quadratic) model to the pressure-wind relationship
+    pace, model = huracanpy.diags.track_stats.pace_by_track(
+        tracks_csv, tracks_csv.slp, wind=tracks_csv.wind10
+    )
+
+    np.testing.assert_allclose(pace, np.array([4.34978137, 2.65410482, 6.09892875]))
+
+    # Call with the already fit model instead of wind values
+    pace, _ = huracanpy.diags.track_stats.pace_by_track(
+        tracks_csv,
+        tracks_csv.slp,
+        model=model,
+    )
+
+    np.testing.assert_allclose(pace, np.array([4.34978137, 2.65410482, 6.09892875]))
+
+
 def test_duration():
     data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
     d = huracanpy.diags.track_stats.duration(data.time, data.track_id)
