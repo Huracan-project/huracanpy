@@ -115,7 +115,7 @@ def pace_by_track(
     model : object
 
     """
-    tracks[pace_varname] = pace_by_point(
+    tracks[pace_varname], model = pace_by_point(
         pressure,
         wind=wind,
         model=model,
@@ -130,7 +130,7 @@ def pace_by_track(
     if not keep_pace_by_point:
         del tracks[pace_varname]
 
-    return pace_by_storm
+    return pace_by_storm, model
 
 
 def duration(time, track_ids):
