@@ -78,6 +78,26 @@ def test_save(filename, tracker, extension, tmp_path):
             np.testing.assert_allclose(data[var].data, data_[var].data, rtol=0)
 
 
+def test_save_muddled(tracks_csv, tmp_path):
+    data = tracks_csv.sortby("track_id", ascending=False)
+    huracanpy.save(data.copy(), str(tmp_path / "tmp_file.nc"))
+
+    data_ = huracanpy.load(str(tmp_path / "tmp_file.nc"))
+
+    for var in list(data.variables) + list(data.coords):
+        # Work around for xarray inconsistent loading the data as float or double
+        # depending on fill_value and scale_factor
+        # np.testing.assert_allclose doesn't work for datetime64
+        if np.issubdtype(data[var].dtype, np.datetime64):
+            assert (data[var].data == data_[var].data).all()
+        elif data[var].dtype != data_[var].dtype:
+            np.testing.assert_allclose(
+                data[var].data.astype(data_[var].dtype), data_[var].data, rtol=1e-6
+            )
+        else:
+            np.testing.assert_allclose(data[var].data, data_[var].data, rtol=0)
+
+
 @pytest.mark.parametrize(
     "subset,length",
     [

@@ -37,9 +37,6 @@ def save(dataset, filename):
     # Find the variable with cf_role=trajectory_id
     trajectory_id = _find_trajectory_id(dataset)
 
-    # Sort the dataset along track_id, or the compression-expansion will yield incorrect results
-    dataset = dataset.sortby(trajectory_id)
-
     # Get the name of the sample dimension. The name "record" has been used in the load
     # functions, but we don't need to assume that is the name. It may be different when
     # loaded from other netCDF files
@@ -52,7 +49,11 @@ def save(dataset, filename):
             f"{trajectory_id.name} spans multiple dimensions, should be 1d"
         )
 
-    trajectory_ids = np.unique(trajectory_id)
+    # np.unique returns a sorted array, so return the index so that the trajectory_ids
+    # can be put back in the same order as they are in the original dataset otherwise
+    # the ordering of data can be messed up if the trajectories ids aren't monotonic
+    trajectory_ids, idx = np.unique(trajectory_id, return_index=True)
+    trajectory_ids = trajectory_id[sorted(idx)].values
     rowsize = [np.count_nonzero(trajectory_id == x) for x in trajectory_ids]
 
     dataset[trajectory_id.name] = ("trajectory", trajectory_ids)
