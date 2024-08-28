@@ -2,12 +2,9 @@
 Module containing functions to compute track statistics
 """
 
-# import xarray as xr
-# import pint
-# from metpy.xarray import preprocess_and_wrap
 from metpy.units import units
 
-from huracanpy.utils.ace import ace_by_point
+from huracanpy.utils.ace import ace_by_point, pace_by_point
 
 
 def ace_by_track(
@@ -16,6 +13,7 @@ def ace_by_track(
     threshold=34 * units("knots"),
     wind_units="m s-1",
     keep_ace_by_point=False,
+    ace_varname="ace",
 ):
     r"""Calculate accumulate cyclone energy (ACE) for each track
 
@@ -38,7 +36,11 @@ def ace_by_track(
         assume it is in these units before converting to knots
     keep_ace_by_point : bool, default=False
         If True the ACE calculated from each point of the input wind is saved in the
-        input tracks dataset as "ace"
+        input tracks dataset as `ace_varname`
+    ace_varname : str, default="ace"
+        The name to give the variable for ACE at each point added to the `tracks`
+        dataset. Change this if you want to have a different variable name or want to
+        avoid overwriting an existing variable in the dataset named `ace`
 
     Returns
     -------
@@ -46,14 +48,89 @@ def ace_by_track(
         The ACE for each track in wind
 
     """
-    tracks["ace"] = ace_by_point(wind, threshold, wind_units)
+    tracks[ace_varname] = ace_by_point(wind, threshold, wind_units)
 
-    ace_by_storm = tracks.groupby("track_id").map(lambda x: x.ace.sum())
+    ace_by_storm = tracks.groupby("track_id").map(lambda x: x[ace_varname].sum())
 
     if not keep_ace_by_point:
-        del tracks["ace"]
+        del tracks[ace_varname]
 
     return ace_by_storm
+
+
+def pace_by_track(
+    tracks,
+    pressure,
+    wind=None,
+    model=None,
+    threshold_wind=None,
+    threshold_pressure=None,
+    wind_units="m s-1",
+    keep_pace_by_point=False,
+    pace_varname="pace",
+    **kwargs,
+):
+    """Calculate a pressure-based accumulated cyclone energy (PACE) for each individual
+       point
+
+    PACE is calculated the same way as ACE, but the wind is derived from fitting a
+    pressure-wind relationship and calculating wind values from pressure using this fit
+
+    Example
+    -------
+    This function can be called in two ways
+
+    1. Pass the pressure and wind to fit a pressure-wind relationship to the data and
+    then calculate pace from the winds derived from this fit
+
+    >>> pace, pw_model = pace_by_point(pressure, wind)
+
+    The default model to fit is a quadratic polynomial
+    (:py:class:`numpy.polynomial.polynomial.Polynomial` with `deg=2`)
+
+    2. Pass just the pressure and an already fit model to calculate the wind speeds from
+    this model
+
+    >>> pace, _ = pace_by_point(pressure, model=pw_model)
+
+    Parameters
+    ----------
+    tracks : xarray.Dataset
+    pressure : array_like
+    wind : array_like, optional
+    model : str, class, or object, optional
+    threshold_wind : scalar, optional
+    threshold_pressure : scalar, optional
+    wind_units : str, default="m s-1"
+    keep_pace_by_point : bool, default=False
+        If True the PACE calculated from each point of the input wind is saved in the
+        input tracks dataset as `pace_varname`
+    pace_varname : str, default="pace"
+    **kwargs
+
+    Returns
+    -------
+    pace_values : array_like
+
+    model : object
+
+    """
+    tracks[pace_varname], model = pace_by_point(
+        pressure,
+        wind=wind,
+        model=model,
+        threshold_wind=threshold_wind,
+        threshold_pressure=threshold_pressure,
+        wind_units=wind_units,
+        **kwargs,
+    )
+
+    pace_by_storm = tracks.groupby("track_id").map(lambda x: x[pace_varname].sum())
+
+    if not keep_pace_by_point:
+        del tracks[pace_varname]
+
+    return pace_by_storm, model
 
 
 def duration(time, track_ids):
