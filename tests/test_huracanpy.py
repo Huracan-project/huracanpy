@@ -50,7 +50,8 @@ def test_load_MIT():
     ],
 )
 @pytest.mark.parametrize("extension", ["csv", "nc"])
-def test_save(filename, tracker, extension, tmp_path):
+@pytest.mark.parametrize("muddle", [False, True])
+def test_save(filename, tracker, extension, muddle, tmp_path):
     if filename == huracanpy.example_TRACK_netcdf_file and extension == "csv":
         pytest.skip(
             "The netCDF file has multiple dimensions so fails because converting to a"
@@ -58,31 +59,17 @@ def test_save(filename, tracker, extension, tmp_path):
             " even though the dimensions cover different variables"
         )
     data = huracanpy.load(filename, tracker=tracker)
+
+    # Check that save/load gives the same result when the track_id is not monotonic
+    # Caused an issue because they got sorted before
+    if muddle:
+        data = data.sortby("track_id", ascending=False)
+
     # Copy the data because save modifies the dataset at the moment
     huracanpy.save(data.copy(), str(tmp_path / f"tmp_file.{extension}"))
 
     # Reload the data and check it is still the same
     data_ = huracanpy.load(str(tmp_path / f"tmp_file.{extension}"))
-
-    for var in list(data.variables) + list(data.coords):
-        # Work around for xarray inconsistent loading the data as float or double
-        # depending on fill_value and scale_factor
-        # np.testing.assert_allclose doesn't work for datetime64
-        if np.issubdtype(data[var].dtype, np.datetime64):
-            assert (data[var].data == data_[var].data).all()
-        elif data[var].dtype != data_[var].dtype:
-            np.testing.assert_allclose(
-                data[var].data.astype(data_[var].dtype), data_[var].data, rtol=1e-6
-            )
-        else:
-            np.testing.assert_allclose(data[var].data, data_[var].data, rtol=0)
-
-
-def test_save_muddled(tracks_csv, tmp_path):
-    data = tracks_csv.sortby("track_id", ascending=False)
-    huracanpy.save(data.copy(), str(tmp_path / "tmp_file.nc"))
-
-    data_ = huracanpy.load(str(tmp_path / "tmp_file.nc"))
 
     for var in list(data.variables) + list(data.coords):
         # Work around for xarray inconsistent loading the data as float or double
