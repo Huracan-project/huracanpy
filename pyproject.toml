@@ -51,8 +51,6 @@ extend-include = ["*.ipynb"]
 
 # - How to distribute the package
 
-# 0/ Applying black formatting
-
 # 1/ Generate the distribution
 # 1a. Make sure that build is up-to-date: `pip install --upgrade build`(add the --user option if necessary)
 # 1b. Run python -m build in the package's root directory
