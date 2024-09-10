@@ -34,9 +34,9 @@ def test_load_CHAZ():
 def test_load_MIT():
     data = huracanpy.load(huracanpy.example_MIT_file, tracker="MIT")
 
-    assert len(data.record) == 3138
-    assert data.time.max() == 1296000
-    assert data.n_trk.max() == 10
+    assert len(data.record) == 2138
+    assert data.time.max() == 1119600
+    assert data.n_track.max() == 10
 
 
 @pytest.mark.parametrize(

@@ -16,6 +16,8 @@ def load(
     tempest_extremes_unstructured=False,
     tempest_extremes_header_str="start",
     track_calendar=None,
+    n_track_name="n_track",
+    lat_track_name="lat_track",
     **kwargs,
 ):
     """Load track data
@@ -131,7 +133,7 @@ def load(
         elif tracker.lower() == "chaz":
             data = _CHAZ.load(filename)
         elif tracker.lower() == "mit":
-            data = _MIT.load(filename)
+            data = _MIT.load(filename, n_track_name, lat_track_name)
         elif tracker.lower() == "ibtracs":
             if ibtracs_online:
                 if filename is None:
