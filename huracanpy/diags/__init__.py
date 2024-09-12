@@ -7,6 +7,7 @@ __all__ = [
     "lifecycle",
     "rate",
     "climato",
+    "_accessor",
 ]
 
 from . import track_density
@@ -15,3 +16,4 @@ from . import translation_speed
 from . import lifecycle
 from .rates import rate
 from . import climato
+from . import _accessor
