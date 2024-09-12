@@ -14,7 +14,13 @@ dependencies = [
     "parse",
     "shapely",
     "pandas",
-    "geopandas",
+    # Issue with newer versions of fiona when using old versions of geopandas
+    # see https://stackoverflow.com/a/78949565/8270394
+    # Normally just specify the newer geopandas, but it does not exist for python3.8
+    # so pin the version of fiona when using python3.8
+    "geopandas>=0.14.4;python_version>='3.9'",
+    "geopandas;python_version<'3.9'",
+    "fiona<=1.9.6;python_version<'3.9'",
     "matplotlib",
     "seaborn",
     "netcdf4",
