@@ -75,7 +75,7 @@ def get_basin(lon, lat, convention="WMO", crs=None):
 # Running this on lots of tracks was very slow if the file is reopened every time this
 # is called
 _natural_earth_feature_cache = {
-    f"physical_{key}_0_basin": value.rename_axis("basin")
+    f"physical_{key}_0_basin": value.rename_axis("basin").reset_index()
     for key, value in basins_def.items()
 }
 
