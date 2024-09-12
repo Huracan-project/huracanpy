@@ -1,6 +1,7 @@
 import xarray as xr
 
 from .track_density import simple_global_histogram
+from .track_stats import duration
 
 
 @xr.register_dataset_accessor("diags")
@@ -22,3 +23,6 @@ class DiagsAccessor:
             bin_size=bin_size,
             N_seasons=N_seasons,
         )
+
+    def duration(self, time_name="time", track_id_name="track_id"):
+        return duration(self._dataset[time_name], self._dataset[track_id_name])
