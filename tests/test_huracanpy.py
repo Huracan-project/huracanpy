@@ -1,3 +1,4 @@
+import numpy.exceptions
 import pytest
 import numpy as np
 
@@ -13,6 +14,10 @@ import huracanpy
         (huracanpy.example_parquet_file, dict(), 13, 0, 99, 3),
         (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86),
         (huracanpy.example_TE_file, dict(tracker="tempestextremes"), 8, 0, 210, 8),
+        # (huracanpy.example_CHAZ_file, dict(tracker="CHAZ"), 9, 3, 1078, 20),
+        # (huracanpy.example_MIT_file, dict(tracker="MIT"), 8, 4, 2138, 20),
+        (None, dict(tracker="ibtracs", ibtracs_subset="wmo"), 8, 0, 139416, 4380),
+        (None, dict(tracker="ibtracs", ibtracs_subset="usa"), 10, 0, 118882, 4072),
     ],
 )
 def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
@@ -49,6 +54,9 @@ def test_load_MIT():
         (huracanpy.example_csv_file, None),
         (huracanpy.example_parquet_file, None),
         (huracanpy.example_TE_file, "tempestextremes"),
+        # (huracanpy.example_CHAZ_file, "CHAZ"),
+        # (huracanpy.example_MIT_file, "MIT"),
+        (None, "ibtracs"),
     ],
 )
 @pytest.mark.parametrize("extension", ["csv", "nc"])
@@ -79,29 +87,14 @@ def test_save(filename, tracker, extension, muddle, tmp_path):
     for var in list(data.variables) + list(data.coords):
         # Work around for xarray inconsistent loading the data as float or double
         # depending on fill_value and scale_factor
-        # np.testing.assert_allclose doesn't work for datetime64
-        if np.issubdtype(data[var].dtype, np.datetime64):
-            assert (data[var].data == data_[var].data).all()
-        elif data[var].dtype != data_[var].dtype:
+        # np.testing.assert_allclose doesn't work for datetime64, object, or string
+        if np.issubdtype(data[var].dtype, np.number):
+            if data[var].dtype != data_[var].dtype:
+                rtol = 1e-6
+            else:
+                rtol = 0
             np.testing.assert_allclose(
-                data[var].data.astype(data_[var].dtype), data_[var].data, rtol=1e-6
+                data[var].data.astype(data_[var].dtype), data_[var].data, rtol=rtol
             )
         else:
-            np.testing.assert_allclose(data[var].data, data_[var].data, rtol=0)
-
-
-@pytest.mark.parametrize(
-    "subset,length",
-    [
-        ("wmo", 8),
-        ("usa", 10),
-    ],
-)
-def test_ibtracs_offline(subset, length):
-    ib = huracanpy.load(tracker="ibtracs", ibtracs_subset=subset)
-    assert ib.season.min() == 1980
-    assert (
-        len(ib.time) > 0
-    )  # Can't assert on dataset length, because it might change with updates.
-    assert len(ib) == length
-    assert len(ib.coords) == 0
+            assert (data[var].data == data_[var].data).all()

@@ -58,4 +58,17 @@ def load(
         )
 
     # Output xr dataset
-    return tracks.to_xarray().rename({"index": "record"}).drop_vars("record")
+    tracks = tracks.to_xarray().rename({"index": "record"}).drop_vars("record")
+
+    # Convert any variables that are objects to explicit string objects.
+    # This can cause strings stored as "NA", such as for basin to be converted to NaNs
+    # Revert any nans back to their original values
+    # Better to do it here than getting caught out later
+    for var in tracks:
+        if tracks[var].dtype == "O" and isinstance(tracks[var].data[0], str):
+            new_var = tracks[var].astype(str)
+            false_nans = new_var == "nan"
+            new_var[false_nans] = tracks[var][false_nans]
+            tracks[var] = new_var
+
+    return tracks
