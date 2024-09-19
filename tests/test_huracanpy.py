@@ -9,8 +9,8 @@ import huracanpy
     [
         (huracanpy.example_TRACK_file, dict(tracker="TRACK"), 35, 0, 46, 2),
         (huracanpy.example_TRACK_tilt_file, dict(tracker="TRACK.tilt"), 3, 1, 46, 2),
-        (huracanpy.example_csv_file, dict(), 13, 1, 99, 3),
-        (huracanpy.example_parquet_file, dict(), 13, 1, 99, 3),
+        (huracanpy.example_csv_file, dict(), 13, 0, 99, 3),
+        (huracanpy.example_parquet_file, dict(), 13, 0, 99, 3),
         (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86),
         (huracanpy.example_TE_file, dict(tracker="tempestextremes"), 8, 0, 210, 8),
     ],
@@ -104,4 +104,4 @@ def test_ibtracs_offline(subset, length):
         len(ib.time) > 0
     )  # Can't assert on dataset length, because it might change with updates.
     assert len(ib) == length
-    assert len(ib.coords) == 1
+    assert len(ib.coords) == 0

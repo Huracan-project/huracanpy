@@ -58,4 +58,4 @@ def load(
         )
 
     # Output xr dataset
-    return tracks.to_xarray().rename({"index": "record"})
+    return tracks.to_xarray().rename({"index": "record"}).drop_vars("record")
