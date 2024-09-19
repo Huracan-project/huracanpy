@@ -36,6 +36,7 @@ def load(
         tracker needs to be specified to decide how to load the data
 
         * **track**
+        * **track.tilt**
         * **te**, **tempest**, **tempestextremes**, **uz**:
         * **ibtracs**
         * **CHAZ**, **MIT**
@@ -120,6 +121,11 @@ def load(
         if tracker.lower() == "track":
             data = _TRACK.load(
                 filename, calendar=track_calendar, variable_names=variable_names
+            )
+        elif tracker.lower() == "track.tilt":
+            data = _TRACK.load_tilts(
+                filename,
+                calendar=track_calendar,
             )
         elif tracker.lower() in ["csv", "uz"]:
             data = _csv.load(filename)
