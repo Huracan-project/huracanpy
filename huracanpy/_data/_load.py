@@ -16,6 +16,8 @@ def load(
     tempest_extremes_unstructured=False,
     tempest_extremes_header_str="start",
     track_calendar=None,
+    n_track_name="n_track",
+    lat_track_name="lat_track",
     **kwargs,
 ):
     """Load track data
@@ -34,6 +36,7 @@ def load(
         tracker needs to be specified to decide how to load the data
 
         * **track**
+        * **track.tilt**
         * **te**, **tempest**, **tempestextremes**, **uz**:
         * **ibtracs**
         * **CHAZ**, **MIT**
@@ -119,6 +122,11 @@ def load(
             data = _TRACK.load(
                 filename, calendar=track_calendar, variable_names=variable_names
             )
+        elif tracker.lower() == "track.tilt":
+            data = _TRACK.load_tilts(
+                filename,
+                calendar=track_calendar,
+            )
         elif tracker.lower() in ["csv", "uz"]:
             data = _csv.load(filename)
         elif tracker.lower() in ["te", "tempest", "tempestextremes"]:
@@ -131,7 +139,7 @@ def load(
         elif tracker.lower() == "chaz":
             data = _CHAZ.load(filename)
         elif tracker.lower() == "mit":
-            data = _MIT.load(filename)
+            data = _MIT.load(filename, n_track_name, lat_track_name)
         elif tracker.lower() == "ibtracs":
             if ibtracs_online:
                 if filename is None:

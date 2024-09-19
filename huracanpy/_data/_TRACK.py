@@ -17,6 +17,9 @@ track_header_fmt = "TRACK_ID{track_id:>d}"
 track_header_fmt_new = "TRACK_ID{track_id:^d}START_TIME{start_time:>}"
 track_info_fmt = "POINT_NUM{npoints:>d}"
 
+tilt_header_fmt = "NTRACK {ntracks:d} NFIELD {nfields:d}"
+tilt_track_header_fmt = "TRACK_NO {track_id:d} NUMPT {npoints:d}"
+
 
 def _parse(fmt, string, **kwargs):
     # Call parse but raise an error if None is returned
@@ -143,6 +146,61 @@ def load(filename, calendar=None, variable_names=None):
             output.append(ds)
 
     output = xr.concat(output, dim="record")
+    output.track_id.attrs["cf_role"] = "trajectory_id"
+
+    return output
+
+
+def load_tilts(filename, calendar=None, nans=1e25):
+    output = list()
+    with open(filename, "rt") as f:
+        # First line
+        header = _parse(tilt_header_fmt, f.readline().strip()).named
+        ntracks = header["ntracks"]
+        nfields = header["nfields"]
+
+        line_fmt = "LEVELS " + " ".join(["{:f}"] * nfields)
+        levels = np.array(_parse(line_fmt, f.readline().strip()).fixed)
+
+        # Read in each track as an xarray dataset with time as the coordinate
+        for n in range(ntracks):
+            # Read individual track header
+            track_info = _parse(tilt_track_header_fmt, f.readline().strip()).named
+            npoints = track_info["npoints"]
+
+            # Create an xarray dataset for the individual track (and concatenate later)
+            # Do time as a list and add to the dataset after reading all the times to
+            # account for awkward to definitions
+            ds = xr.Dataset(
+                data_vars=dict(
+                    tilt=(["record", "levels"], np.zeros([npoints, nfields])),
+                    track_id=(
+                        "record",
+                        np.array([track_info["track_id"]] * npoints, dtype=int),
+                    ),
+                ),
+                coords=dict(pressure=("levels", np.array(levels))),
+            )
+            times = []
+
+            # Populate time and data line by line
+            for m in range(npoints):
+                line = f.readline().strip().split(" ")
+                times.append(parse_date(line[0], calendar=calendar))
+                ds.tilt[m, :] = np.array(line[1:])
+
+            # Return a dataset for the individual track
+            # Add time separately so xarray can deal with the awkward np.datetime64
+            # format
+            ds["time"] = ("record", times)
+            output.append(ds)
+
+    output = xr.concat(output, dim="record")
+    if nans is not None:
+        output["tilt"] = (
+            ["record", "levels"],
+            np.where(output.tilt == nans, np.nan, output.tilt),
+        )
     output.track_id.attrs["cf_role"] = "trajectory_id"
 
     return output

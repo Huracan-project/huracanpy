@@ -1,6 +1,7 @@
 import pytest
 
 import datetime
+from collections import namedtuple
 
 import numpy as np
 import xarray as xr
@@ -35,3 +36,16 @@ def tracks_0_360():
             lat=np.linspace(-90, 90, 24),
         )
     )
+
+
+coords = namedtuple("coords", ["lon", "lat"])
+
+
+@pytest.fixture()
+def tracks_as_list():
+    return coords(lon=[0, 20], lat=[0, 0])
+
+
+@pytest.fixture()
+def tracks_as_point():
+    return coords(lon=0.0, lat=0.0)

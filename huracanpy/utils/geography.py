@@ -7,7 +7,6 @@ from pint.errors import UnitStrippedWarning
 
 import numpy as np
 import pandas as pd
-import shapely
 from shapely.geometry import Point
 import geopandas as gpd
 from cartopy.io.shapereader import natural_earth
@@ -36,7 +35,6 @@ def get_hemisphere(lat):
     return np.where(lat >= 0, "N", "S")
 
 
-@preprocess_and_wrap(wrap_like="lon")
 def get_basin(lon, lat, convention="WMO", crs=None):
     """
     Function to determine the basin of each point, according to the selected convention.
@@ -63,35 +61,23 @@ def get_basin(lon, lat, convention="WMO", crs=None):
         The basin series.
         You can append it to your tracks by running tracks["basin"] = get_basin(tracks)
     """
-    if crs is None:
-        crs = Geodetic()
-    xyz = PlateCarree().transform_points(crs, lon, lat)
-
-    B = basins_def[convention]  # Select GeoDataFrame for the convention
-    points = pd.DataFrame(
-        dict(coords=list(zip(xyz[:, 0], xyz[:, 1])))
-    )  # Create dataframe of points coordinates
-    points = gpd.GeoDataFrame(
-        points.coords.apply(Point), geometry="coords", crs=B.crs
-    )  # Transform into Points within a GeoDataFrame
-    basin = (
-        gpd.tools.sjoin(
-            points,
-            B,
-            how="left",  # Identify basins
-        )
-        .reset_index()
-        .groupby("index")
-        .first(  # Deal with points at borders
-        )
-        .index_right
-    )  # Select basin names
-    return basin
+    return _get_natural_earth_feature(
+        lon,
+        lat,
+        feature="basin",
+        category="physical",
+        name=convention,
+        resolution=0,
+        crs=crs,
+    )
 
 
 # Running this on lots of tracks was very slow if the file is reopened every time this
 # is called
-_natural_earth_feature_cache = {}
+_natural_earth_feature_cache = {
+    f"physical_{key}_0_basin": value.rename_axis("basin").reset_index()
+    for key, value in basins_def.items()
+}
 
 
 @preprocess_and_wrap(wrap_like="lon")
@@ -117,19 +103,18 @@ def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, cr
     if crs is None:
         crs = Geodetic()
     xyz = PlateCarree().transform_points(crs, lon, lat)
-    lon = xyz[:, 0]
-    lat = xyz[:, 1]
 
-    # Any strings are loaded in as objects. Use the specific string type with the
-    # maximum possible length for the output instead
-    dtype = df[feature].dtype
-    if dtype == "O":
-        max_length = df[feature].apply(len).max()
-        dtype = f"U{max_length}"
+    # Create dataframe of points coordinates
+    points = pd.DataFrame(dict(coords=list(xyz[:, :2])))
+    # Transform into Points within a GeoDataFrame
+    points = gpd.GeoDataFrame(points.coords.apply(Point), geometry="coords", crs=df.crs)
 
-    result = np.zeros(len(lon), dtype=dtype)
-    for n, row in df.iterrows():
-        result[np.where(shapely.contains_xy(row.geometry, lon, lat))] = row[feature]
+    result = np.array(
+        gpd.tools.sjoin(df, points, how="right", predicate="contains")[feature]
+    ).astype(str)
+
+    # Set "nan" as empty
+    result[result == "nan"] = ""
 
     return result
 

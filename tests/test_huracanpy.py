@@ -8,6 +8,7 @@ import huracanpy
     "filename, kwargs, nvars, ncoords, npoints, ntracks",
     [
         (huracanpy.example_TRACK_file, dict(tracker="TRACK"), 35, 0, 46, 2),
+        (huracanpy.example_TRACK_tilt_file, dict(tracker="TRACK.tilt"), 3, 1, 46, 2),
         (huracanpy.example_csv_file, dict(), 13, 1, 99, 3),
         (huracanpy.example_parquet_file, dict(), 13, 1, 99, 3),
         (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86),
@@ -34,15 +35,16 @@ def test_load_CHAZ():
 def test_load_MIT():
     data = huracanpy.load(huracanpy.example_MIT_file, tracker="MIT")
 
-    assert len(data.record) == 3138
-    assert data.time.max() == 1296000
-    assert data.n_trk.max() == 10
+    assert len(data.record) == 2138
+    assert data.time.max() == 1119600
+    assert data.n_track.max() == 10
 
 
 @pytest.mark.parametrize(
     "filename, tracker",
     [
         (huracanpy.example_TRACK_file, "TRACK"),
+        (huracanpy.example_TRACK_tilt_file, "TRACK.tilt"),
         (huracanpy.example_TRACK_netcdf_file, None),
         (huracanpy.example_csv_file, None),
         (huracanpy.example_parquet_file, None),
@@ -52,7 +54,10 @@ def test_load_MIT():
 @pytest.mark.parametrize("extension", ["csv", "nc"])
 @pytest.mark.parametrize("muddle", [False, True])
 def test_save(filename, tracker, extension, muddle, tmp_path):
-    if filename == huracanpy.example_TRACK_netcdf_file and extension == "csv":
+    if extension == "csv" and (
+        filename == huracanpy.example_TRACK_tilt_file
+        or filename == huracanpy.example_TRACK_netcdf_file
+    ):
         pytest.skip(
             "The netCDF file has multiple dimensions so fails because converting to a"
             " dataframe leads to having rows equal to the product of the dimensions"
