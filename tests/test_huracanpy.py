@@ -27,6 +27,7 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
     assert len(data.coords) == ncoords
     assert len(data.time) == npoints
     assert len(data.groupby("track_id")) == ntracks
+    assert "record" not in data.coords
 
 
 def test_load_CHAZ():
@@ -84,6 +85,8 @@ def test_save(filename, tracker, extension, muddle, tmp_path):
     # Reload the data and check it is still the same
     data_ = huracanpy.load(str(tmp_path / f"tmp_file.{extension}"))
 
+    assert len(data.variables) == len(data_.variables)
+    assert len(data.coords) == len(data_.coords)
     for var in list(data.variables) + list(data.coords):
         # Work around for xarray inconsistent loading the data as float or double
         # depending on fill_value and scale_factor
@@ -98,3 +101,7 @@ def test_save(filename, tracker, extension, muddle, tmp_path):
             )
         else:
             assert (data[var].data == data_[var].data).all()
+
+    assert len(data.attrs) == len(data_.attrs)
+    for attr in data.attrs:
+        assert data.attrs[attr] == data_.attrs[attr]
