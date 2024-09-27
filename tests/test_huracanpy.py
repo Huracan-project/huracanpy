@@ -7,12 +7,12 @@ import huracanpy
 @pytest.mark.parametrize(
     "filename, kwargs, nvars, ncoords, npoints, ntracks",
     [
-        (huracanpy.example_TRACK_file, dict(tracker="TRACK"), 35, 0, 46, 2),
-        (huracanpy.example_TRACK_tilt_file, dict(tracker="TRACK.tilt"), 3, 1, 46, 2),
+        (huracanpy.example_TRACK_file, dict(source="TRACK"), 35, 0, 46, 2),
+        (huracanpy.example_TRACK_tilt_file, dict(source="TRACK.tilt"), 3, 1, 46, 2),
         (huracanpy.example_csv_file, dict(), 13, 1, 99, 3),
         (huracanpy.example_parquet_file, dict(), 13, 1, 99, 3),
         (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86),
-        (huracanpy.example_TE_file, dict(tracker="tempestextremes"), 8, 0, 210, 8),
+        (huracanpy.example_TE_file, dict(source="tempestextremes"), 8, 0, 210, 8),
     ],
 )
 def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
@@ -25,7 +25,7 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
 
 
 def test_load_CHAZ():
-    data = huracanpy.load(huracanpy.example_CHAZ_file, tracker="CHAZ")
+    data = huracanpy.load(huracanpy.example_CHAZ_file, source="CHAZ")
 
     assert len(data.record) == 1078
     assert data.lifelength.max() == 124
@@ -33,7 +33,7 @@ def test_load_CHAZ():
 
 
 def test_load_MIT():
-    data = huracanpy.load(huracanpy.example_MIT_file, tracker="MIT")
+    data = huracanpy.load(huracanpy.example_MIT_file, source="MIT")
 
     assert len(data.record) == 2138
     assert data.time.max() == 1119600
@@ -41,7 +41,7 @@ def test_load_MIT():
 
 
 @pytest.mark.parametrize(
-    "filename, tracker",
+    "filename, source",
     [
         (huracanpy.example_TRACK_file, "TRACK"),
         (huracanpy.example_TRACK_tilt_file, "TRACK.tilt"),
@@ -52,7 +52,7 @@ def test_load_MIT():
     ],
 )
 @pytest.mark.parametrize("extension", ["csv", "nc"])
-def test_save(filename, tracker, extension, tmp_path):
+def test_save(filename, source, extension, tmp_path):
     if extension == "csv" and (
         filename == huracanpy.example_TRACK_tilt_file
         or filename == huracanpy.example_TRACK_netcdf_file
@@ -62,7 +62,7 @@ def test_save(filename, tracker, extension, tmp_path):
             " dataframe leads to having rows equal to the product of the dimensions"
             " even though the dimensions cover different variables"
         )
-    data = huracanpy.load(filename, tracker=tracker)
+    data = huracanpy.load(filename, source=source)
     # Copy the data because save modifies the dataset at the moment
     huracanpy.save(data.copy(), str(tmp_path / f"tmp_file.{extension}"))
 
@@ -91,7 +91,7 @@ def test_save(filename, tracker, extension, tmp_path):
     ],
 )
 def test_ibtracs_offline(subset, length):
-    ib = huracanpy.load(tracker="ibtracs", ibtracs_subset=subset)
+    ib = huracanpy.load(source="ibtracs", ibtracs_subset=subset)
     assert ib.season.min() == 1980
     assert (
         len(ib.time) > 0

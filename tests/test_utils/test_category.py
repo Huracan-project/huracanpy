@@ -39,13 +39,13 @@ def test_categorise(convention, data, expected):
 
 
 def test_sshs():
-    data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
+    data = huracanpy.load(huracanpy.example_csv_file, source="csv")
     assert huracanpy.utils.category.get_sshs_cat(data.wind10).min() == -1
     assert huracanpy.utils.category.get_sshs_cat(data.wind10).max() == 0
 
 
 def test_pressure_cat():
-    data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
+    data = huracanpy.load(huracanpy.example_csv_file, source="csv")
     Klotz = huracanpy.utils.category.get_pressure_cat(data.slp / 100)
     Simps = huracanpy.utils.category.get_pressure_cat(
         data.slp / 100, convention="Simpson"
@@ -64,7 +64,7 @@ def test_pressure_cat():
     ],
 )
 def test_sshs_units(units, expected, pass_as_numpy):
-    data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
+    data = huracanpy.load(huracanpy.example_csv_file, source="csv")
 
     if isinstance(expected, str) and expected == "default":
         expected = huracanpy.utils.category.get_sshs_cat(data.wind10)
@@ -95,7 +95,7 @@ def test_sshs_units(units, expected, pass_as_numpy):
     ],
 )
 def test_pressure_cat_units(units, expected, convention, pass_as_numpy):
-    data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
+    data = huracanpy.load(huracanpy.example_csv_file, source="csv")
 
     if isinstance(expected, str) and expected == "default":
         expected = huracanpy.utils.category.get_pressure_cat(

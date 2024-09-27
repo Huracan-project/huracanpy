@@ -2,7 +2,7 @@ import huracanpy
 
 
 def test_translation_speed():
-    data = huracanpy.load(huracanpy.example_csv_file, tracker="csv")
+    data = huracanpy.load(huracanpy.example_csv_file, source="csv")
     deepening_rate = huracanpy.diags.rates.rate(data, "slp")
     intensification_rate = huracanpy.diags.rates.rate(data, "wind10")
     assert (
