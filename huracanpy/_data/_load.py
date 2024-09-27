@@ -152,6 +152,7 @@ def load(
                             header=0,
                             skiprows=[1],
                             na_values=["", " "],
+                            keep_default_na=False,
                             converters={
                                 "SID": str,
                                 "SEASON": int,
