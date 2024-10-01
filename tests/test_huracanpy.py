@@ -13,10 +13,10 @@ import huracanpy
         (huracanpy.example_parquet_file, dict(), 13, 0, 99, 3),
         (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86),
         (huracanpy.example_TE_file, dict(source="tempestextremes"), 8, 0, 210, 8),
-        # (huracanpy.example_CHAZ_file, dict(tracker="CHAZ"), 9, 3, 1078, 20),
-        # (huracanpy.example_MIT_file, dict(tracker="MIT"), 8, 4, 2138, 20),
-        (None, dict(tracker="ibtracs", ibtracs_subset="wmo"), 8, 0, 139416, 4380),
-        (None, dict(tracker="ibtracs", ibtracs_subset="usa"), 10, 0, 118882, 4072),
+        # (huracanpy.example_CHAZ_file, dict(source="CHAZ"), 9, 3, 1078, 20),
+        # (huracanpy.example_MIT_file, dict(source="MIT"), 8, 4, 2138, 20),
+        (None, dict(source="ibtracs", ibtracs_subset="wmo"), 8, 0, 139416, 4380),
+        (None, dict(source="ibtracs", ibtracs_subset="usa"), 10, 0, 118882, 4072),
     ],
 )
 def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
@@ -27,6 +27,10 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
     assert len(data.time) == npoints
     assert len(data.groupby("track_id")) == ntracks
     assert "record" not in data.coords
+
+    if filename != huracanpy.example_TRACK_tilt_file:
+        for name in ["track_id", "time", "lon", "lat"]:
+            assert name in data
 
 
 def test_load_CHAZ():

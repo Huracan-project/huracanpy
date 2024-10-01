@@ -5,10 +5,17 @@ from . import ibtracs
 from huracanpy import utils
 
 
+rename_defaults = dict(
+    longitude="lon",
+    latitude="lat",
+)
+
+
 def load(
     filename=None,
     source=None,
     variable_names=None,
+    rename=None,
     add_info=False,
     ibtracs_online=False,
     ibtracs_subset="wmo",
@@ -50,6 +57,16 @@ def load(
           with TRACK). If the variable names are not given, then any additional
           variables will be named variable_n, where n goes from 0 to the number of
           variables
+
+    rename : dict, optional
+        A mapping of variable names to rename. Defaults are
+
+        * longitude -> lon
+        * latitude -> lat
+
+        To override any of these defaults, you can pass the same name, e.g.
+
+        >>> tracks = huracanpy.load(..., rename=dict(longitude="longitude"))
 
     add_info : bool, default=False
     ibtracs_online : bool, default=False
@@ -167,6 +184,19 @@ def load(
                 data = _csv.load(ibtracs.offline(ibtracs_subset))
         else:
             raise ValueError(f"Source {source} unsupported or misspelled")
+
+    if rename is None:
+        rename = rename_defaults
+    else:
+        # Overwrite default arguments with explicit arguments passed to rename by
+        # putting "rename" second in this dictionary combination
+        rename = {**rename_defaults, **rename}
+
+    # xarray.Dataset.rename only accepts keys that are actually in the dataset
+    rename = {key: rename[key] for key in rename if key in data}
+
+    if len(rename) > 0:
+        data = data.rename(rename)
 
     if add_info:  # TODO : Manage potentially different variable names
         data["hemisphere"] = utils.geography.get_hemisphere(data.lat)

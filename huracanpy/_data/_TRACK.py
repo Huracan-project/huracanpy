@@ -98,8 +98,8 @@ def load(filename, calendar=None, variable_names=None):
             assert len(variable_names) == nfields
         for n, variable_name in enumerate(variable_names):
             if has_coords[n]:
-                var_labels.append(f"{variable_name}_longitude")
-                var_labels.append(f"{variable_name}_latitude")
+                var_labels.append(f"{variable_name}_lon")
+                var_labels.append(f"{variable_name}_lat")
             var_labels.append(variable_name)
 
         # Read in each track as an xarray dataset with time as the coordinate
