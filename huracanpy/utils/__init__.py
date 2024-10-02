@@ -1,12 +1,33 @@
 """Huracanpy module for useful auxilliary functions"""
 
-__all__ = ["geography", "category", "time", "add_all_info", "interp", "ace"]
+__all__ = [
+    "get_hemisphere",
+    "get_basin",
+    "get_country",
+    "get_continent",
+    "get_land_or_ocean",
+    "get_category",
+    "get_sshs_cat",
+    "get_pressure_cat",
+    "get_time",
+    "get_season",
+    "interp_time",
+    "get_ace",
+    "get_pace",
+    "get_pressure_wind_relation",
+]
 
-from . import geography
-from . import category
-from . import time
-from . import interp
-from . import ace
+from .geography import (
+    get_hemisphere,
+    get_basin,
+    get_country,
+    get_continent,
+    get_land_or_ocean,
+)
+from .category import get_category, get_sshs_cat, get_pressure_cat
+from .time import get_time, get_season
+from .interp import interp_time
+from .ace import get_ace, get_pace, get_pressure_wind_relation
 
 
 def add_all_info(
@@ -71,25 +92,23 @@ def add_all_info(
 
     # Geographical
     if lat_name is not None:
-        data["hemisphere"] = geography.get_hemisphere(data[lat_name])
+        data["hemisphere"] = get_hemisphere(data[lat_name])
         if lon_name is not None:
-            data["basin"] = geography.get_basin(data[lon_name], data[lat_name])
-            data["is_ocean"] = geography.get_land_or_ocean(
-                data[lon_name], data[lat_name]
-            )
-            data["country"] = geography.get_country(data[lon_name], data[lat_name])
-            data["continent"] = geography.get_continent(data[lon_name], data[lat_name])
+            data["basin"] = get_basin(data[lon_name], data[lat_name])
+            data["is_ocean"] = get_land_or_ocean(data[lon_name], data[lat_name])
+            data["country"] = get_country(data[lon_name], data[lat_name])
+            data["continent"] = get_continent(data[lon_name], data[lat_name])
 
     # Time
     if time_name is not None:
         if time_name not in list(data) + list(data.coords):
-            data[time_name] = time.get_time(
+            data[time_name] = get_time(
                 data[year_name],
                 data[month_name],
                 data[day_name],
                 data[hour_name],
             )
-        data["season"] = time.get_season(
+        data["season"] = get_season(
             data[track_id_name],
             data[lat_name],
             data[time_name],
@@ -98,11 +117,9 @@ def add_all_info(
 
     # Category
     if wind_name is not None:
-        data["sshs"] = category.get_sshs_cat(
-            data[wind_name], sshs_convention, wind_units
-        )
+        data["sshs"] = get_sshs_cat(data[wind_name], sshs_convention, wind_units)
     if slp_name is not None:
-        data["pres_cat"] = category.get_pressure_cat(
+        data["pres_cat"] = get_pressure_cat(
             data[slp_name], pres_cat_convention, slp_units
         )
 

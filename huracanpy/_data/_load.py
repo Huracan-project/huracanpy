@@ -2,7 +2,7 @@ import pandas as pd
 
 from . import _csv, _TRACK, _netcdf, _tempestextremes, _CHAZ, _MIT
 from . import ibtracs
-from huracanpy import utils
+from .. import utils
 
 
 rename_defaults = dict(

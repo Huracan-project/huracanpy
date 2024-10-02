@@ -4,7 +4,7 @@ Module containing functions to compute track statistics
 
 from metpy.units import units
 
-from huracanpy.utils.ace import ace_by_point, pace_by_point
+from huracanpy.utils.ace import get_ace, get_pace
 
 
 def ace_by_track(
@@ -48,7 +48,7 @@ def ace_by_track(
         The ACE for each track in wind
 
     """
-    tracks[ace_varname] = ace_by_point(wind, threshold, wind_units)
+    tracks[ace_varname] = get_ace(wind, threshold, wind_units)
 
     ace_by_storm = tracks.groupby("track_id").map(lambda x: x[ace_varname].sum())
 
@@ -83,7 +83,7 @@ def pace_by_track(
     1. Pass the pressure and wind to fit a pressure-wind relationship to the data and
     then calculate pace from the winds derived from this fit
 
-    >>> pace, pw_model = pace_by_point(pressure, wind)
+    >>> pace, pw_model = get_pace(pressure, wind)
 
     The default model to fit is a quadratic polynomial
     (:py:class:`numpy.polynomial.polynomial.Polynomial` with `deg=2`)
@@ -91,7 +91,7 @@ def pace_by_track(
     2. Pass just the pressure and an already fit model to calculate the wind speeds from
     this model
 
-    >>> pace, _ = pace_by_point(pressure, model=pw_model)
+    >>> pace, _ = get_pace(pressure, model=pw_model)
 
     Parameters
     ----------
@@ -115,7 +115,7 @@ def pace_by_track(
     model : object
 
     """
-    tracks[pace_varname], model = pace_by_point(
+    tracks[pace_varname], model = get_pace(
         pressure,
         wind=wind,
         model=model,

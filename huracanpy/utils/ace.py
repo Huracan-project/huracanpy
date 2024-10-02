@@ -9,7 +9,7 @@ from metpy.xarray import preprocess_and_wrap
 from metpy.units import units
 
 
-def ace_by_point(wind, threshold=34 * units("knots"), wind_units="m s-1"):
+def get_ace(wind, threshold=34 * units("knots"), wind_units="m s-1"):
     """Calculate accumulate cyclone energy (ACE) for each individual point
 
     Parameters
@@ -63,7 +63,7 @@ def _ace_by_point(wind, threshold=34 * units("knots"), wind_units="m s-1"):
     return ace_values
 
 
-def pace_by_point(
+def get_pace(
     pressure,
     wind=None,
     model=None,
@@ -85,7 +85,7 @@ def pace_by_point(
     1. Pass the pressure and wind to fit a pressure-wind relationship to the data and
        then calculate pace from the winds derived from this fit
 
-    >>> pace, pw_model = pace_by_point(pressure, wind)
+    >>> pace, pw_model = get_pace(pressure, wind)
 
     The default model to fit is a quadratic polynomial
     (:py:class:`numpy.polynomial.polynomial.Polynomial` with `deg=2`)
@@ -93,7 +93,7 @@ def pace_by_point(
     2. Pass just the pressure and an already fit model to calculate the wind speeds from
        this model
 
-    >>> pace, _ = pace_by_point(pressure, model=pw_model)
+    >>> pace, _ = get_pace(pressure, model=pw_model)
 
     Parameters
     ----------
@@ -112,12 +112,10 @@ def pace_by_point(
     model : object
 
     """
-    model_wind, model = pressure_wind_relationship(
+    model_wind, model = get_pressure_wind_relation(
         pressure, wind=wind, model=model, **kwargs
     )
-    pace_values = ace_by_point(
-        model_wind, threshold=threshold_wind, wind_units=wind_units
-    )
+    pace_values = get_ace(model_wind, threshold=threshold_wind, wind_units=wind_units)
 
     if threshold_pressure is not None:
         pace_values[pressure > threshold_pressure] = 0.0
@@ -125,7 +123,7 @@ def pace_by_point(
     return pace_values, model
 
 
-def pressure_wind_relationship(pressure, wind=None, model=None, **kwargs):
+def get_pressure_wind_relation(pressure, wind=None, model=None, **kwargs):
     if isinstance(model, str):
         if model.lower() == "z2021":
             model = pw_z2021

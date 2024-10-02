@@ -3,13 +3,17 @@
 __version__ = "0.1.0"
 __author__ = "Leo Saffin <l.saffin@reading.ac.uk>, Stella Bourdin <stella.bourdin@physics.ox.ac.uk>, Kelvin Ng "
 __all__ = [
-    "load",
-    "save",
-    "utils",
+    # Modules
     "diags",
     "plot",
     "assess",
-    "subset",
+    "utils",
+    # Functions
+    "load",
+    "save",
+    "sel_id",
+    "trackswhere",
+    # Parameters
     "example_csv_file",
     "example_parquet_file",
     "example_year_file",
@@ -22,7 +26,6 @@ __all__ = [
 ]
 
 
-from . import utils
 from ._data import (
     load,
     save,
@@ -36,7 +39,5 @@ from ._data import (
     example_CHAZ_file,
     example_MIT_file,
 )
-from . import diags
-from . import plot
-from . import assess
-from . import subset
+from . import diags, plot, assess, utils
+from ._subset import sel_id, trackswhere

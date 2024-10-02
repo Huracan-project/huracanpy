@@ -1,5 +1,13 @@
 import xarray as xr
 
+__all__ = ["trackswhere", "sel_id"]
+
+
+def sel_id(data, tid, track_id_name="track_id"):
+    df = data.to_dataframe()
+    track = df[df[track_id_name] == tid]
+    return track.to_xarray()
+
 
 def trackswhere(tracks, condition):
     """Subset tracks from the input
