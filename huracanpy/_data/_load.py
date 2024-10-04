@@ -181,7 +181,13 @@ def load(
                         ),
                     )
             else:
-                data = _csv.load(ibtracs.offline(ibtracs_subset))
+                data = _csv.load(
+                    ibtracs.offline(ibtracs_subset),
+                    read_csv_kws=dict(
+                        na_values=["", " "],
+                        keep_default_na=False,
+                    ),
+                )
         else:
             raise ValueError(f"Source {source} unsupported or misspelled")
 
