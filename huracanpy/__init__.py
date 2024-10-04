@@ -14,6 +14,7 @@ __all__ = [
     "sel_id",
     "trackswhere",
     # Parameters
+    "basins",
     "example_csv_file",
     "example_parquet_file",
     "example_year_file",
@@ -40,4 +41,5 @@ from ._data import (
     example_MIT_file,
 )
 from . import diags, plot, assess, utils
+from .utils._basins import basins_def as basins
 from ._subset import sel_id, trackswhere
