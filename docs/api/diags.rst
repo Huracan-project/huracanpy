@@ -1,17 +1,21 @@
-Diagnostics
-===========
+diags
+=====
 
 .. automodule:: huracanpy.diags
-    :members:
+.. currentmodule:: huracanpy.diags
+.. autosummary::
+    :toctree: _autosummary
 
-.. automodule:: huracanpy.diags.lifecycle
-    :members:
-
-.. automodule:: huracanpy.diags.track_density
-    :members:
-
-.. automodule:: huracanpy.diags.track_stats
-    :members:
-
-.. automodule:: huracanpy.diags.translation_speed
-    :members:
+    simple_global_histogram
+    duration
+    gen_vals
+    extremum_vals
+    ace_by_track
+    pace_by_track
+    translation_speed
+    time_from_genesis
+    time_from_extremum
+    rate
+    freq
+    TC_days
+    ACE

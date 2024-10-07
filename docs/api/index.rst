@@ -2,11 +2,21 @@ API
 ===
 
 .. toctree::
-    :maxdepth: 2
+    :hidden:
 
-    loading
-    assess
-    diags
+    self
+    huracanpy
     utils
-    subset
+    diags
+    assess
     plot
+
+Modules
+-------
+================ ================================
+:doc:`huracanpy` .. automodule:: huracanpy
+:doc:`utils`     .. automodule:: huracanpy.utils
+:doc:`diags`     .. automodule:: huracanpy.diags
+:doc:`assess`    .. automodule:: huracanpy.assess
+:doc:`plot`      .. automodule:: huracanpy.plot
+================ ================================
