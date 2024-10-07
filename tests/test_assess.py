@@ -4,7 +4,7 @@ import huracanpy
 
 
 def test_match():
-    ib = huracanpy.load(tracker="ibtracs", ibtracs_subset="wmo")
+    ib = huracanpy.load(source="ibtracs", ibtracs_subset="wmo")
     ref_1996 = ib.where(ib.time.dt.year == 1996, drop=True)
     UZ = huracanpy.load(huracanpy.example_year_file)
     UZ1 = UZ.where(UZ.track_id.isin([1207, 1208, 1210, 1212, 1220, 1238]), drop=True)
@@ -27,13 +27,13 @@ def test_match():
 
 
 def test_scores():
-    ib = huracanpy.load(tracker="ibtracs", ibtracs_subset="wmo")
+    ib = huracanpy.load(source="ibtracs", ibtracs_subset="wmo")
     ref_1996 = ib.where(ib.time.dt.year == 1996, drop=True)
     UZ = huracanpy.load(huracanpy.example_year_file)
     M = huracanpy.assess.match_multiple([UZ, ref_1996], ["UZ", "ib"])
 
-    POD = huracanpy.assess.scores.POD(M, ref_1996)
-    FAR = huracanpy.assess.scores.FAR(M, UZ)
+    POD = huracanpy.assess.POD(M, ref_1996)
+    FAR = huracanpy.assess.FAR(M, UZ)
 
     assert 0.63 < POD < 0.64
     assert 0.14 < FAR < 0.15

@@ -2,13 +2,20 @@ import pandas as pd
 
 from . import _csv, _TRACK, _netcdf, _tempestextremes, _CHAZ, _MIT
 from . import ibtracs
-from huracanpy import utils
+from .. import utils
+
+
+rename_defaults = dict(
+    longitude="lon",
+    latitude="lat",
+)
 
 
 def load(
     filename=None,
-    tracker=None,
+    source=None,
     variable_names=None,
+    rename=None,
     add_info=False,
     ibtracs_online=False,
     ibtracs_subset="wmo",
@@ -22,18 +29,18 @@ def load(
 ):
     """Load track data
 
-    The optional parameters for different trackers (currently **IBTrACS**, **TRACK** and
-    **TempestExtremes**) are named {tracker}_{parameter} (in lower case),
+    The optional parameters for different sources of tracks (currently **IBTrACS**,
+    **TRACK** and **TempestExtremes**) are named {source}_{parameter} (in lower case),
     e.g. "ibtracs_online".
 
     Parameters
     ----------
     filename : str, optional
-        The file to be loaded. If `tracker="ibtracs"`, this is not needed as the data is
+        The file to be loaded. If `source="ibtracs"`, this is not needed as the data is
         either included in huracanpy or downloaded when called
-    tracker : str, optional
+    source : str, optional
         If the file is not a CSV or NetCDF (identified by the file extension) then the
-        tracker needs to be specified to decide how to load the data
+        source needs to be specified to decide how to load the data
 
         * **track**
         * **track.tilt**
@@ -50,6 +57,16 @@ def load(
           with TRACK). If the variable names are not given, then any additional
           variables will be named variable_n, where n goes from 0 to the number of
           variables
+
+    rename : dict, optional
+        A mapping of variable names to rename. Defaults are
+
+        * longitude -> lon
+        * latitude -> lat
+
+        To override any of these defaults, you can pass the same name, e.g.
+
+        >>> tracks = huracanpy.load(..., rename=dict(longitude="longitude"))
 
     add_info : bool, default=False
     ibtracs_online : bool, default=False
@@ -104,8 +121,8 @@ def load(
     xarray.Dataset
 
     """
-    # If tracker is not given, try to derive the right function from the file extension
-    if tracker is None:
+    # If source is not given, try to derive the right function from the file extension
+    if source is None:
         extension = filename.split(".")[-1]
         if extension == "csv":
             data = _csv.load(filename, **kwargs)
@@ -114,33 +131,33 @@ def load(
         elif filename.split(".")[-1] == "nc":
             data = _netcdf.load(filename, **kwargs)
         else:
-            raise ValueError(f"{tracker} is set to None and file type is not detected")
+            raise ValueError(f"{source} is set to None and file type is not detected")
 
-    # If tracker is given, use the relevant function
+    # If source is given, use the relevant function
     else:
-        if tracker.lower() == "track":
+        if source.lower() == "track":
             data = _TRACK.load(
                 filename, calendar=track_calendar, variable_names=variable_names
             )
-        elif tracker.lower() == "track.tilt":
+        elif source.lower() == "track.tilt":
             data = _TRACK.load_tilts(
                 filename,
                 calendar=track_calendar,
             )
-        elif tracker.lower() in ["csv", "uz"]:
+        elif source.lower() in ["csv", "uz"]:
             data = _csv.load(filename)
-        elif tracker.lower() in ["te", "tempest", "tempestextremes"]:
+        elif source.lower() in ["te", "tempest", "tempestextremes"]:
             data = _tempestextremes.load(
                 filename,
                 variable_names,
                 tempest_extremes_unstructured,
                 tempest_extremes_header_str,
             )
-        elif tracker.lower() == "chaz":
+        elif source.lower() == "chaz":
             data = _CHAZ.load(filename)
-        elif tracker.lower() == "mit":
+        elif source.lower() == "mit":
             data = _MIT.load(filename, n_track_name, lat_track_name)
-        elif tracker.lower() == "ibtracs":
+        elif source.lower() == "ibtracs":
             if ibtracs_online:
                 if filename is None:
                     filename = "ibtracs.csv"
@@ -164,9 +181,28 @@ def load(
                         ),
                     )
             else:
-                data = _csv.load(ibtracs.offline(ibtracs_subset))
+                data = _csv.load(
+                    ibtracs.offline(ibtracs_subset),
+                    read_csv_kws=dict(
+                        na_values=["", " "],
+                        keep_default_na=False,
+                    ),
+                )
         else:
-            raise ValueError(f"Tracker {tracker} unsupported or misspelled")
+            raise ValueError(f"Source {source} unsupported or misspelled")
+
+    if rename is None:
+        rename = rename_defaults
+    else:
+        # Overwrite default arguments with explicit arguments passed to rename by
+        # putting "rename" second in this dictionary combination
+        rename = {**rename_defaults, **rename}
+
+    # xarray.Dataset.rename only accepts keys that are actually in the dataset
+    rename = {key: rename[key] for key in rename if key in data}
+
+    if len(rename) > 0:
+        data = data.rename(rename)
 
     if add_info:  # TODO : Manage potentially different variable names
         data["hemisphere"] = utils.geography.get_hemisphere(data.lat)

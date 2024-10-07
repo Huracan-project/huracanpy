@@ -53,7 +53,7 @@ def load(
     elif "time" in tracks.columns:
         tracks["time"] = pd.to_datetime(tracks.time)
     else:
-        tracks["time"] = utils.time.get_time(
+        tracks["time"] = utils.get_time(
             tracks.year, tracks.month, tracks.day, tracks.hour
         )
 

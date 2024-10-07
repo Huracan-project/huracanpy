@@ -1,16 +1,45 @@
-Utils
+utils
 =====
 
+.. automodule:: huracanpy.utils
 .. currentmodule:: huracanpy.utils
+
+Geographic
+----------
+
 .. autosummary::
     :toctree: _autosummary
 
-    category.categorize
-    category.get_sshs_cat
-    geography.get_hemisphere
-    geography.get_basin
-    geography.get_land_or_ocean
-    geography.get_country
-    geography.get_continent
-    time.get_time
-    time.get_season
+    get_hemisphere
+    get_basin
+    get_land_or_ocean
+    get_country
+    get_continent
+
+Categorisation
+--------------
+
+.. autosummary::
+    :toctree: _autosummary
+
+    get_category
+    get_sshs_cat
+    get_pressure_cat
+
+Time
+----
+
+.. autosummary::
+    :toctree: _autosummary
+
+    get_time
+    get_season
+
+ACE
+---
+
+.. autosummary::
+    :toctree: _autosummary
+
+    get_ace
+    get_pace

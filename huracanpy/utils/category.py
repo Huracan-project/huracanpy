@@ -12,7 +12,9 @@ from metpy.units import units
 
 
 @preprocess_and_wrap(wrap_like="variable")
-def categorize(variable, bins=None, labels=None, convention=None, variable_units=None):
+def get_category(
+    variable, bins=None, labels=None, convention=None, variable_units=None
+):
     """Calculate a generic category from a variable and a set of thresholds
 
     Parameters
@@ -92,7 +94,7 @@ def get_sshs_cat(wind, convention="Saffir-Simpson", wind_units="m s-1"):
         The category series.
         You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
     """
-    return categorize(wind, convention=convention, variable_units=wind_units)
+    return get_category(wind, convention=convention, variable_units=wind_units)
 
 
 @preprocess_and_wrap(wrap_like="slp")
@@ -128,7 +130,7 @@ def get_pressure_cat(slp, convention="Klotzbach", slp_units="hPa"):
             )
             slp = slp / 100
 
-    return categorize(slp, convention=convention, variable_units=slp_units)
+    return get_category(slp, convention=convention, variable_units=slp_units)
 
 
 # [Stella] Leaving that here as an alternative method memo if we encounter performance issues.

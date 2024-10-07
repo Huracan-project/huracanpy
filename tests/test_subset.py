@@ -8,7 +8,7 @@ def test_trackswhere():
         tracks.slp, slp_units="Pa"
     )
 
-    tracks_subset = huracanpy.subset.trackswhere(
+    tracks_subset = huracanpy.trackswhere(
         tracks, lambda track: track.category.max() >= 2
     )
 

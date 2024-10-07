@@ -1,8 +1,8 @@
 import pandas as pd
 import xarray as xr
 
-from .track_stats import duration
-from huracanpy.utils.ace import ace_by_point
+from ._track_stats import duration
+from huracanpy.utils.ace import get_ace
 from metpy.units import units
 
 
@@ -99,7 +99,7 @@ def ACE(
         Aggregated ACE.
 
     """
-    ace = ace_by_point(self[wind_name], threshold, wind_units)
+    ace = get_ace(self[wind_name], threshold, wind_units)
 
     if by is None:
         return ace.sum()

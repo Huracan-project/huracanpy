@@ -40,3 +40,6 @@ docs/_build/
 
 # Jupyter notebook
 .ipynb_checkpoints/
+
+# Sphinx autosummary folder
+docs/api/_autosummary/

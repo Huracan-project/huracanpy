@@ -1,7 +1,7 @@
 """Huracanpy module for tracker assessment"""
 
-__all__ = ["match_pair", "match_multiple", "scores", "overlap"]
+__all__ = ["match_pair", "match_multiple", "POD", "FAR", "overlap"]
 
 from ._match import match_pair, match_multiple
-from . import scores
-from .overlap import overlap
+from ._scores import POD, FAR
+from ._overlap import overlap
