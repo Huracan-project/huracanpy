@@ -7,11 +7,35 @@ import pandas as pd
 
 from .. import utils
 
+# All values recognised as NaN by pandas.read_csv, except "NA" which we want to load
+# normally because it is a basin, and added "" to interpret empty entries as NaN
+pandas_na_values = [
+    " ",
+    "#N/A",
+    "#N/A N/A",
+    "#NA",
+    "-1.#IND",
+    "-1.#QNAN",
+    "-NaN",
+    "-nan",
+    "1.#IND",
+    "1.#QNAN",
+    "<NA>",
+    "N/A",
+    "NULL",
+    "NaN",
+    "None",
+    "n/a",
+    "nan",
+    "null ",
+    "",
+]
+
 
 def load(
     filename,
     load_function=pd.read_csv,
-    read_csv_kws=dict(),
+    **kwargs,
 ):
     """Load csv tracks data as an xarray.Dataset
     These tracks may come from TempestExtremes StitchNodes, or any other source.
@@ -24,13 +48,23 @@ def load(
             - time must be defined a single `time`column or by four columns : year, month, day, hour
             - track ID must be within a column named track_id.
 
+    load_function : callable
+        One of the load functions in pandas
+
+    **kwargs
+        Remaining keywords are passed to the pandas
+
     Returns
     -------
     xarray.Dataset
     """
+    # Update keywords with extra defaults for dealing with "NA" as basin not nan
+    # Put kwargs second in this statement, so it can override defaults
+    if load_function is pd.read_csv:
+        kwargs = {**dict(na_values=pandas_na_values, keep_default_na=False), **kwargs}
 
     ## Read file
-    tracks = load_function(filename, **read_csv_kws)
+    tracks = load_function(filename, **kwargs)
     if (
         tracks.columns.str[0][1] == " "
     ):  # Sometimes columns names are read starting with a space, which we remove
