@@ -116,6 +116,10 @@ def load(
         * CSV file - :func:`pandas.read_csv`
         * parquet file - :func:`pandas.read_parquet`
 
+        For CSV files pandas interprets "NA" as `nan` by default, which is overriden in
+        this function. To restore the pandas default behavious set
+        :code:`keep_default_NA=True` and :code:`na_values=[]`
+
     Returns
     -------
     xarray.Dataset
@@ -145,7 +149,7 @@ def load(
                 calendar=track_calendar,
             )
         elif source.lower() in ["csv", "uz"]:
-            data = _csv.load(filename)
+            data = _csv.load(filename, **kwargs)
         elif source.lower() in ["te", "tempest", "tempestextremes"]:
             data = _tempestextremes.load(
                 filename,
@@ -163,13 +167,13 @@ def load(
                     filename = "ibtracs.csv"
 
                 with ibtracs.online(ibtracs_subset, filename, ibtracs_clean) as f:
-                    data = _csv.load(
-                        f,
-                        read_csv_kws=dict(
+                    # Put IBTrACS specific arguments to read_csv second, so it
+                    # overwrites any arguments passed
+                    kwargs = {
+                        **kwargs,
+                        **dict(
                             header=0,
                             skiprows=[1],
-                            na_values=["", " "],
-                            keep_default_na=False,
                             converters={
                                 "SID": str,
                                 "SEASON": int,
@@ -179,14 +183,20 @@ def load(
                                 "LAT": float,
                             },
                         ),
+                    }
+                    return load(
+                        filename=f,
+                        source="csv",
+                        rename=rename,
+                        add_info=add_info,
+                        **kwargs,
                     )
             else:
-                data = _csv.load(
-                    ibtracs.offline(ibtracs_subset),
-                    read_csv_kws=dict(
-                        na_values=["", " "],
-                        keep_default_na=False,
-                    ),
+                return load(
+                    filename=ibtracs.offline(ibtracs_subset),
+                    rename=rename,
+                    add_info=add_info,
+                    **kwargs,
                 )
         else:
             raise ValueError(f"Source {source} unsupported or misspelled")
