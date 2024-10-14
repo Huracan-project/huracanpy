@@ -17,6 +17,7 @@ __all__ = [
     "get_pace",
     "get_pressure_wind_relation",
     "get_distance",
+    "get_translation_speed",
 ]
 
 from .geography import (
@@ -30,7 +31,7 @@ from .category import get_category, get_sshs_cat, get_pressure_cat
 from .time import get_time, get_time_components, get_season
 from .interp import interp_time
 from .ace import get_ace, get_pace, get_pressure_wind_relation
-from .translation import get_distance
+from .translation import get_distance, get_translation_speed
 
 
 def add_all_info(
