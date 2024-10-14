@@ -41,7 +41,7 @@ def freq(self, by=None, track_id_name="track_id"):
         return self.groupby(by).apply(freq, by=None).mean()
 
 
-def TC_days(self, by=None, track_id_name="track_id", time_name="time"):
+def tc_days(self, by=None, track_id_name="track_id", time_name="time"):
     """
     Function to compute the number of "TC days", or cumulated TC duration, potentially normalized by another variable (e.g. season to get yearly TCD).
 
@@ -68,10 +68,10 @@ def TC_days(self, by=None, track_id_name="track_id", time_name="time"):
     if by is None:
         return xr.DataArray(duration(self[time_name], self[track_id_name]).sum() / 24)
     else:
-        return self.groupby(by).apply(TC_days, by=None).mean()
+        return self.groupby(by).apply(tc_days, by=None).mean()
 
 
-def ACE(
+def ace(
     self, by=None, wind_name="wind", threshold=0 * units("knots"), wind_units="m s-1"
 ):
     """
