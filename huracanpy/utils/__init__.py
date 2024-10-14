@@ -10,6 +10,7 @@ __all__ = [
     "get_sshs_cat",
     "get_pressure_cat",
     "get_time",
+    "get_time_components",
     "get_season",
     "interp_time",
     "get_ace",
@@ -25,7 +26,7 @@ from .geography import (
     get_land_or_ocean,
 )
 from .category import get_category, get_sshs_cat, get_pressure_cat
-from .time import get_time, get_season
+from .time import get_time, get_time_components, get_season
 from .interp import interp_time
 from .ace import get_ace, get_pace, get_pressure_wind_relation
 

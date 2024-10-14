@@ -4,12 +4,30 @@ Utils related to time
 
 import pandas as pd
 import numpy as np
+import xarray as xr
 from metpy.xarray import preprocess_and_wrap
 
 from .geography import get_hemisphere
 
 
-def get_time(year, month, day, hour):
+def _get_time_xr(year, month, day, hour):
+    time = pd.to_datetime(
+        year.astype(str)
+        .str.cat("-")
+        .str.cat(month.astype(str))
+        .str.cat("-")
+        .str.cat(day.astype(str))
+        .str.cat(" ")
+        .str.cat(hour.astype(str))
+        .str.cat(":00:00")
+    )
+    return xr.DataArray(
+        time,
+        dims=year.dims,
+    )
+
+
+def _get_time_pd(year, month, day, hour):
     """
     Get np.datetime64 array corresponding to year, month, day and hour arrays
 
@@ -35,28 +53,44 @@ def get_time(year, month, day, hour):
     return time
 
 
-def expand_time(data, time_name="time"):
+def get_time(year, month, day, hour):
+    """
+    Get np.datetime64 array corresponding to year, month, day and hour arrays
+
+    Parameters
+    ----------
+    year, month, day, hour : pandas.Series or xarray.DataArray
+
+    Returns
+    -------
+    pandas.Series or xarray.DataArray
+        The corresponding np.datetime64
+    """
+    if type(year) == pd.Series:
+        return _get_time_pd(year, month, day, hour)
+    if type(year) == xr.DataArray:
+        return _get_time_xr(year, month, day, hour)
+
+
+def get_time_components(time):
     """
     Expand the time variable into year/month/day/hour
 
     Parameters
     ----------
-    data : xr.Dataset
-        The tracks dataset.
-    time_name : str, optional
-        Name of the time variable. The default is "time".
+    time : xr.DataArray
+        The time time series.
 
     Returns
     -------
-    data : TYPE
-        DESCRIPTION.
+    year, month, day, hour : xr.DataArrays
 
     """
-    data["year"] = data[time_name].dt.year
-    data["month"] = data[time_name].dt.month
-    data["day"] = data[time_name].dt.day
-    data["hour"] = data[time_name].dt.hour
-    return data
+    year = time.dt.year
+    month = time.dt.month
+    day = time.dt.day
+    hour = time.dt.hour
+    return year, month, day, hour
 
 
 @preprocess_and_wrap(wrap_like="track_id")
