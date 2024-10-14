@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 
 
-def plot_density(
+def density(
     d,
     contourf_kws=dict(cmap="magma_r", levels=10),
     subplot_kws=dict(projection=ccrs.PlateCarree(180)),

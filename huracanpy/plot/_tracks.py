@@ -7,7 +7,7 @@ import seaborn as sns
 import cartopy.crs as ccrs
 
 
-def plot_tracks_basic(
+def tracks(
     lon,
     lat,
     intensity_var=None,
