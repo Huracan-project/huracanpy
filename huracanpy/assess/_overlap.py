@@ -1,6 +1,6 @@
 """Overlap function"""
 
-from ._match import match_pair
+from ._match import match
 
 
 def overlap(tracks1, tracks2, matches=None):
@@ -20,7 +20,7 @@ def overlap(tracks1, tracks2, matches=None):
         Match dataset with added deltas in days
     """
     if matches is None:
-        matches = match_pair(tracks1, tracks2)
+        matches = match(tracks1, tracks2)
     c1, c2 = matches.columns[:2].str.slice(3)
     tracks1, tracks2 = tracks1.to_dataframe(), tracks2.to_dataframe()
     matches = (

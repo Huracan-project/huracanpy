@@ -6,7 +6,46 @@ from haversine import haversine_vector, Unit
 from itertools import combinations
 
 
-def match_pair(
+def match(tracksets, names=["1", "2"], max_dist=300, min_overlap=0):
+    """
+    Match the provided track sets between them.
+
+    Parameters
+    ----------
+    tracksets : list
+        list of track datasets to match together. Must be of length two or more.
+    names : list, optional
+        list of track datasets names. Must be the same size as tracksets. The default is ['1','2'].
+    max_dist : float, optional
+        Threshold for maximum distance between two tracks. The default is 300.
+    min_overlap : int, optional
+        Minimum number of overlapping time steps for matching. The default is 0.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe containing the matching tracks with
+            the id from corresponding datasets
+            the number of matching time steps (if only two datasets provided)
+            the distance between two tracks (if only two datasets provided)
+
+    """
+
+    # Check input
+    assert len(tracksets) >= 2, "You must provide at least two datasets to match"
+    assert len(names) == len(
+        tracksets
+    ), "Number of names provided do not correspond to the number of track sets"
+
+    # Two track sets
+    if len(tracksets) == 2:
+        return _match_pair(*tracksets, *names, max_dist, min_overlap)
+    # More than two track sets
+    else:
+        return _match_multiple(tracksets, names, max_dist, min_overlap)
+
+
+def _match_pair(
     tracks1,
     tracks2,
     name1="1",
@@ -70,7 +109,7 @@ def match_pair(
     return matches
 
 
-def match_multiple(
+def _match_multiple(
     datasets,
     names,
     max_dist=300,
@@ -108,7 +147,7 @@ def match_multiple(
     for names_pair, dataset_pair in zip(
         combinations(names, 2), combinations(datasets, 2)
     ):
-        m = match_pair(*dataset_pair, *names_pair, max_dist, min_overlap)
+        m = _match_pair(*dataset_pair, *names_pair, max_dist, min_overlap)
         if len(m) == 0:
             raise NotImplementedError(
                 "For the moment, the case where two datasets have no match is not handled. Problem raised by datasets "  # TODO

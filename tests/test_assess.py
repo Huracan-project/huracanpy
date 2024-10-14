@@ -9,7 +9,7 @@ def test_match():
     UZ = huracanpy.load(huracanpy.example_year_file)
     UZ1 = UZ.where(UZ.track_id.isin([1207, 1208, 1210, 1212, 1220, 1238]), drop=True)
     UZ2 = UZ.where(UZ.track_id.isin([1207, 1208, 1209, 1211, 1220, 1238]), drop=True)
-    M = huracanpy.assess.match_multiple([UZ1, UZ2, ref_1996], ["UZ1", "UZ2", "ib"])
+    M = huracanpy.assess.match([UZ1, UZ2, ref_1996], ["UZ1", "UZ2", "ib"])
 
     data1, data2, data3 = UZ1, UZ2, ref_1996
     N1 = len(np.unique(data1.track_id.values))  # Number of tracks in dataset 1
@@ -30,7 +30,7 @@ def test_scores():
     ib = huracanpy.load(source="ibtracs", ibtracs_subset="wmo")
     ref_1996 = ib.where(ib.time.dt.year == 1996, drop=True)
     UZ = huracanpy.load(huracanpy.example_year_file)
-    M = huracanpy.assess.match_multiple([UZ, ref_1996], ["UZ", "ib"])
+    M = huracanpy.assess.match([UZ, ref_1996], ["UZ", "ib"])
 
     POD = huracanpy.assess.pod(M, ref_1996)
     FAR = huracanpy.assess.far(M, UZ)
