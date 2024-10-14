@@ -66,9 +66,9 @@ def get_time(year, month, day, hour):
     pandas.Series or xarray.DataArray
         The corresponding np.datetime64
     """
-    if type(year) == pd.Series:
+    if type(year) is pd.Series:
         return _get_time_pd(year, month, day, hour)
-    if type(year) == xr.DataArray:
+    if type(year) is xr.DataArray:
         return _get_time_xr(year, month, day, hour)
 
 
