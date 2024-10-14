@@ -30,6 +30,7 @@ dependencies = [
     "metpy",
     "tqdm",
     "pyarrow",
+    "pyproj"
 ]
 
 [project.optional-dependencies]
