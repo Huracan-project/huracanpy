@@ -3,7 +3,7 @@
 import numpy as np
 
 
-def POD(matches, ref, ref_name="ib"):
+def pod(matches, ref, ref_name="ib"):
     """
 
     Parameters
@@ -21,7 +21,7 @@ def POD(matches, ref, ref_name="ib"):
     return N_detected / N_total
 
 
-def FAR(matches, detected, detected_name="UZ"):
+def far(matches, detected, detected_name="UZ"):
     """
 
     Parameters
