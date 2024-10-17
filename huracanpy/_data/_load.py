@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 from . import _csv, _TRACK, _netcdf, _tempestextremes
 from . import ibtracs
 from .. import utils
@@ -25,6 +26,7 @@ def load(
     variable_names=None,
     rename=dict(),
     add_info=False,
+    baselon=None,
     ibtracs_online=False,
     ibtracs_subset="wmo",
     ibtracs_clean=True,
@@ -74,6 +76,9 @@ def load(
         >>> tracks = huracanpy.load(..., rename=dict(longitude="longitude"))
 
     add_info : bool, default=False
+    baselon : scalar, optional
+        Force the loaded longitudes into the range (baselon, baselon + 360). e.g.
+        (0, 360) or (-180, 180)
     ibtracs_online : bool, default=False
         * **False**: Use a small subset of the IBTrACS data included in this package
         * **True**: Download the IBTrACS data
@@ -211,6 +216,9 @@ def load(
 
     if len(rename) > 0:
         data = data.rename(rename)
+
+    if baselon is not None:
+        data["lon"] = ((data.lon - baselon) % 360) + baselon
 
     if add_info:  # TODO : Manage potentially different variable names
         data["hemisphere"] = utils.geography.get_hemisphere(data.lat)
