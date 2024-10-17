@@ -65,29 +65,40 @@ def test_save(filename, source, extension, muddle, tmp_path):
     # Caused an issue because they got sorted before
     if muddle:
         data = data.sortby("track_id", ascending=False)
+
     # Copy the data because save modifies the dataset at the moment
-    huracanpy.save(data.copy(), str(tmp_path / f"tmp_file.{extension}"))
+    data_orig = data.copy()
+    huracanpy.save(data, str(tmp_path / f"tmp_file.{extension}"))
+
+    # Check that the original data is not modified by the save function
+    _assert_dataset_identical(data_orig, data)
 
     # Reload the data and check it is still the same
-    data_ = huracanpy.load(str(tmp_path / f"tmp_file.{extension}"))
+    # Saving as netcdf does force sorting by track_id so apply this
+    if extension == "nc":
+        data = data.sortby("track_id")
+    data_reload = huracanpy.load(str(tmp_path / f"tmp_file.{extension}"))
+    _assert_dataset_identical(data, data_reload)
 
-    assert len(data.variables) == len(data_.variables)
-    assert len(data.coords) == len(data_.coords)
-    for var in list(data.variables) + list(data.coords):
+
+def _assert_dataset_identical(ds1, ds2):
+    assert len(ds1.variables) == len(ds2.variables)
+    assert len(ds1.coords) == len(ds2.coords)
+    for var in list(ds1.variables) + list(ds1.coords):
         # Work around for xarray inconsistent loading the data as float or double
         # depending on fill_value and scale_factor
         # np.testing.assert_allclose doesn't work for datetime64, object, or string
-        if np.issubdtype(data[var].dtype, np.number):
-            if data[var].dtype != data_[var].dtype:
+        if np.issubdtype(ds1[var].dtype, np.number):
+            if ds1[var].dtype != ds2[var].dtype:
                 rtol = 1e-6
             else:
                 rtol = 0
             np.testing.assert_allclose(
-                data[var].data.astype(data_[var].dtype), data_[var].data, rtol=rtol
+                ds1[var].data.astype(ds2[var].dtype), ds2[var].data, rtol=rtol
             )
         else:
-            assert (data[var].data == data_[var].data).all()
+            assert (ds1[var].data == ds2[var].data).all()
 
-    assert len(data.attrs) == len(data_.attrs)
-    for attr in data.attrs:
-        assert data.attrs[attr] == data_.attrs[attr]
+    assert len(ds1.attrs) == len(ds2.attrs)
+    for attr in ds1.attrs:
+        assert ds1.attrs[attr] == ds2.attrs[attr]

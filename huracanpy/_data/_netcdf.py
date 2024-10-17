@@ -47,11 +47,10 @@ def save(dataset, filename):
             f"{trajectory_id.name} spans multiple dimensions, should be 1d"
         )
 
-    # np.unique returns a sorted array, so return the index so that the trajectory_ids
-    # can be put back in the same order as they are in the original dataset otherwise
-    # the ordering of data can be messed up if the trajectories ids aren't monotonic
-    trajectory_ids, idx = np.unique(trajectory_id, return_index=True)
-    trajectory_ids = trajectory_id[sorted(idx)].values
+    # Sort by trajectory_id so each track can be described by the first index and
+    # number of elements of the unique trajectory id
+    dataset = dataset.sortby(trajectory_id.name)
+    trajectory_ids = np.unique(trajectory_id)
     rowsize = [np.count_nonzero(trajectory_id == x) for x in trajectory_ids]
 
     dataset[trajectory_id.name] = ("trajectory", trajectory_ids)
@@ -75,9 +74,10 @@ def stretch_trid(dataset):
 
     dataset = dataset.drop_vars([trajectory_id.name, rowsize.name])
 
-    dataset["track_id"] = (sample_dimension, trajectory_id_stretched)
-    # Keep attributes (including cf_role)
-    dataset["track_id"].attrs = trajectory_id.attrs
+    dataset[trajectory_id.name] = (sample_dimension, trajectory_id_stretched)
+    # Keep attributes (add cf_role if not already there)
+    dataset[trajectory_id.name].attrs = trajectory_id.attrs
+    dataset[trajectory_id.name].attrs["cf_role"] = "trajectory_id"
 
     return dataset
 
@@ -118,7 +118,6 @@ def _find_trajectory_id(dataset):
         return trajectory_id[0]
     else:
         if "track_id" in dataset:
-            dataset["track_id"].attrs["cf_role"] = "trajectory_id"
             return dataset["track_id"]
         else:
             raise ValueError(

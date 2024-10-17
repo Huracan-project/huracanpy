@@ -14,6 +14,8 @@ rename_defaults = dict(
     lat_track="lat",
     # Names for CHAZ netCDF
     stormID="track_id",
+    # Names for TRACK netCDF
+    TRACK_ID="track_id",
 )
 
 
