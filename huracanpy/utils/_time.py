@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 from metpy.xarray import preprocess_and_wrap
 
-from .geography import get_hemisphere
+from ._geography import get_hemisphere
 
 
 def get_time_components(time):
