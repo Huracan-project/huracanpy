@@ -11,24 +11,22 @@ import xarray as xr
 # trajectories to allow us to use groupby() and sel() with track_id to work by
 # individual tracks. So we need to replace the "track_id" or equivalent variable when
 # loading or saving the data
-def load(filename, **kwargs):
+def load(filename, rename, **kwargs):
     dataset = xr.open_dataset(filename, **kwargs)
 
-    # Find the trajectory_id and rowSize variables from their CF labels
-    trajectory_id = _find_trajectory_id(dataset)
-    rowsize = _find_rowsize(dataset)
-    sample_dimension = rowsize.attrs["sample_dimension"]
+    # xarray.Dataset.rename only accepts keys that are actually in the dataset
+    rename = {
+        key: rename[key] for key in rename if key in dataset or key in dataset.dims
+    }
+    if len(rename) > 0:
+        dataset = dataset.rename(rename)
 
-    # Stretch the trajectory_id out along the sample dimension
-    trajectory_id_stretched = []
-    for npoints, tr_id in zip(rowsize.data, trajectory_id.data):
-        trajectory_id_stretched.extend([tr_id] * npoints)
-
-    dataset = dataset.drop_vars([trajectory_id.name, rowsize.name])
-
-    dataset["track_id"] = (sample_dimension, trajectory_id_stretched)
-    # Keep attributes (including cf_role)
-    dataset["track_id"].attrs = trajectory_id.attrs
+    # Assume ragged array. If the CF trajectory_id and sample dimension can't be found
+    # try reshaping from a 2d array
+    try:
+        dataset = stretch_trid(dataset)
+    except ValueError:
+        dataset = as1d(dataset)
 
     return dataset
 
@@ -62,6 +60,49 @@ def save(dataset, filename):
     dataset["rowSize"].attrs["sample_dimension"] = sample_dimension
 
     dataset.to_netcdf(filename)
+
+
+def stretch_trid(dataset):
+    # Find the trajectory_id and rowSize variables from their CF labels
+    trajectory_id = _find_trajectory_id(dataset)
+    rowsize = _find_rowsize(dataset)
+    sample_dimension = rowsize.attrs["sample_dimension"]
+
+    # Stretch the trajectory_id out along the sample dimension
+    trajectory_id_stretched = []
+    for npoints, tr_id in zip(rowsize.data, trajectory_id.data):
+        trajectory_id_stretched.extend([tr_id] * npoints)
+
+    dataset = dataset.drop_vars([trajectory_id.name, rowsize.name])
+
+    dataset["track_id"] = (sample_dimension, trajectory_id_stretched)
+    # Keep attributes (including cf_role)
+    dataset["track_id"].attrs = trajectory_id.attrs
+
+    return dataset
+
+
+def as1d(dataset):
+    # Stack 2d dimensions into a record dimension
+    dims = dataset.lon.dims
+    dataset = dataset.stack(record=dims)
+
+    # Record only as an index, not a coordinate
+    record = dataset.record
+    dataset = dataset.drop_vars(["record", *dims])
+
+    # Set old dims as variables
+    for dim in dims:
+        # If it is a dimension, add it as a variable
+        dataset[dim] = ("record", record[dim].values)
+
+    # Remove data that is only nans
+    dataset = dataset.where(~np.isnan(dataset.lon), drop=True)
+
+    # Add cf role to track_id
+    dataset.track_id.attrs["cf_role"] = "trajectory_id"
+
+    return dataset.sortby(["track_id", "time"])
 
 
 def _find_trajectory_id(dataset):

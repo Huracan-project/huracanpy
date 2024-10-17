@@ -1,6 +1,6 @@
 import pandas as pd
 
-from . import _csv, _TRACK, _netcdf, _tempestextremes, _CHAZ, _MIT
+from . import _csv, _TRACK, _netcdf, _tempestextremes
 from . import ibtracs
 from .. import utils
 
@@ -8,6 +8,12 @@ from .. import utils
 rename_defaults = dict(
     longitude="lon",
     latitude="lat",
+    # Names for MIT netCDF
+    n_track="track_id",
+    lon_track="lon",
+    lat_track="lat",
+    # Names for CHAZ netCDF
+    stormID="track_id",
 )
 
 
@@ -15,7 +21,7 @@ def load(
     filename=None,
     source=None,
     variable_names=None,
-    rename=None,
+    rename=dict(),
     add_info=False,
     ibtracs_online=False,
     ibtracs_subset="wmo",
@@ -23,8 +29,6 @@ def load(
     tempest_extremes_unstructured=False,
     tempest_extremes_header_str="start",
     track_calendar=None,
-    n_track_name="n_track",
-    lat_track_name="lat_track",
     **kwargs,
 ):
     """Load track data
@@ -46,7 +50,6 @@ def load(
         * **track.tilt**
         * **te**, **tempest**, **tempestextremes**, **uz**:
         * **ibtracs**
-        * **CHAZ**, **MIT**
 
     variable_names : list of str, optional
           When loading data from an ASCII file (TRACK or TempestExtremes), specify the
@@ -125,6 +128,10 @@ def load(
     xarray.Dataset
 
     """
+    # Overwrite default arguments with explicit arguments passed to rename by putting
+    # "rename" second in this dictionary combination
+    rename = {**rename_defaults, **rename}
+
     # If source is not given, try to derive the right function from the file extension
     if source is None:
         extension = filename.split(".")[-1]
@@ -133,9 +140,9 @@ def load(
         elif extension == "parquet":
             data = _csv.load(filename, load_function=pd.read_parquet, **kwargs)
         elif filename.split(".")[-1] == "nc":
-            data = _netcdf.load(filename, **kwargs)
+            data = _netcdf.load(filename, rename, **kwargs)
         else:
-            raise ValueError(f"{source} is set to None and file type is not detected")
+            raise ValueError("Source is set to None and file type is not detected")
 
     # If source is given, use the relevant function
     else:
@@ -157,10 +164,6 @@ def load(
                 tempest_extremes_unstructured,
                 tempest_extremes_header_str,
             )
-        elif source.lower() == "chaz":
-            data = _CHAZ.load(filename)
-        elif source.lower() == "mit":
-            data = _MIT.load(filename, n_track_name, lat_track_name)
         elif source.lower() == "ibtracs":
             if ibtracs_online:
                 if filename is None:
@@ -200,13 +203,6 @@ def load(
                 )
         else:
             raise ValueError(f"Source {source} unsupported or misspelled")
-
-    if rename is None:
-        rename = rename_defaults
-    else:
-        # Overwrite default arguments with explicit arguments passed to rename by
-        # putting "rename" second in this dictionary combination
-        rename = {**rename_defaults, **rename}
 
     # xarray.Dataset.rename only accepts keys that are actually in the dataset
     rename = {key: rename[key] for key in rename if key in data}
