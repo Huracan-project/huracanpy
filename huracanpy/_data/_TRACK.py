@@ -65,6 +65,8 @@ def load(filename, calendar=None, variable_names=None):
         open_func = open
 
     output = list()
+    track_id = list()
+    times = list()
     with open_func(filename, "rt") as f:
         # The first lines can contain extra information bounded by two extra lines
         # Just skip to the main header line for now
@@ -118,41 +120,35 @@ def load(filename, calendar=None, variable_names=None):
             # Time is a list because it will hold datetime or cftime objects
             # Other variables are a dictionary mapping variable name to a tuple of
             # (time, data_array) as this is what is passed to xarray.Dataset
-            times = [None] * npoints
-            track_data = {label: ("record", np.zeros(npoints)) for label in var_labels}
 
             # Add track ID as a variable along the record dimension so that it can be used
             # for groupby
-            track_id = np.array([track_info["track_id"]] * npoints)
-            track_data["track_id"] = ("record", track_id)
+            track_id.extend([track_info["track_id"]] * npoints)
 
             # Populate time and data line by line
             for m in range(npoints):
-                line = f.readline().strip().split("&")
-                time, lon, lat, vorticity = line[0].split()
-                times[m] = parse_date(time, calendar=calendar)
-                track_data["lon"][1][m] = float(lon)
-                track_data["lat"][1][m] = float(lat)
-                track_data["vorticity"][1][m] = float(vorticity)
+                line = f.readline().strip()
+                times.append(parse_date(line.split(" ")[0], calendar=calendar))
+                output.append(line.replace("&", " "))
 
-                for i, label in enumerate(var_labels[3:], start=1):
-                    track_data[label][1][m] = float(line[i])
+    output = np.genfromtxt(output)
+    data_vars = {
+        varname: ("record", output[:, i])
+        for i, varname in enumerate(var_labels, start=1)
+    }
+    data_vars["track_id"] = ("record", track_id)
+    data_vars["time"] = ("record", times)
 
-            # Return a dataset for the individual track
-            # Add time separately so xarray can deal with the awkward np.datetime64
-            # format
-            ds = xr.Dataset(track_data)
-            ds["time"] = ("record", times)
-            output.append(ds)
+    ds = xr.Dataset(data_vars=data_vars)
+    ds.track_id.attrs["cf_role"] = "trajectory_id"
 
-    output = xr.concat(output, dim="record")
-    output.track_id.attrs["cf_role"] = "trajectory_id"
-
-    return output
+    return ds
 
 
 def load_tilts(filename, calendar=None, nans=1e25):
     output = list()
+    track_id = list()
+    times = list()
     with open(filename, "rt") as f:
         # First line
         header = _parse(tilt_header_fmt, f.readline().strip()).named
@@ -168,34 +164,27 @@ def load_tilts(filename, calendar=None, nans=1e25):
             track_info = _parse(tilt_track_header_fmt, f.readline().strip()).named
             npoints = track_info["npoints"]
 
-            # Create an xarray dataset for the individual track (and concatenate later)
-            # Do time as a list and add to the dataset after reading all the times to
-            # account for awkward to definitions
-            ds = xr.Dataset(
-                data_vars=dict(
-                    tilt=(["record", "levels"], np.zeros([npoints, nfields])),
-                    track_id=(
-                        "record",
-                        np.array([track_info["track_id"]] * npoints, dtype=int),
-                    ),
-                ),
-                coords=dict(pressure=("levels", np.array(levels))),
-            )
-            times = []
+            # Add track ID as a variable along the record dimension so that it can be used
+            # for groupby
+            track_id.extend([track_info["track_id"]] * npoints)
 
             # Populate time and data line by line
             for m in range(npoints):
-                line = f.readline().strip().split(" ")
-                times.append(parse_date(line[0], calendar=calendar))
-                ds.tilt[m, :] = np.array(line[1:])
+                line = f.readline().strip()
+                times.append(parse_date(line.split(" ")[0], calendar=calendar))
+                output.append(line)
 
-            # Return a dataset for the individual track
-            # Add time separately so xarray can deal with the awkward np.datetime64
-            # format
-            ds["time"] = ("record", times)
-            output.append(ds)
+    output = np.genfromtxt(output)
+    data_vars = dict(
+        tilt=(["record", "levels"], output[:, 1:]),
+        track_id=("record", track_id),
+        time=("record", times),
+    )
+    coords = dict(pressure=("levels", levels))
 
-    output = xr.concat(output, dim="record")
+    output = xr.Dataset(data_vars=data_vars, coords=coords)
+    output.track_id.attrs["cf_role"] = "trajectory_id"
+
     if nans is not None:
         output["tilt"] = (
             ["record", "levels"],

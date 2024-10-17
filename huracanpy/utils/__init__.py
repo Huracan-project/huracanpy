@@ -9,7 +9,6 @@ __all__ = [
     "get_category",
     "get_sshs_cat",
     "get_pressure_cat",
-    "get_time",
     "get_time_components",
     "get_season",
     "interp_time",
@@ -28,7 +27,7 @@ from .geography import (
     get_land_or_ocean,
 )
 from .category import get_category, get_sshs_cat, get_pressure_cat
-from .time import get_time, get_time_components, get_season
+from .time import get_time_components, get_season
 from .interp import interp_time
 from .ace import get_ace, get_pace, get_pressure_wind_relation
 from .translation import get_distance, get_translation_speed
@@ -106,11 +105,15 @@ def add_all_info(
     # Time
     if time_name is not None:
         if time_name not in list(data) + list(data.coords):
-            data[time_name] = get_time(
-                data[year_name],
-                data[month_name],
-                data[day_name],
-                data[hour_name],
+            import pandas as pd
+
+            data[time_name] = pd.to_datetime(
+                dict(
+                    year=data[year_name],
+                    month=data[month_name],
+                    day=data[day_name],
+                    hour=data[hour_name],
+                )
             )
         data["season"] = get_season(
             data[track_id_name],
