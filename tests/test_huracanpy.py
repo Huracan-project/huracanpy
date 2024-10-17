@@ -9,8 +9,8 @@ import huracanpy
     [
         (huracanpy.example_TRACK_file, dict(source="TRACK"), 35, 0, 46, 2),
         (huracanpy.example_TRACK_tilt_file, dict(source="TRACK.tilt"), 3, 1, 46, 2),
-        (huracanpy.example_csv_file, dict(), 13, 0, 99, 3),
-        (huracanpy.example_parquet_file, dict(), 13, 0, 99, 3),
+        (huracanpy.example_csv_file, dict(), 9, 0, 99, 3),
+        (huracanpy.example_parquet_file, dict(), 9, 0, 99, 3),
         (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86),
         (huracanpy.example_TE_file, dict(source="tempestextremes"), 8, 0, 210, 8),
         (huracanpy.example_CHAZ_file, dict(), 11, 0, 1078, 20),

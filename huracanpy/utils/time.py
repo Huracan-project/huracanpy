@@ -4,72 +4,9 @@ Utils related to time
 
 import pandas as pd
 import numpy as np
-import xarray as xr
 from metpy.xarray import preprocess_and_wrap
 
 from .geography import get_hemisphere
-
-
-def _get_time_xr(year, month, day, hour):
-    time = pd.to_datetime(
-        year.astype(str)
-        .str.cat("-")
-        .str.cat(month.astype(str))
-        .str.cat("-")
-        .str.cat(day.astype(str))
-        .str.cat(" ")
-        .str.cat(hour.astype(str))
-        .str.cat(":00:00")
-    )
-    return xr.DataArray(
-        time,
-        dims=year.dims,
-    )
-
-
-def _get_time_pd(year, month, day, hour):
-    """
-    Get np.datetime64 array corresponding to year, month, day and hour arrays
-
-    Parameters
-    ----------
-    year, month, day, hour : numpy.ndarray or pandas.Series
-
-    Returns
-    -------
-    numpy.ndarray or pandas.Series
-        The corresponding np.datetime64
-    """
-    time = pd.to_datetime(
-        year.astype(str)
-        + "-"
-        + month.astype(str)
-        + "-"
-        + day.astype(str)
-        + " "
-        + hour.astype(str)
-        + ":00"
-    )
-    return time
-
-
-def get_time(year, month, day, hour):
-    """
-    Get np.datetime64 array corresponding to year, month, day and hour arrays
-
-    Parameters
-    ----------
-    year, month, day, hour : pandas.Series or xarray.DataArray
-
-    Returns
-    -------
-    pandas.Series or xarray.DataArray
-        The corresponding np.datetime64
-    """
-    if type(year) is pd.Series:
-        return _get_time_pd(year, month, day, hour)
-    if type(year) is xr.DataArray:
-        return _get_time_xr(year, month, day, hour)
 
 
 def get_time_components(time):

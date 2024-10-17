@@ -3,9 +3,7 @@ Module to load tracks stored as csv files, including TempestExtremes output.
 """
 
 import pandas as pd
-
-
-from .. import utils
+from pandas.core.tools.datetimes import _unit_map
 
 # All values recognised as NaN by pandas.read_csv, except "NA" which we want to load
 # normally because it is a basin, and added "" to interpret empty entries as NaN
@@ -65,20 +63,8 @@ def load(
 
     ## Read file
     tracks = load_function(filename, **kwargs)
-    if (
-        tracks.columns.str[0][1] == " "
-    ):  # Sometimes columns names are read starting with a space, which we remove
-        tracks = tracks.rename(columns={c: c[1:] for c in tracks.columns[1:]})
-    tracks.columns = tracks.columns.str.lower()  # Make all column names lowercase
-    tracks = tracks.rename(
-        {"longitude": "lon", "latitude": "lat"}
-    )  # Rename lon & lat columns if necessary
-
-    ## Geographical attributes
-    if "lon" in tracks.columns:
-        tracks.loc[tracks.lon < 0, "lon"] += (
-            360  # Longitude are converted to [0,360] if necessary
-        )
+    # Remove leading/trailing spaces and make all column names lowercase
+    tracks.columns = tracks.columns.str.strip().str.lower()
 
     ## Time attribute
     if "iso_time" in tracks.columns:
@@ -87,9 +73,11 @@ def load(
     elif "time" in tracks.columns:
         tracks["time"] = pd.to_datetime(tracks.time)
     else:
-        tracks["time"] = utils.get_time(
-            tracks.year, tracks.month, tracks.day, tracks.hour
-        )
+        # Combine separate year/month/day etc. values into a time, and drop those
+        # variables from the dataframe
+        time_vars = [var for var in tracks.columns if var in _unit_map]
+        tracks["time"] = pd.to_datetime(tracks[time_vars])
+        tracks = tracks.drop(time_vars, axis="columns")
 
     # Output xr dataset
     tracks = tracks.to_xarray().rename({"index": "record"}).drop_vars("record")
