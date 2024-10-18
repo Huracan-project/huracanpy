@@ -31,7 +31,6 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 autodoc_member_order = "bysource"
 
 nbsphinx_prompt_width = "88"
-nbsphinx_allow_errors = True
 
 # Options for intersphinx.
 intersphinx_mapping = {

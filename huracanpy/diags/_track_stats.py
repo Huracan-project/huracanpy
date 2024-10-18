@@ -4,7 +4,7 @@ Module containing functions to compute track statistics
 
 from metpy.units import units
 
-from huracanpy.utils.ace import get_ace, get_pace
+from huracanpy.utils import get_ace, get_pace
 
 
 def ace_by_track(

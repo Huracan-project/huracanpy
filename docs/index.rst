@@ -40,7 +40,7 @@ The package has several module that allow you to:
 * Compare several datasets between them.
 The flowchart below illustrates this structure. 
 
-.. image:: path/filename.png
+.. image:: images/package_structure_flowchart/flowchart.png
   :width: 400
   :alt: Alternative text
 

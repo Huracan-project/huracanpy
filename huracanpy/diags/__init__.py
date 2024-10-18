@@ -7,7 +7,6 @@ __all__ = [
     "extremum_vals",
     "ace_by_track",
     "pace_by_track",
-    "translation_speed",
     "time_from_genesis",
     "time_from_extremum",
     "rate",

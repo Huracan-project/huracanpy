@@ -4,10 +4,11 @@ import warnings
 import numpy as np
 
 import huracanpy
+from huracanpy._data import ibtracs
 
 
 def prepare_offline(wmo=True, usa=True):
-    ib = huracanpy.data.ibtracs.online("since1980", "tmp/ibtracs.csv")
+    ib = ibtracs.online("since1980", "tmp/ibtracs.csv")
 
     # Remove season with tracks that are still provisional
     first_season_provi = ib.where(
@@ -38,7 +39,7 @@ def prepare_offline(wmo=True, usa=True):
             ib_wmo[var] = ib_wmo[var].astype(np.int16)
 
         ## Save WMO file
-        huracanpy.save(ib_wmo, huracanpy.data.ibtracs.wmo_file)
+        huracanpy.save(ib_wmo, ibtracs.wmo_file)
 
     if usa:
         # - USA subset
@@ -84,7 +85,7 @@ def prepare_offline(wmo=True, usa=True):
             ib_usa[var] = ib_usa[var].astype(np.int8)
 
         ## Save
-        huracanpy.save(ib_usa, huracanpy.data.ibtracs.usa_file)
+        huracanpy.save(ib_usa, ibtracs.usa_file)
 
     warnings.warn(
         "If you just updated the offline files within the package, do not forget to update information in offline loader warnings"

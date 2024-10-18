@@ -19,18 +19,18 @@ __all__ = [
     "get_translation_speed",
 ]
 
-from .geography import (
+from ._geography import (
     get_hemisphere,
     get_basin,
     get_country,
     get_continent,
     get_land_or_ocean,
 )
-from .category import get_category, get_sshs_cat, get_pressure_cat
-from .time import get_time_components, get_season
-from .interp import interp_time
-from .ace import get_ace, get_pace, get_pressure_wind_relation
-from .translation import get_distance, get_translation_speed
+from ._category import get_category, get_sshs_cat, get_pressure_cat
+from ._time import get_time_components, get_season
+from ._interp import interp_time
+from ._ace import get_ace, get_pace, get_pressure_wind_relation
+from ._translation import get_distance, get_translation_speed
 
 
 def add_all_info(

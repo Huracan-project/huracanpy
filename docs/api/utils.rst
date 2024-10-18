@@ -32,8 +32,9 @@ Time
 .. autosummary::
     :toctree: _autosummary
 
-    get_time
     get_season
+    get_time_components
+    interp_time
 
 ACE
 ---
@@ -43,3 +44,12 @@ ACE
 
     get_ace
     get_pace
+
+Translation
+-----------
+
+.. autosummary::
+    :toctree: _autosummary
+
+    get_distance
+    get_translation_speed
