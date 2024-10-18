@@ -4,7 +4,9 @@ from . import _netcdf
 
 
 def save(dataset, filename):
-    """Save the dataset as either NetCDF or CSV
+    """
+    Save dataset as filename.
+    The file type (NetCDF or csv supported) is detected based on filename extension.
 
     Parameters
     ----------
