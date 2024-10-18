@@ -140,3 +140,14 @@ def test_accessor():
         "translation_speed",
     ]:
         assert col in list(data.variables), f"{col} not found in data columns"
+
+    # Test interpolation method
+    interpolated_data_acc = data.hrcn.interp_time(
+        freq="1h", track_id_name="track_id", prog_bar=False
+    )
+    expected_interpolated_data = huracanpy.utils.interp.interp_time(
+        data, freq="1h", track_id_name="track_id", prog_bar=False
+    )
+    np.testing.assert_array_equal(
+        interpolated_data_acc.time, expected_interpolated_data.time
+    )

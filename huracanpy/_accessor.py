@@ -15,6 +15,7 @@ from .utils.ace import get_ace, get_pace
 from .utils.time import get_time_components, get_season
 from .utils.category import get_category, get_pressure_cat, get_sshs_cat
 from .utils.translation import get_distance, get_translation_speed
+from .utils.interp import interp_time
 
 
 @xr.register_dataset_accessor("hrcn")
@@ -403,6 +404,15 @@ class HuracanPyAccessor:
             lon_name, lat_name, time_name, track_id_name, method, ellps
         )
         return self._dataset
+
+    # ---- interp ----
+    def interp_time(self, freq="1h", track_id_name="track_id", prog_bar=False):
+        """
+        Interpolate track data at a given frequency.
+        """
+        return interp_time(
+            self._dataset, freq=freq, track_id_name=track_id_name, prog_bar=prog_bar
+        )
 
 
 #
