@@ -92,7 +92,7 @@ def get_translation_speed(lon, lat, time, track_id=None, method="geod", ellps="W
     # Curate input
     ## If track_id is not provided, all points are considered to belong to the same track
     if track_id is None:
-        track_id = [0] * len(lon)
+        track_id = xr.DataArray([0] * len(lon), dims=lon.dims)
         print(
             "track_id is not provided, all points are considered to come from the same track"
         )
