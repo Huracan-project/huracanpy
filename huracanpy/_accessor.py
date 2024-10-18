@@ -14,8 +14,7 @@ from .utils.geography import (
 from .utils.ace import get_ace, get_pace
 from .utils.time import get_time_components, get_season
 from .utils.category import get_category, get_pressure_cat, get_sshs_cat
-# from .time import get_time, get_season
-# from .interp import interp_time
+from .utils.translation import get_distance, get_translation_speed
 
 
 @xr.register_dataset_accessor("hrcn")
@@ -305,6 +304,103 @@ class HuracanPyAccessor:
         """
         self._dataset["pressure_cat"] = self.get_pressure_cat(
             slp_name, convention, slp_units
+        )
+        return self._dataset
+
+    # ---- translation ----
+    def get_distance(
+        self,
+        lon_name="lon",
+        lat_name="lat",
+        track_id_name="track_id",
+        method="geod",
+        ellps="WGS84",
+    ):
+        """
+        Compute the distance between points along a track.
+        """
+        if track_id_name in list(self._dataset.variables):
+            return get_distance(
+                self._dataset[lon_name],
+                self._dataset[lat_name],
+                track_id=self._dataset[track_id_name],
+                method=method,
+                ellps=ellps,
+            )
+        if (track_id_name is None) or (
+            track_id_name not in list(self._dataset.variables)
+        ):
+            return get_distance(
+                self._dataset[lon_name],
+                self._dataset[lat_name],
+                track_id=None,
+                method=method,
+                ellps=ellps,
+            )
+
+    def add_distance(
+        self,
+        lon_name="lon",
+        lat_name="lat",
+        track_id_name="track_id",
+        method="geod",
+        ellps="WGS84",
+    ):
+        """
+        Add the distance calculation to the dataset.
+        """
+        self._dataset["distance"] = self.get_distance(
+            lon_name, lat_name, track_id_name, method, ellps
+        )
+        return self._dataset
+
+    def get_translation_speed(
+        self,
+        lon_name="lon",
+        lat_name="lat",
+        time_name="time",
+        track_id_name="track_id",
+        method="geod",
+        ellps="WGS84",
+    ):
+        """
+        Compute the translation speed along tracks.
+        """
+        if track_id_name in list(self._dataset.variables):
+            return get_translation_speed(
+                self._dataset[lon_name],
+                self._dataset[lat_name],
+                self._dataset[time_name],
+                track_id=self._dataset[track_id_name],
+                method=method,
+                ellps=ellps,
+            )
+        if (track_id_name is None) or (
+            track_id_name not in list(self._dataset.variables)
+        ):
+            return get_translation_speed(
+                self._dataset[lon_name],
+                self._dataset[lat_name],
+                self._dataset[time_name],
+                track_id=None,
+                method=method,
+                ellps=ellps,
+            )
+
+    def add_translation_speed(
+        self,
+        lon_name="lon",
+        lat_name="lat",
+        time_name="time",
+        track_id_name="track_id",
+        method="geod",
+        ellps="WGS84",
+    ):
+        """
+        Add the translation speed calculation to the dataset.
+        """
+        self._dataset["translation_speed"] = self.get_translation_speed(
+            lon_name, lat_name, time_name, track_id_name, method, ellps
         )
         return self._dataset
 

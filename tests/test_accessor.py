@@ -1,5 +1,7 @@
 import huracanpy
 
+import numpy as np
+
 
 def test_accessor():
     data = huracanpy.load(huracanpy.example_csv_file)
@@ -74,6 +76,32 @@ def test_accessor():
         pressure_cat_acc == pressure_cat_fct
     ), "Pressure category output does not match"
 
+    ## - Distance
+    distance_acc = data.hrcn.get_distance(
+        lon_name="lon", lat_name="lat", track_id_name="track_id"
+    )
+    distance_fct = huracanpy.utils.translation.get_distance(
+        data.lon, data.lat, data.track_id
+    )
+    np.testing.assert_array_equal(
+        distance_acc,
+        distance_fct,
+        "Distance accessor output differs from function output",
+    )
+
+    ## - Translation speed
+    translation_speed_acc = data.hrcn.get_translation_speed(
+        lon_name="lon", lat_name="lat", time_name="time", track_id_name="track_id"
+    )
+    translation_speed_fct = huracanpy.utils.translation.get_translation_speed(
+        data.lon, data.lat, data.time, data.track_id
+    )
+    np.testing.assert_array_equal(
+        translation_speed_acc,
+        translation_speed_fct,
+        "Translation speed  accessor output differs from function output",
+    )
+
     # Test that add_ accessors output do add the columns
     data = (
         data.hrcn.add_hemisphere(lat_name="lat")
@@ -81,12 +109,16 @@ def test_accessor():
         .hrcn.add_land_or_ocean(lon_name="lon", lat_name="lat")
         .hrcn.add_country(lon_name="lon", lat_name="lat")
         .hrcn.add_continent(lon_name="lon", lat_name="lat")
-        .hrcn.add_ace(wind_name="wind")
-        .hrcn.add_pace(pressure_name="pressure", wind_name="wind")
+        .hrcn.add_ace(wind_name="wind10")
+        .hrcn.add_pace(pressure_name="slp", wind_name="wind10")
         .hrcn.add_time_components(time_name="time")
         .hrcn.add_season(track_id_name="track_id", lat_name="lat", time_name="time")
-        .hrcn.add_sshs_cat(wind_name="wind")
+        .hrcn.add_sshs_cat(wind_name="wind10")
         .hrcn.add_pressure_cat(slp_name="slp")
+        .hrcn.add_distance(lon_name="lon", lat_name="lat")
+        .hrcn.add_translation_speed(
+            lon_name="lon", lat_name="lat", time_name="time", track_id_name="track_id"
+        )
     )
 
     for col in [
@@ -104,5 +136,7 @@ def test_accessor():
         "season",
         "sshs_cat",
         "pressure_cat",
+        "distance",
+        "translation_speed",
     ]:
         assert col in list(data.variables), f"{col} not found in data columns"
