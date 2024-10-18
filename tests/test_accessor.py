@@ -33,6 +33,34 @@ def test_accessor():
     assert not any(
         continent_acc != continent_fct
     ), "accessor output differs from function output"
+    ## - ace
+    ace_acc = data.hrcn.get_ace(wind_name="wind")
+    ace_fct = huracanpy.utils.ace.get_ace(data.wind)
+    assert not any(ace_acc != ace_fct), "accessor output differs from function output"
+
+    ## - pace
+    pace_acc, model_acc = data.hrcn.get_pace(pressure_name="pressure", wind_name="wind")
+    pace_fct, model_fct = huracanpy.utils.ace.get_pace(data.pressure, data.wind)
+    assert not any(pace_acc != pace_fct), "accessor output differs from function output"
+
+    ## - time components
+    year_acc, month_acc, day_acc, hour_acc = data.hrcn.get_time_components(
+        time_name="time"
+    )
+    year_fct, month_fct, day_fct, hour_fct = huracanpy.utils.time.get_time_components(
+        data.time
+    )
+    assert all(year_acc == year_fct), "Year component does not match"
+    assert all(month_acc == month_fct), "Month component does not match"
+    assert all(day_acc == day_fct), "Day component does not match"
+    assert all(hour_acc == hour_fct), "Hour component does not match"
+
+    ## - season
+    season_acc = data.hrcn.get_season(
+        track_id_name="track_id", lat_name="lat", time_name="time"
+    )
+    season_fct = huracanpy.utils.time.get_season(data.track_id, data.lat, data.time)
+    assert all(season_acc == season_fct), "Season component does not match"
 
     # Test that add_ accessors output do add the columns
     data = (
@@ -41,7 +69,24 @@ def test_accessor():
         .hrcn.add_land_or_ocean(lon_name="lon", lat_name="lat")
         .hrcn.add_country(lon_name="lon", lat_name="lat")
         .hrcn.add_continent(lon_name="lon", lat_name="lat")
+        .hrcn.add_ace(wind_name="wind")
+        .hrcn.add_pace(pressure_name="pressure", wind_name="wind")
+        .hrcn.add_time_components(time_name="time")
+        .hrcn.add_season(track_id_name="track_id", lat_name="lat", time_name="time")
     )
 
-    for col in ["hemisphere", "basin", "land_or_ocean", "country", "continent"]:
+    for col in [
+        "hemisphere",
+        "basin",
+        "land_or_ocean",
+        "country",
+        "continent",
+        "ace",
+        "pace",
+        "year",
+        "month",
+        "day",
+        "hour",
+        "season",
+    ]:
         assert col in list(data.variables), f"{col} not found in data columns"

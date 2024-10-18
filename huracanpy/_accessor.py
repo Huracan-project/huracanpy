@@ -1,4 +1,5 @@
 import xarray as xr
+from metpy.units import units
 
 from ._data._save import save
 
@@ -10,6 +11,8 @@ from .utils.geography import (
     get_country,
     get_continent,
 )
+from .utils.ace import get_ace, get_pace
+from .utils.time import get_time_components, get_season
 # from .time import get_time, get_season
 # from .interp import interp_time
 
@@ -37,8 +40,8 @@ class HuracanPyAccessor:
 
         save(self._dataset, filename)
 
-    # ---- utils ----
-    # geography
+    # ==== utils ====
+    # ---- geography ----
     def get_hemisphere(self, lat_name="lat"):
         return get_hemisphere(self._dataset[lat_name])
 
@@ -99,6 +102,128 @@ class HuracanPyAccessor:
     def add_continent(self, lon_name="lon", lat_name="lat", resolution="10m", crs=None):
         self._dataset["continent"] = self.get_continent(
             lon_name, lat_name, resolution, crs
+        )
+        return self._dataset
+
+    # ---- ACE & PACE ----
+    def get_ace(
+        self, wind_name="wind", threshold=34 * units("knots"), wind_units="m s-1"
+    ):
+        """
+        Calculate Accumulated Cyclone Energy (ACE) for each point.
+        """
+        return get_ace(
+            self._dataset[wind_name], threshold=threshold, wind_units=wind_units
+        )
+
+    def add_ace(
+        self, wind_name="wind", threshold=34 * units("knots"), wind_units="m s-1"
+    ):
+        """
+        Add ACE calculation to the dataset.
+        """
+        self._dataset["ace"] = self.get_ace(
+            wind_name, threshold=threshold, wind_units=wind_units
+        )
+        return self._dataset
+
+    def get_pace(
+        self,
+        pressure_name="slp",
+        wind_name=None,
+        model=None,
+        threshold_wind=None,
+        threshold_pressure=None,
+        wind_units="m s-1",
+        **kwargs,
+    ):
+        """
+        Calculate Pressure-based Accumulated Cyclone Energy (PACE) for each point.
+        """
+        pace_values, model = get_pace(
+            self._dataset[pressure_name],
+            wind=self._dataset[wind_name] if wind_name else None,
+            model=model,
+            threshold_wind=threshold_wind,
+            threshold_pressure=threshold_pressure,
+            wind_units=wind_units,
+            **kwargs,
+        )
+        return pace_values
+
+    def add_pace(
+        self,
+        pressure_name="slp",
+        wind_name=None,
+        model=None,
+        threshold_wind=None,
+        threshold_pressure=None,
+        wind_units="m s-1",
+        **kwargs,
+    ):
+        """
+        Add PACE calculation to the dataset.
+        """
+        pace_values = self.get_pace(
+            pressure_name=pressure_name,
+            wind_name=wind_name,
+            model=model,
+            threshold_wind=threshold_wind,
+            threshold_pressure=threshold_pressure,
+            wind_units=wind_units,
+            **kwargs,
+        )
+        self._dataset["pace"] = pace_values
+        return self._dataset
+
+    # ---- time ----
+    def get_time_components(self, time_name="time"):
+        """
+        Expand the time variable into year, month, day, and hour.
+        """
+        return get_time_components(self._dataset[time_name])
+
+    def add_time_components(self, time_name="time"):
+        """
+        Add year, month, day, and hour as new variables to the dataset.
+        """
+        year, month, day, hour = self.get_time_components(time_name)
+        self._dataset["year"] = year
+        self._dataset["month"] = month
+        self._dataset["day"] = day
+        self._dataset["hour"] = hour
+        return self._dataset
+
+    # ---- Season ----
+    def get_season(
+        self,
+        track_id_name="track_id",
+        lat_name="lat",
+        time_name="time",
+        convention="short",
+    ):
+        """
+        Derive the season for each track based on latitude and time.
+        """
+        return get_season(
+            self._dataset[track_id_name],
+            self._dataset[lat_name],
+            self._dataset[time_name],
+            convention=convention,
+        )
+
+    def add_season(
+        self,
+        track_id_name="track_id",
+        lat_name="lat",
+        time_name="time",
+        convention="short",
+    ):
+        """
+        Add the season as a new variable to the dataset.
+        """
+        self._dataset["season"] = self.get_season(
+            track_id_name, lat_name, time_name, convention
         )
         return self._dataset
 
