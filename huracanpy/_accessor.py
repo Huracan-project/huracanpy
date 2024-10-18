@@ -17,6 +17,7 @@ from .utils.category import get_category, get_pressure_cat, get_sshs_cat
 from .utils.translation import get_distance, get_translation_speed
 from .utils.interp import interp_time
 from . import plot
+from . import diags
 
 
 @xr.register_dataset_accessor("hrcn")
@@ -426,6 +427,18 @@ class HuracanPyAccessor:
 
         return plot.tracks(
             self._dataset[lon_name], self._dataset[lat_name], intensity_var, **kwargs
+        )
+
+    def plot_density(
+        self, lon_name="lon", lat_name="lat", density_kws=dict(), **kwargs
+    ):
+        d = self.get_density(**density_kws)
+        return plot.density(d, **kwargs)
+
+    # ==== diags ====
+    def get_density(self, lon_name="lon", lat_name="lat", method="histogram", **kwargs):
+        return diags.density(
+            self._dataset[lon_name], self._dataset[lat_name], method=method, **kwargs
         )
 
 
