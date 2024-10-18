@@ -39,7 +39,6 @@ def histogram(lon, lat, bin_size=5, N_seasons=1):
 
     """
 
-    # TODO: Allow for custom bounds
     if lon.min() < 0:
         lon_range = (-180, 180)
     else:
