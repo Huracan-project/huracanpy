@@ -62,6 +62,18 @@ def test_accessor():
     season_fct = huracanpy.utils.time.get_season(data.track_id, data.lat, data.time)
     assert all(season_acc == season_fct), "Season component does not match"
 
+    ## - SSHS category
+    sshs_acc = data.hrcn.get_sshs_cat(wind_name="wind")
+    sshs_fct = huracanpy.utils.categories.get_sshs_cat(data.wind)
+    assert all(sshs_acc == sshs_fct), "SSHS category output does not match"
+
+    ## - Pressure category
+    pressure_cat_acc = data.hrcn.get_pressure_cat(slp_name="slp")
+    pressure_cat_fct = huracanpy.utils.categories.get_pressure_cat(data.slp)
+    assert all(
+        pressure_cat_acc == pressure_cat_fct
+    ), "Pressure category output does not match"
+
     # Test that add_ accessors output do add the columns
     data = (
         data.hrcn.add_hemisphere(lat_name="lat")
@@ -73,6 +85,8 @@ def test_accessor():
         .hrcn.add_pace(pressure_name="pressure", wind_name="wind")
         .hrcn.add_time_components(time_name="time")
         .hrcn.add_season(track_id_name="track_id", lat_name="lat", time_name="time")
+        .hrcn.add_sshs_cat(wind_name="wind")
+        .hrcn.add_pressure_cat(slp_name="slp")
     )
 
     for col in [
@@ -88,5 +102,7 @@ def test_accessor():
         "day",
         "hour",
         "season",
+        "sshs_cat",
+        "pressure_cat",
     ]:
         assert col in list(data.variables), f"{col} not found in data columns"
