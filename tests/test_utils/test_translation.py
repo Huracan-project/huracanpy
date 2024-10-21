@@ -20,7 +20,7 @@ def test_get_distance():
 def test_get_translation_speed():
     data = huracanpy.load(huracanpy.example_csv_file)
 
-    ts = huracanpy.utils.translation.get_translation_speed(
+    ts = huracanpy.utils.get_translation_speed(
         data.lon, data.lat, data.time, data.track_id
     )
 

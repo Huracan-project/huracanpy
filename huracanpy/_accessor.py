@@ -4,18 +4,23 @@ from metpy.units import units
 from ._data._save import save
 
 # from huracanpy.subset import trackswhere
-from .utils.geography import (
+from .utils import (
     get_hemisphere,
     get_basin,
     get_land_or_ocean,
     get_country,
     get_continent,
+    get_ace,
+    get_pace,
+    get_time_components,
+    get_season,
+    get_category,
+    get_pressure_cat,
+    get_sshs_cat,
+    get_distance,
+    get_translation_speed,
+    interp_time,
 )
-from .utils.ace import get_ace, get_pace
-from .utils.time import get_time_components, get_season
-from .utils.category import get_category, get_pressure_cat, get_sshs_cat
-from .utils.translation import get_distance, get_translation_speed
-from .utils.interp import interp_time
 from . import plot
 from . import diags
 

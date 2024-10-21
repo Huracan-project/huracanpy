@@ -9,47 +9,47 @@ def test_accessor():
     # Test get_ accessors output is same as function
     ## - hemisphere
     hemi_acc = data.hrcn.get_hemisphere(lat_name="lat")
-    hemi_fct = huracanpy.utils.geography.get_hemisphere(data.lat)
+    hemi_fct = huracanpy.utils.get_hemisphere(data.lat)
     assert not any(hemi_acc != hemi_fct), "accessor output differs from function output"
     ## - basin
     basin_acc = data.hrcn.get_basin(lon_name="lon", lat_name="lat")
-    basin_fct = huracanpy.utils.geography.get_basin(data.lon, data.lat)
+    basin_fct = huracanpy.utils.get_basin(data.lon, data.lat)
     assert not any(
         basin_acc != basin_fct
     ), "accessor output differs from function output"
     ## - land or ocean
     land_ocean_acc = data.hrcn.get_land_or_ocean(lon_name="lon", lat_name="lat")
-    land_ocean_fct = huracanpy.utils.geography.get_land_or_ocean(data.lon, data.lat)
+    land_ocean_fct = huracanpy.utils.get_land_or_ocean(data.lon, data.lat)
     assert not any(
         land_ocean_acc != land_ocean_fct
     ), "accessor output differs from function output"
     ## - country
     country_acc = data.hrcn.get_country(lon_name="lon", lat_name="lat")
-    country_fct = huracanpy.utils.geography.get_country(data.lon, data.lat)
+    country_fct = huracanpy.utils.get_country(data.lon, data.lat)
     assert not any(
         country_acc != country_fct
     ), "accessor output differs from function output"
     ## - continent
     continent_acc = data.hrcn.get_continent(lon_name="lon", lat_name="lat")
-    continent_fct = huracanpy.utils.geography.get_continent(data.lon, data.lat)
+    continent_fct = huracanpy.utils.get_continent(data.lon, data.lat)
     assert not any(
         continent_acc != continent_fct
     ), "accessor output differs from function output"
     ## - ace
     ace_acc = data.hrcn.get_ace(wind_name="wind10")
-    ace_fct = huracanpy.utils.ace.get_ace(data.wind10)
+    ace_fct = huracanpy.utils.get_ace(data.wind10)
     assert not any(ace_acc != ace_fct), "accessor output differs from function output"
 
     ## - pace
     pace_acc = data.hrcn.get_pace(pressure_name="slp", wind_name="wind10")
-    pace_fct, model_fct = huracanpy.utils.ace.get_pace(data.slp, data.wind10)
+    pace_fct, model_fct = huracanpy.utils.get_pace(data.slp, data.wind10)
     assert not any(pace_acc != pace_fct), "accessor output differs from function output"
 
     ## - time components
     year_acc, month_acc, day_acc, hour_acc = data.hrcn.get_time_components(
         time_name="time"
     )
-    year_fct, month_fct, day_fct, hour_fct = huracanpy.utils.time.get_time_components(
+    year_fct, month_fct, day_fct, hour_fct = huracanpy.utils.get_time_components(
         data.time
     )
     assert all(year_acc == year_fct), "Year component does not match"
@@ -61,17 +61,17 @@ def test_accessor():
     season_acc = data.hrcn.get_season(
         track_id_name="track_id", lat_name="lat", time_name="time"
     )
-    season_fct = huracanpy.utils.time.get_season(data.track_id, data.lat, data.time)
+    season_fct = huracanpy.utils.get_season(data.track_id, data.lat, data.time)
     assert all(season_acc == season_fct), "Season component does not match"
 
     ## - SSHS category
     sshs_acc = data.hrcn.get_sshs_cat(wind_name="wind10")
-    sshs_fct = huracanpy.utils.category.get_sshs_cat(data.wind10)
+    sshs_fct = huracanpy.utils.get_sshs_cat(data.wind10)
     assert all(sshs_acc == sshs_fct), "SSHS category output does not match"
 
     ## - Pressure category
     pressure_cat_acc = data.hrcn.get_pressure_cat(slp_name="slp")
-    pressure_cat_fct = huracanpy.utils.category.get_pressure_cat(data.slp)
+    pressure_cat_fct = huracanpy.utils.get_pressure_cat(data.slp)
     assert all(
         pressure_cat_acc == pressure_cat_fct
     ), "Pressure category output does not match"
@@ -80,9 +80,7 @@ def test_accessor():
     distance_acc = data.hrcn.get_distance(
         lon_name="lon", lat_name="lat", track_id_name="track_id"
     )
-    distance_fct = huracanpy.utils.translation.get_distance(
-        data.lon, data.lat, data.track_id
-    )
+    distance_fct = huracanpy.utils.get_distance(data.lon, data.lat, data.track_id)
     np.testing.assert_array_equal(
         distance_acc,
         distance_fct,
@@ -93,7 +91,7 @@ def test_accessor():
     translation_speed_acc = data.hrcn.get_translation_speed(
         lon_name="lon", lat_name="lat", time_name="time", track_id_name="track_id"
     )
-    translation_speed_fct = huracanpy.utils.translation.get_translation_speed(
+    translation_speed_fct = huracanpy.utils.get_translation_speed(
         data.lon, data.lat, data.time, data.track_id
     )
     np.testing.assert_array_equal(
@@ -145,7 +143,7 @@ def test_accessor():
     interpolated_data_acc = data.hrcn.interp_time(
         freq="1h", track_id_name="track_id", prog_bar=False
     )
-    expected_interpolated_data = huracanpy.utils.interp.interp_time(
+    expected_interpolated_data = huracanpy.utils.interp_time(
         data, freq="1h", track_id_name="track_id", prog_bar=False
     )
     np.testing.assert_array_equal(

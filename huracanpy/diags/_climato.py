@@ -2,7 +2,7 @@ import pandas as pd
 import xarray as xr
 
 from ._track_stats import duration
-from huracanpy.utils.ace import get_ace
+from huracanpy.utils import get_ace
 from metpy.units import units
 
 

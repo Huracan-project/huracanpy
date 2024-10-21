@@ -6,8 +6,7 @@ assess
 .. autosummary::
     :toctree: _autosummary
 
-    match_pair
-    match_multiple
-    POD
-    FAR
+    match
+    pod
+    far
     overlap

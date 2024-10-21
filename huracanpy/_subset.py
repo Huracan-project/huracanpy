@@ -13,7 +13,7 @@ def trackswhere(tracks, condition):
     """Subset tracks from the input
 
     e.g select all tracks that are solely in the Northern hemisphere
-    >>> tracks_subset = huracanpy.subset.trackswhere(tracks, lambda x: (x.lat > 0).all())
+    >>> tracks_subset = huracanpy.trackswhere(tracks, lambda x: (x.lat > 0).all())
 
     Parameters
     ----------
