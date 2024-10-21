@@ -16,6 +16,8 @@ from .utils.time import get_time_components, get_season
 from .utils.category import get_category, get_pressure_cat, get_sshs_cat
 from .utils.translation import get_distance, get_translation_speed
 from .utils.interp import interp_time
+from . import plot
+from . import diags
 
 
 @xr.register_dataset_accessor("hrcn")
@@ -414,11 +416,30 @@ class HuracanPyAccessor:
             self._dataset, freq=freq, track_id_name=track_id_name, prog_bar=prog_bar
         )
 
+    # ==== plot ====
+    def plot_tracks(
+        self, lon_name="lon", lat_name="lat", intensity_var_name=None, **kwargs
+    ):
+        if intensity_var_name in list(self._dataset.variables):
+            intensity_var = self._dataset[intensity_var_name]
+        else:
+            intensity_var = None
 
-#
-#    # interp
-#    def interp_time(self, freq="1h", track_id_name="track_id", prog_bar=False,):
-#        return interp_time(self._dataset, freq, track_id_name, prog_bar)
+        return plot.tracks(
+            self._dataset[lon_name], self._dataset[lat_name], intensity_var, **kwargs
+        )
+
+    def plot_density(
+        self, lon_name="lon", lat_name="lat", density_kws=dict(), **kwargs
+    ):
+        d = self.get_density(**density_kws)
+        return plot.density(d, **kwargs)
+
+    # ==== diags ====
+    def get_density(self, lon_name="lon", lat_name="lat", method="histogram", **kwargs):
+        return diags.density(
+            self._dataset[lon_name], self._dataset[lat_name], method=method, **kwargs
+        )
 
 
 # track density

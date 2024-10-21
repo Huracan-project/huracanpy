@@ -36,13 +36,13 @@ def test_accessor():
         continent_acc != continent_fct
     ), "accessor output differs from function output"
     ## - ace
-    ace_acc = data.hrcn.get_ace(wind_name="wind")
-    ace_fct = huracanpy.utils.ace.get_ace(data.wind)
+    ace_acc = data.hrcn.get_ace(wind_name="wind10")
+    ace_fct = huracanpy.utils.ace.get_ace(data.wind10)
     assert not any(ace_acc != ace_fct), "accessor output differs from function output"
 
     ## - pace
-    pace_acc, model_acc = data.hrcn.get_pace(pressure_name="pressure", wind_name="wind")
-    pace_fct, model_fct = huracanpy.utils.ace.get_pace(data.pressure, data.wind)
+    pace_acc = data.hrcn.get_pace(pressure_name="slp", wind_name="wind10")
+    pace_fct, model_fct = huracanpy.utils.ace.get_pace(data.slp, data.wind10)
     assert not any(pace_acc != pace_fct), "accessor output differs from function output"
 
     ## - time components
@@ -65,13 +65,13 @@ def test_accessor():
     assert all(season_acc == season_fct), "Season component does not match"
 
     ## - SSHS category
-    sshs_acc = data.hrcn.get_sshs_cat(wind_name="wind")
-    sshs_fct = huracanpy.utils.categories.get_sshs_cat(data.wind)
+    sshs_acc = data.hrcn.get_sshs_cat(wind_name="wind10")
+    sshs_fct = huracanpy.utils.category.get_sshs_cat(data.wind10)
     assert all(sshs_acc == sshs_fct), "SSHS category output does not match"
 
     ## - Pressure category
     pressure_cat_acc = data.hrcn.get_pressure_cat(slp_name="slp")
-    pressure_cat_fct = huracanpy.utils.categories.get_pressure_cat(data.slp)
+    pressure_cat_fct = huracanpy.utils.category.get_pressure_cat(data.slp)
     assert all(
         pressure_cat_acc == pressure_cat_fct
     ), "Pressure category output does not match"
