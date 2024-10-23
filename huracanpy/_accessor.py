@@ -432,3 +432,27 @@ class HuracanPyAccessor:
     # ---- track stats
     def get_duration(self, time_name="time", track_id_name="track_id"):
         return diags.duration(self._dataset[time_name], self._dataset[track_id_name])
+
+    def get_track_ace(self, wind_name="wind", track_id_name="track_id", **kwargs):
+        return diags.get_track_ace(
+            self._dataset[wind_name], self._dataset[track_id_name], **kwargs
+        )
+
+    def get_track_pace(
+        self, pressure_name="slp", track_id_name="track_id", wind_name=None, **kwargs
+    ):
+        if wind_name is None:
+            wind = None
+        else:
+            wind = self._dataset[wind_name]
+        return diags.get_track_pace(
+            self._dataset[pressure_name], self._dataset[track_id_name], wind, **kwargs
+        )
+
+    def get_gen_vals(self, time_name="time", track_id_name="track_id"):
+        return diags.get_gen_vals(self._dataset, time_name, track_id_name)
+
+    def get_apex_vals(self, varname, track_id_name="track_id", stat="max"):
+        return diags.get_apex_vals(
+            self._dataset, varname, track_id_name=track_id_name, stat=stat
+        )

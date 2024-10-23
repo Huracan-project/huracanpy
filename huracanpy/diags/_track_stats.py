@@ -60,7 +60,6 @@ def get_track_pace(
     threshold_wind=None,
     threshold_pressure=None,
     wind_units="m s-1",
-    keep_pace_by_point=False,
     **kwargs,
 ):
     """Calculate a pressure-based accumulated cyclone energy (PACE) for each individual
