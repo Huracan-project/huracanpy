@@ -145,6 +145,8 @@ def test_get_methods():
     # )
     # TODO : Write test with same array function
 
+    # TODO: lifecycle functions tests
+
 
 def test_add_methods():
     """

@@ -403,6 +403,30 @@ class HuracanPyAccessor:
             self._dataset, freq=freq, track_id_name=track_id_name, prog_bar=prog_bar
         )
 
+    # ---- lifecycle
+    def get_time_from_genesis(self, time_name="time", track_id_name="track_id"):
+        return utils.lifecycle.get_time_from_genesis(
+            self._dataset[time_name], self._dataset[track_id_name]
+        )
+
+    # TODO : Add function
+
+    def get_time_from_apex(
+        self,
+        time_name="time",
+        track_id_name="track_id",
+        intensity_var_name="wind",
+        stat="max",
+    ):
+        return utils.lifecycle.get_time_from_apex(
+            self._dataset[time_name],
+            self._dataset[track_id_name],
+            self._dataset[intensity_var_name],
+            stat=stat,
+        )
+
+    # TODO : Add function
+
     # %% plot
     def plot_tracks(
         self, lon_name="lon", lat_name="lat", intensity_var_name=None, **kwargs
@@ -458,3 +482,5 @@ class HuracanPyAccessor:
         return diags.get_apex_vals(
             self._dataset, varname, track_id_name=track_id_name, stat=stat
         )
+
+    # ---- lifecycle
