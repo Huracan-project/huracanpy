@@ -2,11 +2,12 @@
 
 __all__ = [
     "density",
-    "duration",
-    "gen_vals",
-    "extremum_vals",
-    "ace_by_track",
-    "pace_by_track",
+    "get_track_ace",
+    "get_track_pace",
+    "get_track_duration",
+    "get_gen_vals",
+    "get_apex_vals",
+    "translation_speed",
     "time_from_genesis",
     "time_from_extremum",
     "rate",
@@ -16,7 +17,13 @@ __all__ = [
 ]
 
 from ._density import density
-from ._track_stats import duration, gen_vals, extremum_vals, ace_by_track, pace_by_track
+from ._track_stats import (
+    get_track_ace,
+    get_track_pace,
+    get_track_duration,
+    get_gen_vals,
+    get_apex_vals,
+)
 from ._lifecycle import time_from_genesis, time_from_extremum
 from ._rates import rate
 from ._climato import freq, tc_days, ace
