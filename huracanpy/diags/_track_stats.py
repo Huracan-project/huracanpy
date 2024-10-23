@@ -7,13 +7,11 @@ from metpy.units import units
 from huracanpy.utils import get_ace, get_pace
 
 
-def ace_by_track(
-    tracks,
+def get_track_ace(
     wind,
+    track_ids,
     threshold=34 * units("knots"),
     wind_units="m s-1",
-    keep_ace_by_point=False,
-    ace_varname="ace",
 ):
     r"""Calculate accumulate cyclone energy (ACE) for each track
 
@@ -48,26 +46,21 @@ def ace_by_track(
         The ACE for each track in wind
 
     """
-    tracks[ace_varname] = get_ace(wind, threshold, wind_units)
 
-    ace_by_storm = tracks.groupby("track_id").map(lambda x: x[ace_varname].sum())
+    ace = get_ace(wind, threshold, wind_units)
 
-    if not keep_ace_by_point:
-        del tracks[ace_varname]
-
-    return ace_by_storm
+    return ace.groupby(track_ids).sum()
 
 
-def pace_by_track(
-    tracks,
+def get_track_pace(
     pressure,
+    track_ids,
     wind=None,
     model=None,
     threshold_wind=None,
     threshold_pressure=None,
     wind_units="m s-1",
     keep_pace_by_point=False,
-    pace_varname="pace",
     **kwargs,
 ):
     """Calculate a pressure-based accumulated cyclone energy (PACE) for each individual
@@ -115,7 +108,7 @@ def pace_by_track(
     model : object
 
     """
-    tracks[pace_varname], model = get_pace(
+    pace, model = get_pace(
         pressure,
         wind=wind,
         model=model,
@@ -125,15 +118,10 @@ def pace_by_track(
         **kwargs,
     )
 
-    pace_by_storm = tracks.groupby("track_id").map(lambda x: x[pace_varname].sum())
-
-    if not keep_pace_by_point:
-        del tracks[pace_varname]
-
-    return pace_by_storm, model
+    return pace.groupby(track_ids).sum()
 
 
-def duration(time, track_ids):
+def get_track_duration(time, track_ids):
     """
     Compute the duration of each track
 
@@ -155,7 +143,7 @@ def duration(time, track_ids):
     return duration
 
 
-def gen_vals(tracks, time_name="time", track_id_name="track_id"):
+def get_gen_vals(tracks, time_name="time", track_id_name="track_id"):
     """
     Shows the attributes for the genesis point of each track
 
@@ -179,7 +167,7 @@ def gen_vals(tracks, time_name="time", track_id_name="track_id"):
     )  # It is 470 times much faster to switch to a dataframe...
 
 
-def extremum_vals(tracks, varname, stat="max", track_id_name="track_id"):
+def get_apex_vals(tracks, varname, stat="max", track_id_name="track_id"):
     """
     Shows the attribute for the extremum point of each track
 
