@@ -17,6 +17,8 @@ __all__ = [
     "get_pressure_wind_relation",
     "get_distance",
     "get_translation_speed",
+    "get_time_from_genesis",
+    "get_time_from_apex",
 ]
 
 from ._geography import (
@@ -31,6 +33,7 @@ from ._time import get_time_components, get_season
 from ._interp import interp_time
 from ._ace import get_ace, get_pace, get_pressure_wind_relation
 from ._translation import get_distance, get_translation_speed
+from .lifecycle import get_time_from_genesis, get_time_from_apex
 
 
 def add_all_info(
