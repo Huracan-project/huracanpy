@@ -2,8 +2,10 @@
 Module containing functions to compute lifecycle stage
 """
 
+import pandas as pd
 
-def time_from_genesis(data):
+
+def get_time_from_genesis(time, track_ids):
     """
     Output the time since genesis for each TC point
 
@@ -19,7 +21,7 @@ def time_from_genesis(data):
         You can append it to your tracks by running tracks["time_from_genesis"] = time_from_genesis(tracks)
 
     """
-    data_df = data[["track_id", "time"]].to_dataframe()
+    data_df = pd.DataFrame({"time": time, "track_id": track_ids})
     data_df = data_df.merge(
         data_df.groupby("track_id").time.min(),
         on="track_id",
@@ -31,7 +33,7 @@ def time_from_genesis(data):
     )
 
 
-def time_from_extremum(data, varname, stat="max"):
+def get_time_from_apex(time, track_ids, intensity_var, stat="max"):
     """
 
     Parameters
@@ -50,12 +52,14 @@ def time_from_extremum(data, varname, stat="max"):
         asc = True
     else:
         raise NotImplementedError("stat not recognized. Please use one of {min, max}")
-    data_df = data[["track_id", "time", varname]].to_dataframe()
-    extr = data_df.sort_values(varname, ascending=asc).groupby("track_id").first()
+    data_df = pd.DataFrame(
+        {"time": time, "track_id": track_ids, "intensity": intensity_var}
+    )
+    extr = data_df.sort_values("intensity", ascending=asc).groupby("track_id").first()
     data_df = data_df.merge(extr, on="track_id", suffixes=["_actual", "_extr"])
     time_from_extr = data_df.time_actual - data_df.time_extr
     return (
         time_from_extr.to_xarray()
-        .rename({"index": data[varname].dims[0]})
+        .rename({"index": time.dims[0]})
         .rename("time_from_extremum")
     )

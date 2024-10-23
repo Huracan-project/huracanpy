@@ -8,8 +8,8 @@ __all__ = [
     "get_gen_vals",
     "get_apex_vals",
     "translation_speed",
-    "time_from_genesis",
-    "time_from_extremum",
+    "get_time_from_genesis",
+    "get_time_from_apex",
     "rate",
     "freq",
     "tc_days",
@@ -24,6 +24,6 @@ from ._track_stats import (
     get_gen_vals,
     get_apex_vals,
 )
-from ._lifecycle import time_from_genesis, time_from_extremum
+from ._lifecycle import get_time_from_genesis, get_time_from_apex
 from ._rates import rate
 from ._climato import freq, tc_days, ace
