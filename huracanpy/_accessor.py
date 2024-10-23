@@ -3,26 +3,8 @@ from metpy.units import units
 
 from ._data._save import save
 
-# from huracanpy.subset import trackswhere
-from .utils import (
-    get_hemisphere,
-    get_basin,
-    get_land_or_ocean,
-    get_country,
-    get_continent,
-    get_ace,
-    get_pace,
-    get_time_components,
-    get_season,
-    get_category,
-    get_pressure_cat,
-    get_sshs_cat,
-    get_distance,
-    get_translation_speed,
-    interp_time,
-)
-from . import plot
-from . import diags
+
+from . import utils, diags, plot
 
 
 @xr.register_dataset_accessor("hrcn")
@@ -48,17 +30,17 @@ class HuracanPyAccessor:
 
         save(self._dataset, filename)
 
-    # ==== utils ====
-    # ---- geography ----
+    # %% utils
+    # ---- geography
     def get_hemisphere(self, lat_name="lat"):
-        return get_hemisphere(self._dataset[lat_name])
+        return utils.geography.get_hemisphere(self._dataset[lat_name])
 
     def add_hemisphere(self, lat_name="lat"):
         self._dataset["hemisphere"] = self.get_hemisphere(lat_name=lat_name)
         return self._dataset
 
     def get_basin(self, lon_name="lon", lat_name="lat", convention="WMO", crs=None):
-        return get_basin(
+        return utils.geography.get_basin(
             self._dataset[lon_name],
             self._dataset[lat_name],
             convention=convention,
@@ -72,7 +54,7 @@ class HuracanPyAccessor:
     def get_land_or_ocean(
         self, lon_name="lon", lat_name="lat", resolution="10m", crs=None
     ):
-        return get_land_or_ocean(
+        return utils.geography.get_land_or_ocean(
             self._dataset[lon_name],
             self._dataset[lat_name],
             resolution=resolution,
@@ -88,7 +70,7 @@ class HuracanPyAccessor:
         return self._dataset
 
     def get_country(self, lon_name="lon", lat_name="lat", resolution="10m", crs=None):
-        return get_country(
+        return utils.geography.get_country(
             self._dataset[lon_name],
             self._dataset[lat_name],
             resolution=resolution,
@@ -100,7 +82,7 @@ class HuracanPyAccessor:
         return self._dataset
 
     def get_continent(self, lon_name="lon", lat_name="lat", resolution="10m", crs=None):
-        return get_continent(
+        return utils.geography.get_continent(
             self._dataset[lon_name],
             self._dataset[lat_name],
             resolution=resolution,
@@ -113,14 +95,14 @@ class HuracanPyAccessor:
         )
         return self._dataset
 
-    # ---- ACE & PACE ----
+    # ---- ACE & PACE
     def get_ace(
         self, wind_name="wind", threshold=34 * units("knots"), wind_units="m s-1"
     ):
         """
         Calculate Accumulated Cyclone Energy (ACE) for each point.
         """
-        return get_ace(
+        return utils.ace.get_ace(
             self._dataset[wind_name], threshold=threshold, wind_units=wind_units
         )
 
@@ -148,7 +130,7 @@ class HuracanPyAccessor:
         """
         Calculate Pressure-based Accumulated Cyclone Energy (PACE) for each point.
         """
-        pace_values, model = get_pace(
+        pace_values, model = utils.ace.get_pace(
             self._dataset[pressure_name],
             wind=self._dataset[wind_name] if wind_name else None,
             model=model,
@@ -184,12 +166,12 @@ class HuracanPyAccessor:
         self._dataset["pace"] = pace_values
         return self._dataset
 
-    # ---- time ----
+    # ---- time
     def get_time_components(self, time_name="time"):
         """
         Expand the time variable into year, month, day, and hour.
         """
-        return get_time_components(self._dataset[time_name])
+        return utils.time.get_time_components(self._dataset[time_name])
 
     def add_time_components(self, time_name="time"):
         """
@@ -212,7 +194,7 @@ class HuracanPyAccessor:
         """
         Derive the season for each track based on latitude and time.
         """
-        return get_season(
+        return utils.time.get_season(
             self._dataset[track_id_name],
             self._dataset[lat_name],
             self._dataset[time_name],
@@ -234,7 +216,7 @@ class HuracanPyAccessor:
         )
         return self._dataset
 
-    # --- category ----
+    # --- category
     def get_category(
         self,
         variable_name,
@@ -246,7 +228,7 @@ class HuracanPyAccessor:
         """
         Calculate a generic category from a variable and a set of thresholds.
         """
-        return get_category(
+        return utils.category.get_category(
             self._dataset[variable_name],
             bins=bins,
             labels=labels,
@@ -281,7 +263,7 @@ class HuracanPyAccessor:
         """
         Determine the Saffir-Simpson Hurricane Scale (SSHS) category.
         """
-        return get_sshs_cat(
+        return utils.category.get_sshs_cat(
             self._dataset[wind_name],
             convention=convention,
             wind_units=wind_units,
@@ -300,7 +282,7 @@ class HuracanPyAccessor:
         """
         Determine the pressure category based on the selected convention.
         """
-        return get_pressure_cat(
+        return utils.category.get_pressure_cat(
             self._dataset[slp_name],
             convention=convention,
             slp_units=slp_units,
@@ -315,7 +297,7 @@ class HuracanPyAccessor:
         )
         return self._dataset
 
-    # ---- translation ----
+    # ---- translation
     def get_distance(
         self,
         lon_name="lon",
@@ -328,7 +310,7 @@ class HuracanPyAccessor:
         Compute the distance between points along a track.
         """
         if track_id_name in list(self._dataset.variables):
-            return get_distance(
+            return utils.translation.get_distance(
                 self._dataset[lon_name],
                 self._dataset[lat_name],
                 track_id=self._dataset[track_id_name],
@@ -338,7 +320,7 @@ class HuracanPyAccessor:
         if (track_id_name is None) or (
             track_id_name not in list(self._dataset.variables)
         ):
-            return get_distance(
+            return utils.translation.get_distance(
                 self._dataset[lon_name],
                 self._dataset[lat_name],
                 track_id=None,
@@ -375,7 +357,7 @@ class HuracanPyAccessor:
         Compute the translation speed along tracks.
         """
         if track_id_name in list(self._dataset.variables):
-            return get_translation_speed(
+            return utils.translation.get_translation_speed(
                 self._dataset[lon_name],
                 self._dataset[lat_name],
                 self._dataset[time_name],
@@ -386,7 +368,7 @@ class HuracanPyAccessor:
         if (track_id_name is None) or (
             track_id_name not in list(self._dataset.variables)
         ):
-            return get_translation_speed(
+            return utils.translation.get_translation_speed(
                 self._dataset[lon_name],
                 self._dataset[lat_name],
                 self._dataset[time_name],
@@ -412,16 +394,16 @@ class HuracanPyAccessor:
         )
         return self._dataset
 
-    # ---- interp ----
+    # ---- interp
     def interp_time(self, freq="1h", track_id_name="track_id", prog_bar=False):
         """
         Interpolate track data at a given frequency.
         """
-        return interp_time(
+        return utils.interp.interp_time(
             self._dataset, freq=freq, track_id_name=track_id_name, prog_bar=prog_bar
         )
 
-    # ==== plot ====
+    # %% plot
     def plot_tracks(
         self, lon_name="lon", lat_name="lat", intensity_var_name=None, **kwargs
     ):
@@ -440,27 +422,13 @@ class HuracanPyAccessor:
         d = self.get_density(**density_kws)
         return plot.density(d, **kwargs)
 
-    # ==== diags ====
+    # %% diags
+    # ---- density
     def get_density(self, lon_name="lon", lat_name="lat", method="histogram", **kwargs):
         return diags.density(
             self._dataset[lon_name], self._dataset[lat_name], method=method, **kwargs
         )
 
-
-# track density
-#    def simple_track_density(
-#        self,
-#        lon_name="lon",
-#        lat_name="lat",
-#        bin_size=5,
-#        N_seasons=1,
-#    ):
-#        return simple_global_histogram(
-#            self._dataset[lon_name],
-#            self._dataset[lat_name],
-#            bin_size=bin_size,
-#            N_seasons=N_seasons,
-#        )
-
-#    def duration(self, time_name="time", track_id_name="track_id"):
-#        return duration(self._dataset[time_name], self._dataset[track_id_name])
+    # ---- track stats
+    def get_duration(self, time_name="time", track_id_name="track_id"):
+        return diags.duration(self._dataset[time_name], self._dataset[track_id_name])
