@@ -7,6 +7,7 @@ authors = [
   { name="Kelvin Ng" },
 ]
 description = "A python package for working with various forms of feature tracking data"
+requires-python = ">=3.8, <3.13"
 dependencies = [
     "numpy<2",
     "xarray",
@@ -55,6 +56,18 @@ huracanpy = ["_data/example_data/*", "_data/_ibtracs_files/*"]
 
 [tool.ruff]
 extend-include = ["*.ipynb"]
+
+[tool.tox]
+requires = ["tox>=4.15.0"]
+env_list = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+[tool.tox.env_run_base]
+extras = ["dev"]
+commands = [
+    ["ruff", "format", "--check"],
+    ["ruff", "check"],
+    ["pytest"]
+]
 
 # - How to distribute the package
 
