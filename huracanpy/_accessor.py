@@ -430,8 +430,10 @@ class HuracanPyAccessor:
         )
 
     # ---- track stats
-    def get_duration(self, time_name="time", track_id_name="track_id"):
-        return diags.duration(self._dataset[time_name], self._dataset[track_id_name])
+    def get_track_duration(self, time_name="time", track_id_name="track_id"):
+        return diags.get_track_duration(
+            self._dataset[time_name], self._dataset[track_id_name]
+        )
 
     def get_track_ace(self, wind_name="wind", track_id_name="track_id", **kwargs):
         return diags.get_track_ace(

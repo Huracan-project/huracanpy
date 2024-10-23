@@ -3,10 +3,10 @@ import huracanpy
 import numpy as np
 
 
-def test_accessor():
+def test_get_methods():
+    """Test get_ accessors output is same as function"""
     data = huracanpy.load(huracanpy.example_csv_file)
 
-    # Test get_ accessors output is same as function
     ## - hemisphere
     hemi_acc = data.hrcn.get_hemisphere(lat_name="lat")
     hemi_fct = huracanpy.utils.get_hemisphere(data.lat)
@@ -100,7 +100,59 @@ def test_accessor():
         "Translation speed  accessor output differs from function output",
     )
 
-    # Test that add_ accessors output do add the columns
+    ## - track duration
+    duration_acc = data.hrcn.get_track_duration()
+    duration_fct = huracanpy.diags.get_track_duration(data.time, data.track_id)
+    np.testing.assert_array_equal(
+        duration_acc,
+        duration_fct,
+        "duration accessor output differs from function output",
+    )
+
+    ## - track ace
+    ace_acc = data.hrcn.get_track_ace(
+        wind_name="wind10",
+    )
+    ace_fct = huracanpy.diags.get_track_ace(data.wind10, data.track_id)
+    np.testing.assert_array_equal(
+        ace_acc,
+        ace_fct,
+        "Track ACE accessor output differs from function output",
+    )
+
+    ## - track pace
+    pace_acc = data.hrcn.get_track_pace(
+        wind_name="wind10",
+    )
+    pace_fct = huracanpy.diags.get_track_pace(data.slp, data.track_id, data.wind10)
+    np.testing.assert_array_equal(
+        pace_acc,
+        pace_fct,
+        "Track PACE accessor output differs from function output",
+    )
+
+    ## - gen vals
+    # gen_vals_acc = data.hrcn.get_gen_vals()
+    # gen_vals_fct = huracanpy.diags.get_gen_vals(
+    #    data,
+    # )
+    # TODO : Write test with same array function
+
+    ## - apex vals
+    # apex_vals_acc = data.hrcn.get_apexn_vals()
+    # apex_vals_fct = huracanpy.diags.get_apex_vals(
+    #    data,
+    # )
+    # TODO : Write test with same array function
+
+
+def test_add_methods():
+    """
+    Test that add_ accessors output do add the columns
+
+    """
+    data = huracanpy.load(huracanpy.example_csv_file)
+
     data = (
         data.hrcn.add_hemisphere(lat_name="lat")
         .hrcn.add_basin(lon_name="lon", lat_name="lat")
@@ -139,7 +191,9 @@ def test_accessor():
     ]:
         assert col in list(data.variables), f"{col} not found in data columns"
 
-    # Test interpolation method
+
+def test_interp_methods():
+    data = huracanpy.load(huracanpy.example_csv_file)
     interpolated_data_acc = data.hrcn.interp_time(
         freq="1h", track_id_name="track_id", prog_bar=False
     )
