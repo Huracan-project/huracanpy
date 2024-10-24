@@ -147,10 +147,10 @@ def test_get_methods():
     )
 
     ## - track pace
-    pace_acc = data.hrcn.get_track_pace(
+    pace_acc, _ = data.hrcn.get_track_pace(
         wind_name="wind10",
     )
-    pace_fct = huracanpy.diags.get_track_pace(data.slp, data.track_id, data.wind10)
+    pace_fct, _ = huracanpy.diags.get_track_pace(data.slp, data.track_id, data.wind10)
     np.testing.assert_array_equal(
         pace_acc,
         pace_fct,
@@ -159,27 +159,24 @@ def test_get_methods():
 
     ## - Genesis Values
     gen_vals_acc = data.hrcn.get_gen_vals(
-        time_name="time", track_id_name="track_id", var_name="wind10"
+        time_name="time",
+        track_id_name="track_id",
     )
-    gen_vals_fct = huracanpy.utils.get_gen_vals(data.time, data.track_id, data.wind10)
-    np.testing.assert_array_equal(
-        gen_vals_acc,
-        gen_vals_fct,
-        "Genesis Values accessor output differs from function output",
+    gen_vals_fct = huracanpy.diags.get_gen_vals(
+        data,
     )
+    assert gen_vals_acc.equals(
+        gen_vals_fct
+    ), "Genesis Values accessor output differs from function output"
 
     ## - Apex Values
     apex_vals_acc = data.hrcn.get_apex_vals(
-        time_name="time", track_id_name="track_id", var_name="wind10", stat="max"
+        track_id_name="track_id", varname="wind10", stat="max"
     )
-    apex_vals_fct = huracanpy.utils.get_apex_vals(
-        data.time, data.track_id, data.wind10, stat="max"
-    )
-    np.testing.assert_array_equal(
-        apex_vals_acc,
-        apex_vals_fct,
-        "Apex Values accessor output differs from function output",
-    )
+    apex_vals_fct = huracanpy.diags.get_apex_vals(data, varname="wind10", stat="max")
+    assert apex_vals_acc.equals(
+        apex_vals_fct
+    ), "Genesis Values accessor output differs from function output"
 
 
 def test_add_methods():

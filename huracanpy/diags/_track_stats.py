@@ -117,7 +117,7 @@ def get_track_pace(
         **kwargs,
     )
 
-    return pace.groupby(track_ids).sum()
+    return pace.groupby(track_ids).sum(), model
 
 
 def get_track_duration(time, track_ids):

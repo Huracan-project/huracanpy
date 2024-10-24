@@ -34,14 +34,14 @@ class HuracanPyAccessor:
     # %% utils
     # ---- geography
     def get_hemisphere(self, lat_name="lat"):
-        return utils.geography.get_hemisphere(self._dataset[lat_name])
+        return utils._geography.get_hemisphere(self._dataset[lat_name])
 
     def add_hemisphere(self, lat_name="lat"):
         self._dataset["hemisphere"] = self.get_hemisphere(lat_name=lat_name)
         return self._dataset
 
     def get_basin(self, lon_name="lon", lat_name="lat", convention="WMO", crs=None):
-        return utils.geography.get_basin(
+        return utils._geography.get_basin(
             self._dataset[lon_name],
             self._dataset[lat_name],
             convention=convention,
@@ -55,7 +55,7 @@ class HuracanPyAccessor:
     def get_land_or_ocean(
         self, lon_name="lon", lat_name="lat", resolution="10m", crs=None
     ):
-        return utils.geography.get_land_or_ocean(
+        return utils._geography.get_land_or_ocean(
             self._dataset[lon_name],
             self._dataset[lat_name],
             resolution=resolution,
@@ -71,7 +71,7 @@ class HuracanPyAccessor:
         return self._dataset
 
     def get_country(self, lon_name="lon", lat_name="lat", resolution="10m", crs=None):
-        return utils.geography.get_country(
+        return utils._geography.get_country(
             self._dataset[lon_name],
             self._dataset[lat_name],
             resolution=resolution,
@@ -83,7 +83,7 @@ class HuracanPyAccessor:
         return self._dataset
 
     def get_continent(self, lon_name="lon", lat_name="lat", resolution="10m", crs=None):
-        return utils.geography.get_continent(
+        return utils._geography.get_continent(
             self._dataset[lon_name],
             self._dataset[lat_name],
             resolution=resolution,
@@ -103,7 +103,7 @@ class HuracanPyAccessor:
         """
         Calculate Accumulated Cyclone Energy (ACE) for each point.
         """
-        return utils.ace.get_ace(
+        return utils._ace.get_ace(
             self._dataset[wind_name], threshold=threshold, wind_units=wind_units
         )
 
@@ -131,7 +131,7 @@ class HuracanPyAccessor:
         """
         Calculate Pressure-based Accumulated Cyclone Energy (PACE) for each point.
         """
-        pace_values, model = utils.ace.get_pace(
+        pace_values, model = utils._ace.get_pace(
             self._dataset[pressure_name],
             wind=self._dataset[wind_name] if wind_name else None,
             model=model,
@@ -172,7 +172,7 @@ class HuracanPyAccessor:
         """
         Expand the time variable into year, month, day, and hour.
         """
-        return utils.time.get_time_components(self._dataset[time_name])
+        return utils._time.get_time_components(self._dataset[time_name])
 
     def add_time_components(self, time_name="time"):
         """
@@ -195,7 +195,7 @@ class HuracanPyAccessor:
         """
         Derive the season for each track based on latitude and time.
         """
-        return utils.time.get_season(
+        return utils._time.get_season(
             self._dataset[track_id_name],
             self._dataset[lat_name],
             self._dataset[time_name],
@@ -229,7 +229,7 @@ class HuracanPyAccessor:
         """
         Calculate a generic category from a variable and a set of thresholds.
         """
-        return utils.category.get_category(
+        return utils._category.get_category(
             self._dataset[variable_name],
             bins=bins,
             labels=labels,
@@ -264,7 +264,7 @@ class HuracanPyAccessor:
         """
         Determine the Saffir-Simpson Hurricane Scale (SSHS) category.
         """
-        return utils.category.get_sshs_cat(
+        return utils._category.get_sshs_cat(
             self._dataset[wind_name],
             convention=convention,
             wind_units=wind_units,
@@ -283,7 +283,7 @@ class HuracanPyAccessor:
         """
         Determine the pressure category based on the selected convention.
         """
-        return utils.category.get_pressure_cat(
+        return utils._category.get_pressure_cat(
             self._dataset[slp_name],
             convention=convention,
             slp_units=slp_units,
@@ -311,7 +311,7 @@ class HuracanPyAccessor:
         Compute the distance between points along a track.
         """
         if track_id_name in list(self._dataset.variables):
-            return utils.translation.get_distance(
+            return utils._translation.get_distance(
                 self._dataset[lon_name],
                 self._dataset[lat_name],
                 track_id=self._dataset[track_id_name],
@@ -321,7 +321,7 @@ class HuracanPyAccessor:
         if (track_id_name is None) or (
             track_id_name not in list(self._dataset.variables)
         ):
-            return utils.translation.get_distance(
+            return utils._translation.get_distance(
                 self._dataset[lon_name],
                 self._dataset[lat_name],
                 track_id=None,
@@ -358,7 +358,7 @@ class HuracanPyAccessor:
         Compute the translation speed along tracks.
         """
         if track_id_name in list(self._dataset.variables):
-            return utils.translation.get_translation_speed(
+            return utils._translation.get_translation_speed(
                 self._dataset[lon_name],
                 self._dataset[lat_name],
                 self._dataset[time_name],
@@ -369,7 +369,7 @@ class HuracanPyAccessor:
         if (track_id_name is None) or (
             track_id_name not in list(self._dataset.variables)
         ):
-            return utils.translation.get_translation_speed(
+            return utils._translation.get_translation_speed(
                 self._dataset[lon_name],
                 self._dataset[lat_name],
                 self._dataset[time_name],
@@ -400,7 +400,7 @@ class HuracanPyAccessor:
         """
         Interpolate track data at a given frequency.
         """
-        return utils.interp.interp_time(
+        return utils._interp.interp_time(
             self._dataset, freq=freq, track_id_name=track_id_name, prog_bar=prog_bar
         )
 
