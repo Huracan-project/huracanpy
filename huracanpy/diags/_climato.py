@@ -1,7 +1,7 @@
 import pandas as pd
 import xarray as xr
 
-from ._track_stats import duration
+from ._track_stats import get_track_duration
 from huracanpy.utils import get_ace
 from metpy.units import units
 
@@ -66,7 +66,9 @@ def tc_days(self, by=None, track_id_name="track_id", time_name="time"):
 
     """
     if by is None:
-        return xr.DataArray(duration(self[time_name], self[track_id_name]).sum() / 24)
+        return xr.DataArray(
+            get_track_duration(self[time_name], self[track_id_name]).sum() / 24
+        )
     else:
         return self.groupby(by).apply(tc_days, by=None).mean()
 

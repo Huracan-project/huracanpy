@@ -100,6 +100,32 @@ def test_get_methods():
         "Translation speed  accessor output differs from function output",
     )
 
+    ## - Time from Genesis
+    time_from_genesis_acc = data.hrcn.get_time_from_genesis(
+        time_name="time", track_id_name="track_id"
+    )
+    time_from_genesis_fct = huracanpy.utils.get_time_from_genesis(
+        data.time, data.track_id
+    )
+    np.testing.assert_array_equal(
+        time_from_genesis_acc,
+        time_from_genesis_fct,
+        "Time from Genesis accessor output differs from function output",
+    )
+
+    ## - Time from Apex
+    time_from_apex_acc = data.hrcn.get_time_from_apex(
+        time_name="time", track_id_name="track_id", intensity_var_name="wind10"
+    )
+    time_from_apex_fct = huracanpy.utils.get_time_from_apex(
+        data.time, data.track_id, data.wind10
+    )
+    np.testing.assert_array_equal(
+        time_from_apex_acc,
+        time_from_apex_fct,
+        "Time from Apex accessor output differs from function output",
+    )
+
     ## - track duration
     duration_acc = data.hrcn.get_track_duration()
     duration_fct = huracanpy.diags.get_track_duration(data.time, data.track_id)
@@ -131,21 +157,29 @@ def test_get_methods():
         "Track PACE accessor output differs from function output",
     )
 
-    ## - gen vals
-    # gen_vals_acc = data.hrcn.get_gen_vals()
-    # gen_vals_fct = huracanpy.diags.get_gen_vals(
-    #    data,
-    # )
-    # TODO : Write test with same array function
+    ## - Genesis Values
+    gen_vals_acc = data.hrcn.get_gen_vals(
+        time_name="time", track_id_name="track_id", var_name="wind10"
+    )
+    gen_vals_fct = huracanpy.utils.get_gen_vals(data.time, data.track_id, data.wind10)
+    np.testing.assert_array_equal(
+        gen_vals_acc,
+        gen_vals_fct,
+        "Genesis Values accessor output differs from function output",
+    )
 
-    ## - apex vals
-    # apex_vals_acc = data.hrcn.get_apexn_vals()
-    # apex_vals_fct = huracanpy.diags.get_apex_vals(
-    #    data,
-    # )
-    # TODO : Write test with same array function
-
-    # TODO: lifecycle functions tests
+    ## - Apex Values
+    apex_vals_acc = data.hrcn.get_apex_vals(
+        time_name="time", track_id_name="track_id", var_name="wind10", stat="max"
+    )
+    apex_vals_fct = huracanpy.utils.get_apex_vals(
+        data.time, data.track_id, data.wind10, stat="max"
+    )
+    np.testing.assert_array_equal(
+        apex_vals_acc,
+        apex_vals_fct,
+        "Apex Values accessor output differs from function output",
+    )
 
 
 def test_add_methods():
@@ -153,6 +187,7 @@ def test_add_methods():
     Test that add_ accessors output do add the columns
 
     """
+
     data = huracanpy.load(huracanpy.example_csv_file)
 
     data = (
@@ -170,6 +205,13 @@ def test_add_methods():
         .hrcn.add_distance(lon_name="lon", lat_name="lat")
         .hrcn.add_translation_speed(
             lon_name="lon", lat_name="lat", time_name="time", track_id_name="track_id"
+        )
+        .hrcn.add_time_from_genesis(time_name="time", track_id_name="track_id")
+        .hrcn.add_time_from_apex(
+            time_name="time",
+            track_id_name="track_id",
+            intensity_var_name="wind10",
+            stat="max",
         )
     )
 
@@ -190,6 +232,8 @@ def test_add_methods():
         "pressure_cat",
         "distance",
         "translation_speed",
+        "time_from_genesis",
+        "time_from_apex",
     ]:
         assert col in list(data.variables), f"{col} not found in data columns"
 

@@ -12,6 +12,7 @@ class HuracanPyAccessor:
     def __init__(self, dataset):
         self._dataset = dataset.copy()
 
+    # %% Save
     def save(self, filename):
         """
         Save dataset as filename.
@@ -405,11 +406,15 @@ class HuracanPyAccessor:
 
     # ---- lifecycle
     def get_time_from_genesis(self, time_name="time", track_id_name="track_id"):
-        return utils.lifecycle.get_time_from_genesis(
+        return utils._lifecycle.get_time_from_genesis(
             self._dataset[time_name], self._dataset[track_id_name]
         )
 
-    # TODO : Add function
+    def add_time_from_genesis(self, time_name="time", track_id_name="track_id"):
+        self._dataset["time_from_genesis"] = self.get_time_from_genesis(
+            time_name, track_id_name
+        )
+        return self._dataset
 
     def get_time_from_apex(
         self,
@@ -418,14 +423,24 @@ class HuracanPyAccessor:
         intensity_var_name="wind",
         stat="max",
     ):
-        return utils.lifecycle.get_time_from_apex(
+        return utils._lifecycle.get_time_from_apex(
             self._dataset[time_name],
             self._dataset[track_id_name],
             self._dataset[intensity_var_name],
             stat=stat,
         )
 
-    # TODO : Add function
+    def add_time_from_apex(
+        self,
+        time_name="time",
+        track_id_name="track_id",
+        intensity_var_name="wind",
+        stat="max",
+    ):
+        self._dataset["time_from_apex"] = self.get_time_from_apex(
+            time_name, track_id_name, intensity_var_name, stat
+        )
+        return self._dataset
 
     # %% plot
     def plot_tracks(
