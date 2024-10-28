@@ -19,6 +19,8 @@ __all__ = [
     "get_translation_speed",
     "get_time_from_genesis",
     "get_time_from_apex",
+    "get_delta",
+    "get_rate",
 ]
 
 from ._geography import (
@@ -34,6 +36,7 @@ from ._interp import interp_time
 from ._ace import get_ace, get_pace, get_pressure_wind_relation
 from ._translation import get_distance, get_translation_speed
 from ._lifecycle import get_time_from_genesis, get_time_from_apex
+from ._rates import get_delta, get_rate
 
 
 def add_all_info(

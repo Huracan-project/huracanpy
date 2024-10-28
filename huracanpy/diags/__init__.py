@@ -8,7 +8,6 @@ __all__ = [
     "get_gen_vals",
     "get_apex_vals",
     "translation_speed",
-    "rate",
     "freq",
     "tc_days",
     "ace",
@@ -22,5 +21,4 @@ from ._track_stats import (
     get_gen_vals,
     get_apex_vals,
 )
-from ._rates import rate
 from ._climato import freq, tc_days, ace
