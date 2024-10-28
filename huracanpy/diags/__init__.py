@@ -8,9 +8,9 @@ __all__ = [
     "get_gen_vals",
     "get_apex_vals",
     "translation_speed",
-    "freq",
-    "tc_days",
-    "ace",
+    "get_freq",
+    "get_tc_days",
+    "get_ace",
 ]
 
 from ._density import density
@@ -21,4 +21,4 @@ from ._track_stats import (
     get_gen_vals,
     get_apex_vals,
 )
-from ._climato import freq, tc_days, ace
+from ._climato import get_freq, get_tc_days, get_ace
