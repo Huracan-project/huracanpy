@@ -35,6 +35,8 @@ def test_get_delta():
     delta_wind = huracanpy.utils.get_delta(data.wind10, var_units="m/s")
     delta_slp = huracanpy.utils.get_delta(data.slp, var_units="hPa")
 
+    ## TODO: Test for time
+
 
 def test_get_rate():
     data = huracanpy.load(huracanpy.example_csv_file)

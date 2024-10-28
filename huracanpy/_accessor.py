@@ -395,6 +395,56 @@ class HuracanPyAccessor:
         )
         return self._dataset
 
+    # ---- rates
+    def get_delta(self, var_name="wind10", track_id_name="track_id", **kwargs):
+        if track_id_name in list(self._dataset.variables):
+            return utils.get_delta(
+                self._dataset[var_name],
+                track_ids=self._dataset[track_id_name],
+                **kwargs,
+            )
+        if (track_id_name is None) or (
+            track_id_name not in list(self._dataset.variables)
+        ):
+            return utils.get_delta(self._dataset[var_name], track_ids=None, **kwargs)
+
+    def add_delta(self, var_name="wind10", track_id_name="track_id", **kwargs):
+        """
+        Add the distance calculation to the dataset.
+        """
+        self._dataset["delta_" + var_name] = self.get_delta(
+            var_name, track_id_name, **kwargs
+        )
+        return self._dataset
+
+    def get_rate(
+        self, var_name="wind10", time_name="time", track_id_name="track_id", **kwargs
+    ):
+        if track_id_name in list(self._dataset.variables):
+            return utils.get_rate(
+                self._dataset[var_name],
+                self._dataset[time_name],
+                track_ids=self._dataset[track_id_name],
+                **kwargs,
+            )
+        if (track_id_name is None) or (
+            track_id_name not in list(self._dataset.variables)
+        ):
+            return utils.get_rate(
+                self._dataset[var_name],
+                self._dataset[time_name],
+                track_id=None,
+                **kwargs,
+            )
+
+    def add_rate(
+        self, var_name="wind10", time_name="time", track_id_name="track_id", **kwargs
+    ):
+        self._dataset["rate_" + var_name] = self.get_rate(
+            var_name, time_name, track_id_name, **kwargs
+        )
+        return self._dataset
+
     # ---- interp
     def interp_time(self, freq="1h", track_id_name="track_id", prog_bar=False):
         """
@@ -498,4 +548,4 @@ class HuracanPyAccessor:
             self._dataset, varname, track_id_name=track_id_name, stat=stat
         )
 
-    # ---- lifecycle
+    # ---- climato

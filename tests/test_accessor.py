@@ -100,6 +100,24 @@ def test_get_methods():
         "Translation speed  accessor output differs from function output",
     )
 
+    ## - get_delta
+    delta_wind10_acc = data.hrcn.get_delta("wind10")
+    delta_wind10_fct = huracanpy.utils.get_delta(data.wind10, data.track_id)
+    np.testing.assert_array_equal(
+        delta_wind10_acc,
+        delta_wind10_fct,
+        "get_delta accessor output differs from function output",
+    )
+
+    ## - get_rate
+    rate_wind10_acc = data.hrcn.get_rate("wind10")
+    rate_wind10_fct = huracanpy.utils.get_rate(data.wind10, data.time, data.track_id)
+    np.testing.assert_array_equal(
+        rate_wind10_acc,
+        rate_wind10_fct,
+        "get_rate accessor output differs from function output",
+    )
+
     ## - Time from Genesis
     time_from_genesis_acc = data.hrcn.get_time_from_genesis(
         time_name="time", track_id_name="track_id"
@@ -203,6 +221,8 @@ def test_add_methods():
         .hrcn.add_translation_speed(
             lon_name="lon", lat_name="lat", time_name="time", track_id_name="track_id"
         )
+        .hrcn.add_delta(var_name="wind10")
+        .hrcn.add_rate(var_name="wind10", time_name="time", track_id_name="track_id")
         .hrcn.add_time_from_genesis(time_name="time", track_id_name="track_id")
         .hrcn.add_time_from_apex(
             time_name="time",
@@ -229,6 +249,8 @@ def test_add_methods():
         "pressure_cat",
         "distance",
         "translation_speed",
+        "delta_wind10",
+        "rate_wind10",
         "time_from_genesis",
         "time_from_apex",
     ]:
