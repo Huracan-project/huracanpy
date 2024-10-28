@@ -3,6 +3,15 @@ import huracanpy
 import numpy as np
 
 
+# %% DataArrayAccessor
+def test_nunique():
+    data = huracanpy.load(huracanpy.example_csv_file)
+
+    N_tracks = data.track_id.hrcn.nunique()
+    assert N_tracks == 3
+
+
+# %% DatasetAccessor
 def test_get_methods():
     """Test get_ accessors output is same as function"""
     data = huracanpy.load(huracanpy.example_csv_file)

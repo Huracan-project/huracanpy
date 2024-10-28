@@ -1,19 +1,11 @@
-import pandas as pd
 import xarray as xr
 
 from ._track_stats import get_track_duration
-from huracanpy.utils import get_ace
+from huracanpy.utils import get_ace as get_point_ace
 from metpy.units import units
 
 
-def nunique(self):
-    return pd.Series(self).nunique()
-
-
-xr.DataArray.nunique = nunique
-
-
-def freq(self, by=None, track_id_name="track_id"):
+def get_freq(track_id, by=None):
     """
     Compute the frequency (number of tracks) in a dataset, potentially normalized by another variable (e.g. season to get yearly count).
 
@@ -24,10 +16,10 @@ def freq(self, by=None, track_id_name="track_id"):
 
     Parameters
     ----------
+    track_id: xr.DataArray
+        track_id variable
     by : str, optional
         Variable to normalize frequency. The default is None (which means the number of unique track in the whole dataset is provided).
-    track_id_name : str, optional
-        Name of the unique track identifier variable. The default is "track_id".
 
     Returns
     -------
@@ -35,13 +27,14 @@ def freq(self, by=None, track_id_name="track_id"):
         The frequency number.
 
     """
-    if by is None:
-        return xr.DataArray(self[track_id_name].nunique())
-    else:
-        return self.groupby(by).apply(freq, by=None).mean()
+    pass
+    # if by is None:
+    #    return xr.DataArray(self[track_id_name].nunique())
+    # else:
+    #    return self.groupby(by).apply(get_freq, by=None).mean()
 
 
-def tc_days(self, by=None, track_id_name="track_id", time_name="time"):
+def get_tc_days(self, by=None, track_id_name="track_id", time_name="time"):
     """
     Function to compute the number of "TC days", or cumulated TC duration, potentially normalized by another variable (e.g. season to get yearly TCD).
 
@@ -70,10 +63,10 @@ def tc_days(self, by=None, track_id_name="track_id", time_name="time"):
             get_track_duration(self[time_name], self[track_id_name]).sum() / 24
         )
     else:
-        return self.groupby(by).apply(tc_days, by=None).mean()
+        return self.groupby(by).apply(get_tc_days, by=None).mean()
 
 
-def ace(
+def get_ace(
     self, by=None, wind_name="wind", threshold=0 * units("knots"), wind_units="m s-1"
 ):
     """
@@ -101,7 +94,7 @@ def ace(
         Aggregated ACE.
 
     """
-    ace = get_ace(self[wind_name], threshold, wind_units)
+    ace = get_point_ace(self[wind_name], threshold, wind_units)
 
     if by is None:
         return ace.sum()

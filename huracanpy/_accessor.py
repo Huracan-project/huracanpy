@@ -1,5 +1,6 @@
 import xarray as xr
 from metpy.units import units
+import pandas as pd
 
 from ._data._save import save
 
@@ -7,8 +8,26 @@ from ._data._save import save
 from . import utils, diags, plot
 
 
+@xr.register_dataarray_accessor("hrcn")
+class HuracanPyDataArrayAccessor:
+    def __init__(self, dataarray):
+        self._dataarray = dataarray.copy()
+
+    def nunique(self):
+        """
+        Method to count number of unique element in a DataArray
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+        return pd.Series(self._dataarray).nunique()
+
+
 @xr.register_dataset_accessor("hrcn")
-class HuracanPyAccessor:
+class HuracanPyDatasetAccessor:
     def __init__(self, dataset):
         self._dataset = dataset.copy()
 
