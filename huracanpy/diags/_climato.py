@@ -11,7 +11,7 @@ def get_freq(track_ids):
     # TODO: groupby & norm by for the accessor only as it is much easier to write then
 
 
-def get_tc_days(track_ids, time):
+def get_tc_days(time, track_ids):
     durations = get_track_duration(time, track_ids)
     durations = durations * units(durations.attrs["units"])
     durations = durations.metpy.convert_units("day")

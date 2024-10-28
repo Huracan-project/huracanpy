@@ -205,6 +205,21 @@ def test_get_methods():
         apex_vals_fct
     ), "Genesis Values accessor output differs from function output"
 
+    ## - get_freq
+    freq_acc = data.hrcn.get_freq()
+    freq_fct = huracanpy.diags.get_freq(data.track_id)
+    assert freq_acc == freq_fct
+
+    ## - get_tc_days
+    tc_days_acc = data.hrcn.get_tc_days()
+    tc_days_fct = huracanpy.diags.get_tc_days(data.time, data.track_id)
+    assert tc_days_acc == tc_days_fct
+
+    ## - get_ace
+    ace_acc = data.hrcn.get_total_ace(wind_name="wind10")
+    ace_fct = huracanpy.diags.get_ace(data.wind10)
+    assert ace_acc == ace_fct
+
 
 def test_add_methods():
     """

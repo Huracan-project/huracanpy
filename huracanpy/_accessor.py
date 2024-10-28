@@ -568,3 +568,11 @@ class HuracanPyDatasetAccessor:
         )
 
     # ---- climato
+    def get_freq(self, track_id_name="track_id"):
+        return diags.get_freq(self._dataset[track_id_name])
+
+    def get_tc_days(self, time_name="time", track_id_name="track_id"):
+        return diags.get_tc_days(self._dataset[time_name], self._dataset[track_id_name])
+
+    def get_total_ace(self, wind_name="wind", **kwargs):
+        return diags.get_ace(self._dataset[wind_name], **kwargs)
