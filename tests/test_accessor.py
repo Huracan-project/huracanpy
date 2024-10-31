@@ -46,12 +46,12 @@ def test_get_methods():
     ), "accessor output differs from function output"
     ## - ace
     ace_acc = data.hrcn.get_ace(wind_name="wind10")
-    ace_fct = huracanpy.utils.get_ace(data.wind10)
+    ace_fct = huracanpy.tc.ace(data.wind10)
     assert not any(ace_acc != ace_fct), "accessor output differs from function output"
 
     ## - pace
     pace_acc = data.hrcn.get_pace(pressure_name="slp", wind_name="wind10")
-    pace_fct, model_fct = huracanpy.utils.get_pace(data.slp, data.wind10)
+    pace_fct, model_fct = huracanpy.tc.pace(data.slp, data.wind10)
     assert not any(pace_acc != pace_fct), "accessor output differs from function output"
 
     ## - time components
@@ -166,7 +166,7 @@ def test_get_methods():
     ace_acc = data.hrcn.get_track_ace(
         wind_name="wind10",
     )
-    ace_fct = huracanpy.diags.get_track_ace(data.wind10, data.track_id)
+    ace_fct = huracanpy.tc.ace(data.wind10, aggregate_by=data.track_id)
     np.testing.assert_array_equal(
         ace_acc,
         ace_fct,
@@ -177,7 +177,7 @@ def test_get_methods():
     pace_acc, _ = data.hrcn.get_track_pace(
         wind_name="wind10",
     )
-    pace_fct, _ = huracanpy.diags.get_track_pace(data.slp, data.track_id, data.wind10)
+    pace_fct, _ = huracanpy.tc.pace(data.slp, data.wind10, aggregate_by=data.track_id)
     np.testing.assert_array_equal(
         pace_acc,
         pace_fct,
@@ -217,7 +217,7 @@ def test_get_methods():
 
     ## - get_ace
     ace_acc = data.hrcn.get_total_ace(wind_name="wind10")
-    ace_fct = huracanpy.diags.get_ace(data.wind10)
+    ace_fct = huracanpy.tc.ace(data.wind10).sum()
     assert ace_acc == ace_fct
 
 

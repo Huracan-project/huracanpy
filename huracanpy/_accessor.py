@@ -5,7 +5,7 @@ import pandas as pd
 from ._data._save import save
 
 
-from . import utils, diags, plot
+from . import utils, diags, plot, tc
 
 
 @xr.register_dataarray_accessor("hrcn")
@@ -122,7 +122,7 @@ class HuracanPyDatasetAccessor:
         """
         Calculate Accumulated Cyclone Energy (ACE) for each point.
         """
-        return utils._ace.get_ace(
+        return tc.ace(
             self._dataset[wind_name], threshold=threshold, wind_units=wind_units
         )
 
@@ -150,7 +150,7 @@ class HuracanPyDatasetAccessor:
         """
         Calculate Pressure-based Accumulated Cyclone Energy (PACE) for each point.
         """
-        pace_values, model = utils._ace.get_pace(
+        pace_values, model = tc.pace(
             self._dataset[pressure_name],
             wind=self._dataset[wind_name] if wind_name else None,
             model=model,
@@ -544,8 +544,10 @@ class HuracanPyDatasetAccessor:
         )
 
     def get_track_ace(self, wind_name="wind", track_id_name="track_id", **kwargs):
-        return diags.get_track_ace(
-            self._dataset[wind_name], self._dataset[track_id_name], **kwargs
+        return tc.ace(
+            self._dataset[wind_name],
+            aggregate_by=self._dataset[track_id_name],
+            **kwargs,
         )
 
     def get_track_pace(
@@ -555,8 +557,11 @@ class HuracanPyDatasetAccessor:
             wind = None
         else:
             wind = self._dataset[wind_name]
-        return diags.get_track_pace(
-            self._dataset[pressure_name], self._dataset[track_id_name], wind, **kwargs
+        return tc.pace(
+            self._dataset[pressure_name],
+            wind,
+            aggregate_by=self._dataset[track_id_name],
+            **kwargs,
         )
 
     def get_gen_vals(self, time_name="time", track_id_name="track_id"):
@@ -575,4 +580,4 @@ class HuracanPyDatasetAccessor:
         return diags.get_tc_days(self._dataset[time_name], self._dataset[track_id_name])
 
     def get_total_ace(self, wind_name="wind", **kwargs):
-        return diags.get_ace(self._dataset[wind_name], **kwargs)
+        return tc.ace(self._dataset[wind_name], **kwargs).sum()

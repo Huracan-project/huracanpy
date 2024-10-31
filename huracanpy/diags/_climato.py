@@ -1,7 +1,6 @@
 import xarray as xr
 
 from ._track_stats import get_track_duration
-from huracanpy.utils import get_ace as get_ace_by_point
 from metpy.units import units
 
 
@@ -16,8 +15,3 @@ def get_tc_days(time, track_ids):
     durations = durations * units(durations.attrs["units"])
     durations = durations.metpy.convert_units("day")
     return durations.sum()
-
-
-def get_ace(wind, **kwargs):
-    ace = get_ace_by_point(wind, **kwargs)
-    return ace.sum() * units(ace.attrs["units"])
