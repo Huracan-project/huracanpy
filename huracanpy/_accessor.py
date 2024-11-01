@@ -170,7 +170,7 @@ class HuracanPyDatasetAccessor:
             wind_units=wind_units,
             **kwargs,
         )
-        return pace_values
+        return pace_values, model
 
     def add_pace(
         self,
@@ -556,11 +556,16 @@ class HuracanPyDatasetAccessor:
         )
 
     def get_gen_vals(self, time_name="time", track_id_name="track_id"):
-        return diags.get_gen_vals(self._dataset, time_name, track_id_name)
+        return diags.get_gen_vals(
+            self._dataset, self._dataset[time_name], self._dataset[track_id_name]
+        )
 
     def get_apex_vals(self, varname, track_id_name="track_id", stat="max"):
         return diags.get_apex_vals(
-            self._dataset, varname, track_id_name=track_id_name, stat=stat
+            self._dataset,
+            variable=self._dataset[varname],
+            track_id=self._dataset[track_id_name],
+            stat=stat,
         )
 
     # ---- climato

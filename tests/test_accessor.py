@@ -1,8 +1,9 @@
 import pytest
 
-import huracanpy
-
 import numpy as np
+import xarray as xr
+
+import huracanpy
 
 
 # %% DataArrayAccessor
@@ -77,6 +78,13 @@ def test_nunique():
         ),
         (huracanpy.diags.get_freq, ["track_id"], "freq", {}),
         (huracanpy.diags.get_tc_days, ["time", "track_id"], "tc_days", {}),
+        # (huracanpy.diags.get_gen_vals, ["all", "time", "track_id"], "gen_vals", {}),
+        # (
+        #     huracanpy.diags.get_apex_vals,
+        #     ["all", "wind10", "track_id"],
+        #     "apex_vals",
+        #     {"varname": "wind10"},
+        # ),
     ],
 )
 def test_accessor_methods_match_functions(
@@ -93,13 +101,20 @@ def test_accessor_methods_match_functions(
             "track_duration",
             "freq",
             "tc_days",
+            "gen_vals",
+            "apex_vals",
         ]:
             pytest.skip(f"Accessor function add_{accessor_name} does not exist")
         elif accessor_name in ["ace"] and "sum_by" in accessor_function_kwargs:
             pytest.skip(f"sum_by not a valid argument for add_{accessor_name}")
 
     # Call the huracanpy function
-    result = function(*[tracks_csv[var] for var in function_args])
+    # Get the function arguments as arrays. Use "all" as a wildcard for the full dataset
+    function_args = [
+        tracks_csv[var] if not var == "all" else tracks_csv for var in function_args
+    ]
+    result = function(*function_args)
+
     # Call the accessor method
     result_accessor = getattr(tracks_csv.hrcn, f"{call_type}_{accessor_name}")(
         **accessor_function_kwargs
@@ -127,14 +142,18 @@ def test_accessor_methods_match_functions(
 
 
 # %% DatasetAccessor
+# Currently keeping tests here that return more than just a DataArray as the testing is
+# less generic
 def test_get_methods(tracks_csv):
     """Test get_ accessors output is same as function"""
     data = tracks_csv
 
     ## - pace
-    pace_acc = data.hrcn.get_pace(pressure_name="slp", wind_name="wind10")
+    pace_acc, _ = data.hrcn.get_pace(pressure_name="slp", wind_name="wind10")
     pace_fct, model_fct = huracanpy.tc.pace(data.slp, data.wind10)
-    assert not any(pace_acc != pace_fct), "accessor output differs from function output"
+    np.testing.assert_array_equal(
+        pace_acc, pace_fct, err_msg="accessor output differs from function output"
+    )
 
     ## - time components
     year_acc, month_acc, day_acc, hour_acc = data.hrcn.get_time_components(
@@ -143,10 +162,18 @@ def test_get_methods(tracks_csv):
     year_fct, month_fct, day_fct, hour_fct = huracanpy.utils.get_time_components(
         data.time
     )
-    assert all(year_acc == year_fct), "Year component does not match"
-    assert all(month_acc == month_fct), "Month component does not match"
-    assert all(day_acc == day_fct), "Day component does not match"
-    assert all(hour_acc == hour_fct), "Hour component does not match"
+    np.testing.assert_array_equal(
+        year_acc, year_fct, err_msg="Year component does not match"
+    )
+    np.testing.assert_array_equal(
+        month_acc, month_fct, err_msg="Month component does not match"
+    )
+    np.testing.assert_array_equal(
+        day_acc, day_fct, err_msg="Day component does not match"
+    )
+    np.testing.assert_array_equal(
+        hour_acc, hour_fct, err_msg="Hour component does not match"
+    )
 
     ## - track pace
     pace_acc, _ = data.hrcn.get_pace(wind_name="wind10", sum_by="track_id")
@@ -162,21 +189,17 @@ def test_get_methods(tracks_csv):
         time_name="time",
         track_id_name="track_id",
     )
-    gen_vals_fct = huracanpy.diags.get_gen_vals(
-        data,
-    )
-    assert gen_vals_acc.equals(
-        gen_vals_fct
-    ), "Genesis Values accessor output differs from function output"
+    gen_vals_fct = huracanpy.diags.get_gen_vals(data, data.time, data.track_id)
+    xr.testing.assert_equal(gen_vals_acc, gen_vals_fct)
 
     ## - Apex Values
     apex_vals_acc = data.hrcn.get_apex_vals(
         track_id_name="track_id", varname="wind10", stat="max"
     )
-    apex_vals_fct = huracanpy.diags.get_apex_vals(data, varname="wind10", stat="max")
-    assert apex_vals_acc.equals(
-        apex_vals_fct
-    ), "Genesis Values accessor output differs from function output"
+    apex_vals_fct = huracanpy.diags.get_apex_vals(
+        data, data.wind10, data.track_id, stat="max"
+    )
+    xr.testing.assert_equal(apex_vals_acc, apex_vals_fct)
 
 
 def test_interp_methods():

@@ -11,13 +11,13 @@ def test_duration():
 
 def test_gen_vals():
     data = huracanpy.load(huracanpy.example_csv_file, source="csv")
-    G = huracanpy.diags.get_gen_vals(data)
+    G = huracanpy.diags.get_gen_vals(data, data.time, data.track_id)
     assert G.time.dt.day.mean() == 10
 
 
-def test_extremum_vals():
-    data = huracanpy.load(huracanpy.example_csv_file, source="csv")
-    M = huracanpy.diags.get_apex_vals(data, "wind10", "max")
-    m = huracanpy.diags.get_apex_vals(data, "slp", "min")
+def test_apex_vals():
+    data = huracanpy.load(huracanpy.example_csv_file)
+    M = huracanpy.diags.get_apex_vals(data, data.wind10, data.track_id, "max")
+    m = huracanpy.diags.get_apex_vals(data, data.slp, data.track_id, "min")
     assert M.time.dt.day.mean() == 15
     assert m.lat.mean() == -27
