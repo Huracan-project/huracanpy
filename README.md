@@ -3,12 +3,17 @@
 
 A python package for working with various forms of feature tracking data
 
+## Version 1 coming soon! Subscribe for notification.
+We will release version 1 soon. To stay updated about it, please subscribe to [this discussion](https://github.com/Huracan-project/huracanpy/discussions/57), that we will use to communicate with our community of users. 
+(We wish there was a better way for you to subscribe to announcements. If you agree with us, please up [this issue](https://github.com/orgs/community/discussions/3951).)
+
 ## Installation
 To install the package, you can use `pip`: `pip install huracanpy`.
 
 This can fail with older python versions due to issues with installing cartopy through
 pip. If this happens, use conda to install cartopy first
 (e.g. `conda install -c conda-forge cartopy`), then install huracanpy as normal
+
 
 ## Usage
 The idea of this package is to be a standard way for working with cyclone track data. We
