@@ -2,6 +2,7 @@
 Module containing functions to compute ACE
 """
 
+import numpy as np
 from numpy.polynomial.polynomial import Polynomial
 import xarray as xr
 import pint
@@ -275,9 +276,14 @@ def get_pressure_wind_relation(pressure, wind=None, model=None, **kwargs):
             "Need to specify either wind or model to calculate pressure-wind relation"
         )
 
-    wind_from_fit = model(pressure)
+    wind_from_fit = _get_wind_from_model(pressure, model)
 
     return wind_from_fit, model
+
+
+@preprocess_and_wrap(wrap_like="pressure")
+def _get_wind_from_model(pressure, model):
+    return np.array(model(pressure))
 
 
 # Pre-determined pressure-wind relationships
