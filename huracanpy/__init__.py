@@ -8,6 +8,7 @@ __all__ = [
     "plot",
     "assess",
     "utils",
+    "tc",
     # Functions
     "load",
     "save",
@@ -41,7 +42,7 @@ from ._data import (
     example_CHAZ_file,
     example_MIT_file,
 )
-from . import diags, plot, assess, utils
+from . import diags, plot, assess, utils, tc
 from .utils._basins import basins_def as basins
 from ._subset import sel_id, trackswhere
 from . import _accessor
