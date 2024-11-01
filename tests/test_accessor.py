@@ -23,6 +23,12 @@ def test_nunique():
         (huracanpy.utils.get_country, ["lon", "lat"], "country", {}),
         (huracanpy.utils.get_continent, ["lon", "lat"], "continent", {}),
         (huracanpy.tc.ace, ["wind10"], "ace", {"wind_name": "wind10"}),
+        (
+            huracanpy.tc.ace,
+            ["wind10", "track_id"],
+            "ace",
+            {"wind_name": "wind10", "sum_by": "track_id"},
+        ),
         # (huracanpy.tc.pace, ["slp", "wind10"], "pace", {"pressure_name": "slp", "wind_name": "wind10"}),
         (huracanpy.utils.get_season, ["track_id", "lat", "time"], "season", {}),
         (huracanpy.utils.get_sshs_cat, ["wind10"], "sshs_cat", {"wind_name": "wind10"}),
@@ -82,12 +88,15 @@ def test_accessor_methods_match_functions(
     call_type,
 ):
     # Skip functions that only have a "get_" version
-    if call_type == "add" and accessor_name in [
-        "track_duration",
-        "freq",
-        "tc_days",
-    ]:
-        pytest.skip(f"Accessor function add_{accessor_name} does not exist")
+    if call_type == "add":
+        if accessor_name in [
+            "track_duration",
+            "freq",
+            "tc_days",
+        ]:
+            pytest.skip(f"Accessor function add_{accessor_name} does not exist")
+        elif accessor_name in ["ace"] and "sum_by" in accessor_function_kwargs:
+            pytest.skip(f"sum_by not a valid argument for add_{accessor_name}")
 
     # Call the huracanpy function
     result = function(*[tracks_csv[var] for var in function_args])
@@ -139,21 +148,8 @@ def test_get_methods(tracks_csv):
     assert all(day_acc == day_fct), "Day component does not match"
     assert all(hour_acc == hour_fct), "Hour component does not match"
 
-    ## - track ace
-    ace_acc = data.hrcn.get_track_ace(
-        wind_name="wind10",
-    )
-    ace_fct = huracanpy.tc.ace(data.wind10, sum_by=data.track_id)
-    np.testing.assert_array_equal(
-        ace_acc,
-        ace_fct,
-        "Track ACE accessor output differs from function output",
-    )
-
     ## - track pace
-    pace_acc, _ = data.hrcn.get_track_pace(
-        wind_name="wind10",
-    )
+    pace_acc, _ = data.hrcn.get_pace(wind_name="wind10", sum_by="track_id")
     pace_fct, _ = huracanpy.tc.pace(data.slp, data.wind10, sum_by=data.track_id)
     np.testing.assert_array_equal(
         pace_acc,
@@ -181,11 +177,6 @@ def test_get_methods(tracks_csv):
     assert apex_vals_acc.equals(
         apex_vals_fct
     ), "Genesis Values accessor output differs from function output"
-
-    ## - get_ace
-    ace_acc = data.hrcn.get_total_ace(wind_name="wind10")
-    ace_fct = huracanpy.tc.ace(data.wind10).sum()
-    assert ace_acc == ace_fct
 
 
 def test_interp_methods():

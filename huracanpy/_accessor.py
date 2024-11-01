@@ -117,13 +117,22 @@ class HuracanPyDatasetAccessor:
 
     # ---- ACE & PACE
     def get_ace(
-        self, wind_name="wind", threshold=34 * units("knots"), wind_units="m s-1"
+        self,
+        wind_name="wind",
+        sum_by=None,
+        threshold=34 * units("knots"),
+        wind_units="m s-1",
     ):
         """
         Calculate Accumulated Cyclone Energy (ACE) for each point.
         """
+        if sum_by is not None:
+            sum_by = self._dataset[sum_by]
         return tc.ace(
-            self._dataset[wind_name], threshold=threshold, wind_units=wind_units
+            self._dataset[wind_name],
+            sum_by=sum_by,
+            threshold=threshold,
+            wind_units=wind_units,
         )
 
     def add_ace(
@@ -133,7 +142,7 @@ class HuracanPyDatasetAccessor:
         Add ACE calculation to the dataset.
         """
         self._dataset["ace"] = self.get_ace(
-            wind_name, threshold=threshold, wind_units=wind_units
+            wind_name, sum_by=None, threshold=threshold, wind_units=wind_units
         )
         return self._dataset
 
@@ -142,6 +151,7 @@ class HuracanPyDatasetAccessor:
         pressure_name="slp",
         wind_name=None,
         model=None,
+        sum_by=None,
         threshold_wind=None,
         threshold_pressure=None,
         wind_units="m s-1",
@@ -154,6 +164,7 @@ class HuracanPyDatasetAccessor:
             self._dataset[pressure_name],
             wind=self._dataset[wind_name] if wind_name else None,
             model=model,
+            sum_by=self._dataset[sum_by] if sum_by else None,
             threshold_wind=threshold_wind,
             threshold_pressure=threshold_pressure,
             wind_units=wind_units,
@@ -178,6 +189,7 @@ class HuracanPyDatasetAccessor:
             pressure_name=pressure_name,
             wind_name=wind_name,
             model=model,
+            sum_by=None,
             threshold_wind=threshold_wind,
             threshold_pressure=threshold_pressure,
             wind_units=wind_units,
@@ -543,25 +555,6 @@ class HuracanPyDatasetAccessor:
             self._dataset[time_name], self._dataset[track_id_name]
         )
 
-    def get_track_ace(self, wind_name="wind", track_id_name="track_id", **kwargs):
-        return tc.ace(
-            self._dataset[wind_name], sum_by=self._dataset[track_id_name], **kwargs
-        )
-
-    def get_track_pace(
-        self, pressure_name="slp", track_id_name="track_id", wind_name=None, **kwargs
-    ):
-        if wind_name is None:
-            wind = None
-        else:
-            wind = self._dataset[wind_name]
-        return tc.pace(
-            self._dataset[pressure_name],
-            wind,
-            sum_by=self._dataset[track_id_name],
-            **kwargs,
-        )
-
     def get_gen_vals(self, time_name="time", track_id_name="track_id"):
         return diags.get_gen_vals(self._dataset, time_name, track_id_name)
 
@@ -576,6 +569,3 @@ class HuracanPyDatasetAccessor:
 
     def get_tc_days(self, time_name="time", track_id_name="track_id"):
         return diags.get_tc_days(self._dataset[time_name], self._dataset[track_id_name])
-
-    def get_total_ace(self, wind_name="wind", **kwargs):
-        return tc.ace(self._dataset[wind_name], **kwargs).sum()
