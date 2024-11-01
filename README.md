@@ -4,7 +4,7 @@
 A python package for working with various forms of feature tracking data
 
 ## Version 1 coming soon! Subscribe for notification.
-We will release version 1 soon. To stay updated about it, there are two options:
+We will release version 1 soon (by the end of November 2024). We advice you wait for this version to install the package. To stay updated about it, there are two options:
 1. Most specific: Subscribe to [this discussion](https://github.com/Huracan-project/huracanpy/discussions/57), that we will use to communicate with our community of users.
 2. Less specific: "Watch" the repo by clicking the button on the top-right of this page. Select "custom" then tick "discussions". You can always go back if there turns out to be too much emails. 
 (We wish there was a better way for you to subscribe to announcements. If you agree with us, please up [this issue](https://github.com/orgs/community/discussions/3951).)
