@@ -2,6 +2,9 @@
 Module containing functions to compute track statistics
 """
 
+import numpy as np
+import pandas as pd
+
 
 def get_track_duration(time, track_ids):
     """
@@ -25,13 +28,15 @@ def get_track_duration(time, track_ids):
     return duration
 
 
-def get_gen_vals(tracks, time_name="time", track_id_name="track_id"):
+def get_gen_vals(tracks, time, track_id):
     """
     Shows the attributes for the genesis point of each track
 
     Parameters
     ----------
     tracks : xarray.DataSet
+    time : array_like
+    track_id : xarray.Dataset
 
     Returns
     -------
@@ -39,25 +44,34 @@ def get_gen_vals(tracks, time_name="time", track_id_name="track_id"):
         Dataset containing only genesis points, with track_id as index.
 
     """
+    # It is 470 times much faster to switch to a dataframe...
+    # Use the sortby/groupby with pandas to find the relevant indices in the original
+    # Dataset by passing an index (named idx to not clash with "index")
+    df = pd.DataFrame(
+        data=dict(
+            idx=np.arange(len(track_id)),
+            time=np.array(time),
+            track_id=np.array(track_id),
+        )
+    )
+    idx = np.array(df.sort_values("time").groupby("track_id").first().idx)
 
-    return (
-        tracks.to_dataframe()
-        .sort_values(time_name)
-        .groupby(track_id_name)
-        .first()
-        .to_xarray()
-    )  # It is 470 times much faster to switch to a dataframe...
+    # Could check that track_id is 1d, but the function would already have failed by now
+    # if not
+    dim = track_id.dims[0]
+    return tracks.isel(**{dim: idx})
 
 
-def get_apex_vals(tracks, varname, stat="max", track_id_name="track_id"):
+def get_apex_vals(tracks, variable, track_id, stat="max"):
     """
     Shows the attribute for the extremum point of each track
 
     Parameters
     ----------
     tracks : xarray.DataSet
-    var : str
+    variable : array_like
         The extremum variable
+    track_id : xarray.DataArray
     stat : str, optional
         Type of extremum. Can be "min" or "max". The default is "max".
 
@@ -82,10 +96,16 @@ def get_apex_vals(tracks, varname, stat="max", track_id_name="track_id"):
     else:
         raise NotImplementedError("stat not recognized. Please use one of {min, max}")
 
-    return (
-        tracks.to_dataframe()
-        .sort_values(varname, ascending=asc)
-        .groupby(track_id_name)
-        .first()
-        .to_xarray()
-    )  # It is 350 times much faster to switch to a dataframe..
+    # It is 350 times much faster to switch to a dataframe.
+    # Use the same trick as with gen_vals
+    df = pd.DataFrame(
+        data=dict(
+            idx=np.arange(len(variable)),
+            var=np.array(variable),
+            track_id=np.array(track_id),
+        )
+    )
+    idx = np.array(df.sort_values("var", ascending=asc).groupby("track_id").first().idx)
+
+    dim = track_id.dims[0]
+    return tracks.isel(**{dim: idx})

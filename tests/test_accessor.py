@@ -1,6 +1,9 @@
-import huracanpy
+import pytest
 
 import numpy as np
+import xarray as xr
+
+import huracanpy
 
 
 # %% DataArrayAccessor
@@ -11,48 +14,146 @@ def test_nunique():
     assert N_tracks == 3
 
 
-# %% DatasetAccessor
-def test_get_methods():
-    """Test get_ accessors output is same as function"""
-    data = huracanpy.load(huracanpy.example_csv_file)
+@pytest.mark.parametrize("call_type", ["get", "add"])
+@pytest.mark.parametrize(
+    "function, function_args, accessor_name, accessor_function_kwargs",
+    [
+        (huracanpy.utils.get_hemisphere, ["lat"], "hemisphere", {}),
+        (huracanpy.utils.get_basin, ["lon", "lat"], "basin", {}),
+        (huracanpy.utils.get_land_or_ocean, ["lon", "lat"], "land_or_ocean", {}),
+        (huracanpy.utils.get_country, ["lon", "lat"], "country", {}),
+        (huracanpy.utils.get_continent, ["lon", "lat"], "continent", {}),
+        (huracanpy.tc.ace, ["wind10"], "ace", {"wind_name": "wind10"}),
+        (
+            huracanpy.tc.ace,
+            ["wind10", "track_id"],
+            "ace",
+            {"wind_name": "wind10", "sum_by": "track_id"},
+        ),
+        # (huracanpy.tc.pace, ["slp", "wind10"], "pace", {"pressure_name": "slp", "wind_name": "wind10"}),
+        (huracanpy.utils.get_season, ["track_id", "lat", "time"], "season", {}),
+        (huracanpy.utils.get_sshs_cat, ["wind10"], "sshs_cat", {"wind_name": "wind10"}),
+        (
+            huracanpy.utils.get_pressure_cat,
+            ["slp"],
+            "pressure_cat",
+            {"slp_name": "slp"},
+        ),
+        (huracanpy.utils.get_distance, ["lon", "lat", "track_id"], "distance", {}),
+        (
+            huracanpy.utils.get_translation_speed,
+            ["lon", "lat", "time", "track_id"],
+            "translation_speed",
+            {},
+        ),
+        (
+            huracanpy.utils.get_delta,
+            ["wind10", "track_id"],
+            "delta",
+            {"var_name": "wind10"},
+        ),
+        (
+            huracanpy.utils.get_rate,
+            ["wind10", "time", "track_id"],
+            "rate",
+            {"var_name": "wind10"},
+        ),
+        (
+            huracanpy.utils.get_time_from_genesis,
+            ["time", "track_id"],
+            "time_from_genesis",
+            {},
+        ),
+        (
+            huracanpy.utils.get_time_from_apex,
+            ["time", "track_id", "wind10"],
+            "time_from_apex",
+            {"intensity_var_name": "wind10"},
+        ),
+        (
+            huracanpy.diags.get_track_duration,
+            ["time", "track_id"],
+            "track_duration",
+            {},
+        ),
+        (huracanpy.diags.get_freq, ["track_id"], "freq", {}),
+        (huracanpy.diags.get_tc_days, ["time", "track_id"], "tc_days", {}),
+        # (huracanpy.diags.get_gen_vals, ["all", "time", "track_id"], "gen_vals", {}),
+        # (
+        #     huracanpy.diags.get_apex_vals,
+        #     ["all", "wind10", "track_id"],
+        #     "apex_vals",
+        #     {"varname": "wind10"},
+        # ),
+    ],
+)
+def test_accessor_methods_match_functions(
+    tracks_csv,
+    function,
+    function_args,
+    accessor_name,
+    accessor_function_kwargs,
+    call_type,
+):
+    # Skip functions that only have a "get_" version
+    if call_type == "add":
+        if accessor_name in [
+            "track_duration",
+            "freq",
+            "tc_days",
+            "gen_vals",
+            "apex_vals",
+        ]:
+            pytest.skip(f"Accessor function add_{accessor_name} does not exist")
+        elif accessor_name in ["ace"] and "sum_by" in accessor_function_kwargs:
+            pytest.skip(f"sum_by not a valid argument for add_{accessor_name}")
 
-    ## - hemisphere
-    hemi_acc = data.hrcn.get_hemisphere(lat_name="lat")
-    hemi_fct = huracanpy.utils.get_hemisphere(data.lat)
-    assert not any(hemi_acc != hemi_fct), "accessor output differs from function output"
-    ## - basin
-    basin_acc = data.hrcn.get_basin(lon_name="lon", lat_name="lat")
-    basin_fct = huracanpy.utils.get_basin(data.lon, data.lat)
-    assert not any(
-        basin_acc != basin_fct
-    ), "accessor output differs from function output"
-    ## - land or ocean
-    land_ocean_acc = data.hrcn.get_land_or_ocean(lon_name="lon", lat_name="lat")
-    land_ocean_fct = huracanpy.utils.get_land_or_ocean(data.lon, data.lat)
-    assert not any(
-        land_ocean_acc != land_ocean_fct
-    ), "accessor output differs from function output"
-    ## - country
-    country_acc = data.hrcn.get_country(lon_name="lon", lat_name="lat")
-    country_fct = huracanpy.utils.get_country(data.lon, data.lat)
-    assert not any(
-        country_acc != country_fct
-    ), "accessor output differs from function output"
-    ## - continent
-    continent_acc = data.hrcn.get_continent(lon_name="lon", lat_name="lat")
-    continent_fct = huracanpy.utils.get_continent(data.lon, data.lat)
-    assert not any(
-        continent_acc != continent_fct
-    ), "accessor output differs from function output"
-    ## - ace
-    ace_acc = data.hrcn.get_ace(wind_name="wind10")
-    ace_fct = huracanpy.tc.ace(data.wind10)
-    assert not any(ace_acc != ace_fct), "accessor output differs from function output"
+    # Call the huracanpy function
+    # Get the function arguments as arrays. Use "all" as a wildcard for the full dataset
+    function_args = [
+        tracks_csv[var] if not var == "all" else tracks_csv for var in function_args
+    ]
+    result = function(*function_args)
+
+    # Call the accessor method
+    result_accessor = getattr(tracks_csv.hrcn, f"{call_type}_{accessor_name}")(
+        **accessor_function_kwargs
+    )
+
+    # When using the "add_" method a new Dataset is returned with the variable added
+    # The naming of the new variable is either simply the function name (minus "add_")
+    # or the function name plus the name of the variable specified if it can be applied
+    # to different variables
+    if call_type == "add":
+        varname = accessor_name
+        if "var_name" in accessor_function_kwargs:
+            varname = f"{varname}_{accessor_function_kwargs['var_name']}"
+        result_accessor = result_accessor[varname]
+
+    # Check that the function and method return identical results
+    assert type(result) is type(
+        result_accessor
+    ), "accessor return type differs from function"
+    np.testing.assert_equal(
+        np.array(result),
+        np.array(result_accessor),
+        err_msg="accessor output differs from function output",
+    )
+
+
+# %% DatasetAccessor
+# Currently keeping tests here that return more than just a DataArray as the testing is
+# less generic
+def test_get_methods(tracks_csv):
+    """Test get_ accessors output is same as function"""
+    data = tracks_csv
 
     ## - pace
-    pace_acc = data.hrcn.get_pace(pressure_name="slp", wind_name="wind10")
+    pace_acc, _ = data.hrcn.get_pace(pressure_name="slp", wind_name="wind10")
     pace_fct, model_fct = huracanpy.tc.pace(data.slp, data.wind10)
-    assert not any(pace_acc != pace_fct), "accessor output differs from function output"
+    np.testing.assert_array_equal(
+        pace_acc, pace_fct, err_msg="accessor output differs from function output"
+    )
 
     ## - time components
     year_acc, month_acc, day_acc, hour_acc = data.hrcn.get_time_components(
@@ -61,122 +162,21 @@ def test_get_methods():
     year_fct, month_fct, day_fct, hour_fct = huracanpy.utils.get_time_components(
         data.time
     )
-    assert all(year_acc == year_fct), "Year component does not match"
-    assert all(month_acc == month_fct), "Month component does not match"
-    assert all(day_acc == day_fct), "Day component does not match"
-    assert all(hour_acc == hour_fct), "Hour component does not match"
-
-    ## - season
-    season_acc = data.hrcn.get_season(
-        track_id_name="track_id", lat_name="lat", time_name="time"
-    )
-    season_fct = huracanpy.utils.get_season(data.track_id, data.lat, data.time)
-    assert all(season_acc == season_fct), "Season component does not match"
-
-    ## - SSHS category
-    sshs_acc = data.hrcn.get_sshs_cat(wind_name="wind10")
-    sshs_fct = huracanpy.utils.get_sshs_cat(data.wind10)
-    assert all(sshs_acc == sshs_fct), "SSHS category output does not match"
-
-    ## - Pressure category
-    pressure_cat_acc = data.hrcn.get_pressure_cat(slp_name="slp")
-    pressure_cat_fct = huracanpy.utils.get_pressure_cat(data.slp)
-    assert all(
-        pressure_cat_acc == pressure_cat_fct
-    ), "Pressure category output does not match"
-
-    ## - Distance
-    distance_acc = data.hrcn.get_distance(
-        lon_name="lon", lat_name="lat", track_id_name="track_id"
-    )
-    distance_fct = huracanpy.utils.get_distance(data.lon, data.lat, data.track_id)
     np.testing.assert_array_equal(
-        distance_acc,
-        distance_fct,
-        "Distance accessor output differs from function output",
-    )
-
-    ## - Translation speed
-    translation_speed_acc = data.hrcn.get_translation_speed(
-        lon_name="lon", lat_name="lat", time_name="time", track_id_name="track_id"
-    )
-    translation_speed_fct = huracanpy.utils.get_translation_speed(
-        data.lon, data.lat, data.time, data.track_id
+        year_acc, year_fct, err_msg="Year component does not match"
     )
     np.testing.assert_array_equal(
-        translation_speed_acc,
-        translation_speed_fct,
-        "Translation speed  accessor output differs from function output",
-    )
-
-    ## - get_delta
-    delta_wind10_acc = data.hrcn.get_delta("wind10")
-    delta_wind10_fct = huracanpy.utils.get_delta(data.wind10, data.track_id)
-    np.testing.assert_array_equal(
-        delta_wind10_acc,
-        delta_wind10_fct,
-        "get_delta accessor output differs from function output",
-    )
-
-    ## - get_rate
-    rate_wind10_acc = data.hrcn.get_rate("wind10")
-    rate_wind10_fct = huracanpy.utils.get_rate(data.wind10, data.time, data.track_id)
-    np.testing.assert_array_equal(
-        rate_wind10_acc,
-        rate_wind10_fct,
-        "get_rate accessor output differs from function output",
-    )
-
-    ## - Time from Genesis
-    time_from_genesis_acc = data.hrcn.get_time_from_genesis(
-        time_name="time", track_id_name="track_id"
-    )
-    time_from_genesis_fct = huracanpy.utils.get_time_from_genesis(
-        data.time, data.track_id
+        month_acc, month_fct, err_msg="Month component does not match"
     )
     np.testing.assert_array_equal(
-        time_from_genesis_acc,
-        time_from_genesis_fct,
-        "Time from Genesis accessor output differs from function output",
-    )
-
-    ## - Time from Apex
-    time_from_apex_acc = data.hrcn.get_time_from_apex(
-        time_name="time", track_id_name="track_id", intensity_var_name="wind10"
-    )
-    time_from_apex_fct = huracanpy.utils.get_time_from_apex(
-        data.time, data.track_id, data.wind10
+        day_acc, day_fct, err_msg="Day component does not match"
     )
     np.testing.assert_array_equal(
-        time_from_apex_acc,
-        time_from_apex_fct,
-        "Time from Apex accessor output differs from function output",
-    )
-
-    ## - track duration
-    duration_acc = data.hrcn.get_track_duration()
-    duration_fct = huracanpy.diags.get_track_duration(data.time, data.track_id)
-    np.testing.assert_array_equal(
-        duration_acc,
-        duration_fct,
-        "duration accessor output differs from function output",
-    )
-
-    ## - track ace
-    ace_acc = data.hrcn.get_track_ace(
-        wind_name="wind10",
-    )
-    ace_fct = huracanpy.tc.ace(data.wind10, sum_by=data.track_id)
-    np.testing.assert_array_equal(
-        ace_acc,
-        ace_fct,
-        "Track ACE accessor output differs from function output",
+        hour_acc, hour_fct, err_msg="Hour component does not match"
     )
 
     ## - track pace
-    pace_acc, _ = data.hrcn.get_track_pace(
-        wind_name="wind10",
-    )
+    pace_acc, _ = data.hrcn.get_pace(wind_name="wind10", sum_by="track_id")
     pace_fct, _ = huracanpy.tc.pace(data.slp, data.wind10, sum_by=data.track_id)
     np.testing.assert_array_equal(
         pace_acc,
@@ -189,96 +189,17 @@ def test_get_methods():
         time_name="time",
         track_id_name="track_id",
     )
-    gen_vals_fct = huracanpy.diags.get_gen_vals(
-        data,
-    )
-    assert gen_vals_acc.equals(
-        gen_vals_fct
-    ), "Genesis Values accessor output differs from function output"
+    gen_vals_fct = huracanpy.diags.get_gen_vals(data, data.time, data.track_id)
+    xr.testing.assert_equal(gen_vals_acc, gen_vals_fct)
 
     ## - Apex Values
     apex_vals_acc = data.hrcn.get_apex_vals(
         track_id_name="track_id", varname="wind10", stat="max"
     )
-    apex_vals_fct = huracanpy.diags.get_apex_vals(data, varname="wind10", stat="max")
-    assert apex_vals_acc.equals(
-        apex_vals_fct
-    ), "Genesis Values accessor output differs from function output"
-
-    ## - get_freq
-    freq_acc = data.hrcn.get_freq()
-    freq_fct = huracanpy.diags.get_freq(data.track_id)
-    assert freq_acc == freq_fct
-
-    ## - get_tc_days
-    tc_days_acc = data.hrcn.get_tc_days()
-    tc_days_fct = huracanpy.diags.get_tc_days(data.time, data.track_id)
-    assert tc_days_acc == tc_days_fct
-
-    ## - get_ace
-    ace_acc = data.hrcn.get_total_ace(wind_name="wind10")
-    ace_fct = huracanpy.tc.ace(data.wind10).sum()
-    assert ace_acc == ace_fct
-
-
-def test_add_methods():
-    """
-    Test that add_ accessors output do add the columns
-
-    """
-
-    data = huracanpy.load(huracanpy.example_csv_file)
-
-    data = (
-        data.hrcn.add_hemisphere(lat_name="lat")
-        .hrcn.add_basin(lon_name="lon", lat_name="lat")
-        .hrcn.add_land_or_ocean(lon_name="lon", lat_name="lat")
-        .hrcn.add_country(lon_name="lon", lat_name="lat")
-        .hrcn.add_continent(lon_name="lon", lat_name="lat")
-        .hrcn.add_ace(wind_name="wind10")
-        .hrcn.add_pace(pressure_name="slp", wind_name="wind10")
-        .hrcn.add_time_components(time_name="time")
-        .hrcn.add_season(track_id_name="track_id", lat_name="lat", time_name="time")
-        .hrcn.add_sshs_cat(wind_name="wind10")
-        .hrcn.add_pressure_cat(slp_name="slp")
-        .hrcn.add_distance(lon_name="lon", lat_name="lat")
-        .hrcn.add_translation_speed(
-            lon_name="lon", lat_name="lat", time_name="time", track_id_name="track_id"
-        )
-        .hrcn.add_delta(var_name="wind10")
-        .hrcn.add_rate(var_name="wind10", time_name="time", track_id_name="track_id")
-        .hrcn.add_time_from_genesis(time_name="time", track_id_name="track_id")
-        .hrcn.add_time_from_apex(
-            time_name="time",
-            track_id_name="track_id",
-            intensity_var_name="wind10",
-            stat="max",
-        )
+    apex_vals_fct = huracanpy.diags.get_apex_vals(
+        data, data.wind10, data.track_id, stat="max"
     )
-
-    for col in [
-        "hemisphere",
-        "basin",
-        "land_or_ocean",
-        "country",
-        "continent",
-        "ace",
-        "pace",
-        "year",
-        "month",
-        "day",
-        "hour",
-        "season",
-        "sshs_cat",
-        "pressure_cat",
-        "distance",
-        "translation_speed",
-        "delta_wind10",
-        "rate_wind10",
-        "time_from_genesis",
-        "time_from_apex",
-    ]:
-        assert col in list(data.variables), f"{col} not found in data columns"
+    xr.testing.assert_equal(apex_vals_acc, apex_vals_fct)
 
 
 def test_interp_methods():
