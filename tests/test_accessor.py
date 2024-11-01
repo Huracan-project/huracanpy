@@ -166,7 +166,7 @@ def test_get_methods():
     ace_acc = data.hrcn.get_track_ace(
         wind_name="wind10",
     )
-    ace_fct = huracanpy.tc.ace(data.wind10, aggregate_by=data.track_id)
+    ace_fct = huracanpy.tc.ace(data.wind10, sum_by=data.track_id)
     np.testing.assert_array_equal(
         ace_acc,
         ace_fct,
@@ -177,7 +177,7 @@ def test_get_methods():
     pace_acc, _ = data.hrcn.get_track_pace(
         wind_name="wind10",
     )
-    pace_fct, _ = huracanpy.tc.pace(data.slp, data.wind10, aggregate_by=data.track_id)
+    pace_fct, _ = huracanpy.tc.pace(data.slp, data.wind10, sum_by=data.track_id)
     np.testing.assert_array_equal(
         pace_acc,
         pace_fct,

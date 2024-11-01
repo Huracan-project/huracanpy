@@ -545,9 +545,7 @@ class HuracanPyDatasetAccessor:
 
     def get_track_ace(self, wind_name="wind", track_id_name="track_id", **kwargs):
         return tc.ace(
-            self._dataset[wind_name],
-            aggregate_by=self._dataset[track_id_name],
-            **kwargs,
+            self._dataset[wind_name], sum_by=self._dataset[track_id_name], **kwargs
         )
 
     def get_track_pace(
@@ -560,7 +558,7 @@ class HuracanPyDatasetAccessor:
         return tc.pace(
             self._dataset[pressure_name],
             wind,
-            aggregate_by=self._dataset[track_id_name],
+            sum_by=self._dataset[track_id_name],
             **kwargs,
         )
 

@@ -11,7 +11,7 @@ from metpy.units import units
 
 def ace(
     wind,
-    aggregate_by=None,
+    sum_by=None,
     threshold=34 * units("knots"),
     wind_units="m s-1",
 ):
@@ -20,11 +20,11 @@ def ace(
     .. math:: \mathrm{ACE} = 10^{-4} \sum v_\mathrm{max}^2 \quad (v_\mathrm{max} \ge 34 \mathrm{kn})
 
     By default, this function will return the "ACE" for each individual point in `wind`.
-    To calculate more useful quantities of ACE, use the `aggregate_by` keyword.
+    To calculate more useful quantities of ACE, use the `sum_by` keyword.
 
     For example, to calculate the ACE of each individual track, doing
 
-    >>> ace_by_track = huracanpy.tc.ace(tracks.wind, aggregate_by=tracks.track_id)
+    >>> ace_by_track = huracanpy.tc.ace(tracks.wind, sum_by=tracks.track_id)
 
     will return a DataArray with track_id as a coordinate and the sum of ACE for each
     track as the data. Note that this is equivalent to using groupby:
@@ -38,13 +38,13 @@ def ace(
 
     Similarly to calculate a climatological mean ACE by year, run
 
-    >>> climatological_ace = huracanpy.tc.ace(tracks.wind, aggregate_by=tracks.time.dt.year).mean()
+    >>> climatological_ace = huracanpy.tc.ace(tracks.wind,sum_by=tracks.time.dt.year).mean()
 
     Parameters
     ----------
     wind : array_like
         Maximum velocity of a tropical cyclone associated with the tracks dataset
-    aggregate_by : array_like
+    sum_by : array_like
         Variable to take the sum of ACE values across. Must have the same length as wind
     threshold : scalar, default=34 knots
         ACE is set to zero below this threshold wind speed. The default argument is in
@@ -64,8 +64,8 @@ def ace(
 
     ace_values = get_ace(wind, threshold, wind_units)
 
-    if aggregate_by is not None:
-        ace_values = ace_values.groupby(aggregate_by).sum()
+    if sum_by is not None:
+        ace_values = ace_values.groupby(sum_by).sum()
 
     return ace_values
 
@@ -74,7 +74,7 @@ def pace(
     pressure,
     wind=None,
     model=None,
-    aggregate_by=None,
+    sum_by=None,
     threshold_wind=None,
     threshold_pressure=None,
     wind_units="m s-1",
@@ -108,7 +108,7 @@ def pace(
     pressure : array_like
     wind : array_like, optional
     model : str, class, or object, optional
-    aggregate_by : array_like
+    sum_by : array_like
         Variable to take the sum of PACE values across. Must have the same length as
         pressure/wind. For examples, see the documentation for `huracanpy.tc.ace`
     threshold_wind : scalar, optional
@@ -133,8 +133,8 @@ def pace(
         **kwargs,
     )
 
-    if aggregate_by is not None:
-        pace_values = pace_values.groupby(aggregate_by).sum()
+    if sum_by is not None:
+        pace_values = pace_values.groupby(sum_by).sum()
 
     return pace_values, model
 
