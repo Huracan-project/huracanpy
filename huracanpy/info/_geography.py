@@ -13,7 +13,7 @@ from cartopy.io.shapereader import natural_earth
 from metpy.xarray import preprocess_and_wrap
 from cartopy.crs import Geodetic, PlateCarree
 
-from .tc._conventions import tc_basins
+from ..tc._conventions import tc_basins
 
 basins_def = tc_basins  # Room for appending other conventions later on
 

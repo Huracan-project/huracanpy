@@ -3,7 +3,6 @@ import pandas as pd
 
 from . import _csv, _TRACK, _netcdf, _tempestextremes
 from . import ibtracs
-from .. import utils
 
 
 rename_defaults = dict(
@@ -25,7 +24,6 @@ def load(
     source=None,
     variable_names=None,
     rename=dict(),
-    add_info=False,
     baselon=None,
     ibtracs_online=False,
     ibtracs_subset="wmo",
@@ -198,14 +196,12 @@ def load(
                         filename=f,
                         source="csv",
                         rename=rename,
-                        add_info=add_info,
                         **kwargs,
                     )
             else:
                 return load(
                     filename=ibtracs.offline(ibtracs_subset),
                     rename=rename,
-                    add_info=add_info,
                     **kwargs,
                 )
         else:
@@ -219,14 +215,5 @@ def load(
 
     if baselon is not None:
         data["lon"] = ((data.lon - baselon) % 360) + baselon
-
-    if add_info:  # TODO : Manage potentially different variable names
-        data["hemisphere"] = utils.geography.get_hemisphere(data.lat)
-        data["basin"] = utils.geography.get_basin(data.lon, data.lat)
-        data["season"] = utils.time.get_season(data.track_id, data.lat, data.time)
-        if "wind10" in list(data.keys()):  # If 'wind10' is in the attributes
-            data["sshs"] = utils.category.get_sshs_cat(data.wind10)
-        if "slp" in list(data.keys()):  # If 'slp' is in the attributes
-            data["pres_cat"] = utils.category.get_pressure_cat(data.slp)
 
     return data

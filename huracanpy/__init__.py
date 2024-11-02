@@ -4,16 +4,17 @@ __version__ = "0.1.0"
 __author__ = "Leo Saffin <l.saffin@reading.ac.uk>, Stella Bourdin <stella.bourdin@physics.ox.ac.uk>, Kelvin Ng "
 __all__ = [
     # Modules
-    "diags",
+    "calc",
     "plot",
     "assess",
-    "utils",
+    "info",
     "tc",
     # Functions
     "load",
     "save",
     "sel_id",
     "trackswhere",
+    "interp_time",
     # Parameters
     "basins",
     "example_csv_file",
@@ -42,7 +43,8 @@ from ._data import (
     example_CHAZ_file,
     example_MIT_file,
 )
-from . import diags, plot, assess, utils, tc
-from .utils._basins import basins_def as basins
+from ._interp import interp_time
 from ._subset import sel_id, trackswhere
+from . import calc, plot, assess, info, tc
+
 from . import _accessor
