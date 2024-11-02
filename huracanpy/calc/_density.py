@@ -8,7 +8,7 @@ import xarray as xr
 
 def density(lon, lat, method="histogram", **kwargs):
     if method == "histogram":
-        return histogram(lon, lat, **kwargs)
+        return _histogram(lon, lat, **kwargs)
     else:
         print(
             "This method was not implemented (yet?)!"
@@ -16,7 +16,7 @@ def density(lon, lat, method="histogram", **kwargs):
         return None
 
 
-def histogram(lon, lat, bin_size=5, N_seasons=1):
+def _histogram(lon, lat, bin_size=5, N_seasons=1):
     """
     Function to compute the track density, based on a simple 2D histogram.
 
