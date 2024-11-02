@@ -1,12 +1,17 @@
 """
-Auxilliary file to define the basins according to the different conventions
+Module defining objects for TC-related conventions
 """
 
 from shapely.geometry import Polygon, MultiPolygon
 import geopandas as gpd
 
-basins_def = {}  # Dictionnary to save basin definition from different conventions
+import numpy as np
+from metpy.units import units
 
+
+# %% Basins
+
+tc_basins = {}  # Dictionnary to save basin definition from different conventions
 
 # WMO convention
 ## Northern hemisphere
@@ -31,4 +36,20 @@ SA = Polygon(((-65, -90), (-65, 0), (20, 0), (20, -90)))
 SH = {"SI": SI, "AUS": AUS, "SP": SP, "SA": SA}
 
 B = dict(SH, **NH)
-basins_def["WMO"] = gpd.GeoDataFrame(index=B.keys(), geometry=list(B.values()))
+tc_basins["WMO-TC"] = gpd.GeoDataFrame(index=B.keys(), geometry=list(B.values()))
+
+# %% Categories
+_thresholds = {
+    "Klotzbach": dict(
+        bins=np.array([-np.inf, 925, 945, 960, 975, 990, 1005, np.inf]) * units("hPa"),
+        labels=[5, 4, 3, 2, 1, 0, -1],
+    ),
+    "Simpson": dict(
+        bins=np.array([-np.inf, 920, 945, 965, 970, 980, 990, np.inf]) * units("hPa"),
+        labels=[5, 4, 3, 2, 1, 0, -1],
+    ),
+    "Saffir-Simpson": dict(
+        bins=np.array([-np.inf, 16, 29, 38, 44, 52, 63, np.inf]) * units("m s-1"),
+        labels=[-1, 0, 1, 2, 3, 4, 5],
+    ),
+}
