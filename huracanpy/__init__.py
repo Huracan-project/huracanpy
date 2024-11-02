@@ -29,7 +29,6 @@ __all__ = [
     "_accessor",
 ]
 
-
 from ._data import (
     load,
     save,
