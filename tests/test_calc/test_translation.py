@@ -7,8 +7,8 @@ import huracanpy
 def test_get_distance():
     data = huracanpy.load(huracanpy.example_csv_file)
 
-    dist_geod = huracanpy.utils.get_distance(data.lon, data.lat, data.track_id)
-    dist_haversine = huracanpy.utils.get_distance(
+    dist_geod = huracanpy.calc.get_distance(data.lon, data.lat, data.track_id)
+    dist_haversine = huracanpy.calc.get_distance(
         data.lon, data.lat, data.track_id, method="haversine"
     )
 
@@ -20,7 +20,7 @@ def test_get_distance():
 def test_get_translation_speed():
     data = huracanpy.load(huracanpy.example_csv_file)
 
-    ts = huracanpy.utils.get_translation_speed(
+    ts = huracanpy.calc.get_translation_speed(
         data.lon, data.lat, data.time, data.track_id
     )
 

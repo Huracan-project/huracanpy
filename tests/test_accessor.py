@@ -18,11 +18,11 @@ def test_nunique():
 @pytest.mark.parametrize(
     "function, function_args, accessor_name, accessor_function_kwargs",
     [
-        (huracanpy.utils.get_hemisphere, ["lat"], "hemisphere", {}),
-        (huracanpy.utils.get_basin, ["lon", "lat"], "basin", {}),
-        (huracanpy.utils.get_land_or_ocean, ["lon", "lat"], "land_or_ocean", {}),
-        (huracanpy.utils.get_country, ["lon", "lat"], "country", {}),
-        (huracanpy.utils.get_continent, ["lon", "lat"], "continent", {}),
+        (huracanpy.info.get_hemisphere, ["lat"], "hemisphere", {}),
+        (huracanpy.info.get_basin, ["lon", "lat"], "basin", {}),
+        (huracanpy.info.get_land_or_ocean, ["lon", "lat"], "land_or_ocean", {}),
+        (huracanpy.info.get_country, ["lon", "lat"], "country", {}),
+        (huracanpy.info.get_continent, ["lon", "lat"], "continent", {}),
         (huracanpy.tc.ace, ["wind10"], "ace", {"wind_name": "wind10"}),
         (
             huracanpy.tc.ace,
@@ -31,56 +31,56 @@ def test_nunique():
             {"wind_name": "wind10", "sum_by": "track_id"},
         ),
         # (huracanpy.tc.pace, ["slp", "wind10"], "pace", {"pressure_name": "slp", "wind_name": "wind10"}),
-        (huracanpy.utils.get_season, ["track_id", "lat", "time"], "season", {}),
-        (huracanpy.utils.get_sshs_cat, ["wind10"], "sshs_cat", {"wind_name": "wind10"}),
+        (huracanpy.info.get_season, ["track_id", "lat", "time"], "season", {}),
+        (huracanpy.tc.get_sshs_cat, ["wind10"], "sshs_cat", {"wind_name": "wind10"}),
         (
-            huracanpy.utils.get_pressure_cat,
+            huracanpy.tc.get_pressure_cat,
             ["slp"],
             "pressure_cat",
             {"slp_name": "slp"},
         ),
-        (huracanpy.utils.get_distance, ["lon", "lat", "track_id"], "distance", {}),
+        (huracanpy.calc.get_distance, ["lon", "lat", "track_id"], "distance", {}),
         (
-            huracanpy.utils.get_translation_speed,
+            huracanpy.calc.get_translation_speed,
             ["lon", "lat", "time", "track_id"],
             "translation_speed",
             {},
         ),
         (
-            huracanpy.utils.get_delta,
+            huracanpy.calc.get_delta,
             ["wind10", "track_id"],
             "delta",
             {"var_name": "wind10"},
         ),
         (
-            huracanpy.utils.get_rate,
+            huracanpy.calc.get_rate,
             ["wind10", "time", "track_id"],
             "rate",
             {"var_name": "wind10"},
         ),
         (
-            huracanpy.utils.get_time_from_genesis,
+            huracanpy.calc.get_time_from_genesis,
             ["time", "track_id"],
             "time_from_genesis",
             {},
         ),
         (
-            huracanpy.utils.get_time_from_apex,
+            huracanpy.calc.get_time_from_apex,
             ["time", "track_id", "wind10"],
             "time_from_apex",
             {"intensity_var_name": "wind10"},
         ),
         (
-            huracanpy.diags.get_track_duration,
+            huracanpy.calc.get_track_duration,
             ["time", "track_id"],
             "track_duration",
             {},
         ),
-        (huracanpy.diags.get_freq, ["track_id"], "freq", {}),
-        (huracanpy.diags.get_tc_days, ["time", "track_id"], "tc_days", {}),
-        # (huracanpy.diags.get_gen_vals, ["all", "time", "track_id"], "gen_vals", {}),
+        #        (huracanpy.calc.get_freq, ["track_id"], "freq", {}),
+        #        (huracanpy.calc.get_tc_days, ["time", "track_id"], "tc_days", {}),
+        # (huracanpy.calc.get_gen_vals, ["all", "time", "track_id"], "gen_vals", {}),
         # (
-        #     huracanpy.diags.get_apex_vals,
+        #     huracanpy.calc.get_apex_vals,
         #     ["all", "wind10", "track_id"],
         #     "apex_vals",
         #     {"varname": "wind10"},
@@ -159,7 +159,7 @@ def test_get_methods(tracks_csv):
     year_acc, month_acc, day_acc, hour_acc = data.hrcn.get_time_components(
         time_name="time"
     )
-    year_fct, month_fct, day_fct, hour_fct = huracanpy.utils.get_time_components(
+    year_fct, month_fct, day_fct, hour_fct = huracanpy.info.get_time_components(
         data.time
     )
     np.testing.assert_array_equal(
@@ -189,14 +189,14 @@ def test_get_methods(tracks_csv):
         time_name="time",
         track_id_name="track_id",
     )
-    gen_vals_fct = huracanpy.diags.get_gen_vals(data, data.time, data.track_id)
+    gen_vals_fct = huracanpy.calc.get_gen_vals(data, data.time, data.track_id)
     xr.testing.assert_equal(gen_vals_acc, gen_vals_fct)
 
     ## - Apex Values
     apex_vals_acc = data.hrcn.get_apex_vals(
         track_id_name="track_id", varname="wind10", stat="max"
     )
-    apex_vals_fct = huracanpy.diags.get_apex_vals(
+    apex_vals_fct = huracanpy.calc.get_apex_vals(
         data, data.wind10, data.track_id, stat="max"
     )
     xr.testing.assert_equal(apex_vals_acc, apex_vals_fct)
@@ -207,7 +207,7 @@ def test_interp_methods():
     interpolated_data_acc = data.hrcn.interp_time(
         freq="1h", track_id_name="track_id", prog_bar=False
     )
-    expected_interpolated_data = huracanpy.utils.interp_time(
+    expected_interpolated_data = huracanpy.interp_time(
         data, freq="1h", track_id_name="track_id", prog_bar=False
     )
     np.testing.assert_array_equal(
