@@ -13,7 +13,9 @@ from cartopy.io.shapereader import natural_earth
 from metpy.xarray import preprocess_and_wrap
 from cartopy.crs import Geodetic, PlateCarree
 
-from ._basins import basins_def
+from .tc._conventions import tc_basins
+
+basins_def = tc_basins  # Room for appending other conventions later on
 
 
 @preprocess_and_wrap(wrap_like="lat")
@@ -35,7 +37,7 @@ def get_hemisphere(lat):
     return np.where(lat >= 0, "N", "S")
 
 
-def get_basin(lon, lat, convention="WMO", crs=None):
+def get_basin(lon, lat, convention="WMO-TC", crs=None):
     """
     Function to determine the basin of each point, according to the selected convention.
 

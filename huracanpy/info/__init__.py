@@ -7,17 +7,8 @@ __all__ = [
     "get_continent",
     "get_land_or_ocean",
     "get_category",
-    "get_sshs_cat",
-    "get_pressure_cat",
     "get_time_components",
     "get_season",
-    "interp_time",
-    "get_distance",
-    "get_translation_speed",
-    "get_time_from_genesis",
-    "get_time_from_apex",
-    "get_delta",
-    "get_rate",
 ]
 
 from ._geography import (
@@ -27,12 +18,8 @@ from ._geography import (
     get_continent,
     get_land_or_ocean,
 )
-from ._category import get_category, get_sshs_cat, get_pressure_cat
+from ._category import get_category
 from ._time import get_time_components, get_season
-from ._interp import interp_time
-from ._translation import get_distance, get_translation_speed
-from ._lifecycle import get_time_from_genesis, get_time_from_apex
-from ._rates import get_delta, get_rate
 
 
 def add_all_info(
@@ -122,14 +109,6 @@ def add_all_info(
             data[lat_name],
             data[time_name],
             convention=season_convention,
-        )
-
-    # Category
-    if wind_name is not None:
-        data["sshs"] = get_sshs_cat(data[wind_name], sshs_convention, wind_units)
-    if slp_name is not None:
-        data["pres_cat"] = get_pressure_cat(
-            data[slp_name], pres_cat_convention, slp_units
         )
 
     return data

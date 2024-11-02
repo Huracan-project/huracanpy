@@ -1,5 +1,5 @@
 """
-Utils related to storm category
+Function to categorise
 """
 
 import numpy as np
@@ -12,9 +12,7 @@ from metpy.units import units
 
 
 @preprocess_and_wrap(wrap_like="variable")
-def get_category(
-    variable, bins=None, labels=None, convention=None, variable_units=None
-):
+def get_category(variable, bins, labels=None, variable_units=None):
     """Calculate a generic category from a variable and a set of thresholds
 
     Parameters
@@ -40,12 +38,12 @@ def get_category(
         The category label for each value in the input variable
 
     """
-    if bins is None and labels is None:
-        if convention is None:
-            raise ValueError("Must specify either bins/labels or convention")
-        else:
-            bins = _thresholds[convention]["bins"]
-            labels = _thresholds[convention]["labels"]
+
+    if labels is None:
+        print(
+            "labels not provided, categories will be named from 1 to n in the order of the provided bins"
+        )
+        labels = [str(i) for i in range(len(bins) - 1)]
 
     if not isinstance(variable, pint.Quantity) or variable.unitless:
         if variable_units is None and isinstance(bins, pint.Quantity):
@@ -57,80 +55,6 @@ def get_category(
         categories[(bins[n] < variable) & (variable <= bins[n + 1])] = label
 
     return categories
-
-
-_thresholds = {
-    "Klotzbach": dict(
-        bins=np.array([-np.inf, 925, 945, 960, 975, 990, 1005, np.inf]) * units("hPa"),
-        labels=[5, 4, 3, 2, 1, 0, -1],
-    ),
-    "Simpson": dict(
-        bins=np.array([-np.inf, 920, 945, 965, 970, 980, 990, np.inf]) * units("hPa"),
-        labels=[5, 4, 3, 2, 1, 0, -1],
-    ),
-    "Saffir-Simpson": dict(
-        bins=np.array([-np.inf, 16, 29, 38, 44, 52, 63, np.inf]) * units("m s-1"),
-        labels=[-1, 0, 1, 2, 3, 4, 5],
-    ),
-}
-
-
-@preprocess_and_wrap(wrap_like="wind")
-def get_sshs_cat(wind, convention="Saffir-Simpson", wind_units="m s-1"):
-    """
-    Function to determine the Saffir-Simpson Hurricane Scale (SSHS) category.
-
-    Parameters
-    ----------
-    wind : xarray.DataArray
-        10-minutes averaged 10m wind in m/s
-
-    wind_units : str, default="m s-1"
-        The units of the input array if they are not already provided by the attributes
-
-    Returns
-    -------
-    xarray.DataArray
-        The category series.
-        You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
-    """
-    return get_category(wind, convention=convention, variable_units=wind_units)
-
-
-@preprocess_and_wrap(wrap_like="slp")
-def get_pressure_cat(slp, convention="Klotzbach", slp_units="hPa"):
-    """
-    Determine the pressure category according to selected convention.
-
-    Parameters
-    ----------
-    slp : xarray.DataArray
-        Minimum Sea-level Pressure series in hPa
-    convention : str
-        Name of the classification convention you want to use.
-            * Klotzbach (default)
-            * Simpson
-    slp_units : str, default="hPa"
-        The units of the input array if they are not already provided by the attributes
-
-    Returns
-    -------
-    xarray.DataArray
-        The category series.
-        You can append it to your tracks by running tracks["cat"] = get_pressure_cat(tracks.slp)
-
-    """
-    if not isinstance(slp, pint.Quantity) or slp.unitless:
-        if slp.min() > 10000 and slp_units == "hPa":
-            print(
-                "Caution, pressure are likely in Pa, they are being converted to hPa "
-                "for categorization. In future specify the units explicitly by passing "
-                'slp_units="Pa" to this function or setting '
-                'slp.attrs["units"] = "Pa"'
-            )
-            slp = slp / 100
-
-    return get_category(slp, convention=convention, variable_units=slp_units)
 
 
 # [Stella] Leaving that here as an alternative method memo if we encounter performance issues.
