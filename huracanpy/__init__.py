@@ -42,6 +42,7 @@ from ._data import (
     example_CHAZ_file,
     example_MIT_file,
 )
+from ._basins import basins
 from ._interp import interp_time
 from ._subset import sel_id, trackswhere
 from . import calc, plot, assess, info, tc

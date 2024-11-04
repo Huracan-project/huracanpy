@@ -13,9 +13,7 @@ from cartopy.io.shapereader import natural_earth
 from metpy.xarray import preprocess_and_wrap
 from cartopy.crs import Geodetic, PlateCarree
 
-from ..tc._conventions import tc_basins
-
-basins_def = tc_basins  # Room for appending other conventions later on
+from .._basins import basins
 
 
 @preprocess_and_wrap(wrap_like="lat")
@@ -78,7 +76,7 @@ def get_basin(lon, lat, convention="WMO-TC", crs=None):
 # is called
 _natural_earth_feature_cache = {
     f"physical_{key}_0_basin": value.rename_axis("basin").reset_index()
-    for key, value in basins_def.items()
+    for key, value in basins.items()
 }
 
 

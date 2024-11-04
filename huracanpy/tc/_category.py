@@ -6,7 +6,7 @@ import pint
 
 from metpy.xarray import preprocess_and_wrap
 
-from ..info._category import get_category
+from ..info import get_category
 from ._conventions import _thresholds
 
 
