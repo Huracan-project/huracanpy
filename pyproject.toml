@@ -57,6 +57,11 @@ huracanpy = ["_data/example_data/*", "_data/_ibtracs_files/*"]
 [tool.ruff]
 extend-include = ["*.ipynb"]
 
+[tool.ruff.lint]
+extend-select = [
+    "ARG", # Flake8 unused arguments
+]
+
 [tool.tox]
 requires = ["tox>=4.15.0"]
 env_list = ["3.8", "3.9", "3.10", "3.11", "3.12"]

@@ -535,7 +535,7 @@ class HuracanPyDatasetAccessor:
     def plot_density(
         self, lon_name="lon", lat_name="lat", density_kws=dict(), **kwargs
     ):
-        d = self.get_density(**density_kws)
+        d = self.get_density(lon_name=lon_name, lat_name=lat_name, **density_kws)
         return plot.density(d, **kwargs)
 
     # %% diags
