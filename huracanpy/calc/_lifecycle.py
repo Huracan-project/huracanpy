@@ -11,8 +11,8 @@ def get_time_from_genesis(time, track_ids):
 
     Parameters
     ----------
-    data : TYPE
-        DESCRIPTION.
+    time
+    track_ids
 
     Returns
     -------
@@ -38,8 +38,9 @@ def get_time_from_apex(time, track_ids, intensity_var, stat="max"):
 
     Parameters
     ----------
-    data
-    varname
+    time
+    track_ids
+    intensity_var
     stat
 
     Returns

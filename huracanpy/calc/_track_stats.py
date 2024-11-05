@@ -12,7 +12,8 @@ def get_track_duration(time, track_ids):
 
     Parameters
     ----------
-    tracks : xarray.Dataset
+    time
+    track_ids
 
     Returns
     -------

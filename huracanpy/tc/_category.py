@@ -17,6 +17,7 @@ def get_sshs_cat(wind, convention="Saffir-Simpson", wind_units="m s-1"):
 
     Parameters
     ----------
+    convention
     wind : xarray.DataArray
         10-minutes averaged 10m wind in m/s
 

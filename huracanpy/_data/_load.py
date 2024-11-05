@@ -73,7 +73,6 @@ def load(
 
         >>> tracks = huracanpy.load(..., rename=dict(longitude="longitude"))
 
-    add_info : bool, default=False
     baselon : scalar, optional
         Force the loaded longitudes into the range (baselon, baselon + 360). e.g.
         (0, 360) or (-180, 180)
