@@ -32,8 +32,7 @@ def get_time_components(time):
 
 @preprocess_and_wrap(wrap_like="track_id")
 def get_season(track_id, lat, time, convention="short"):
-    """
-
+    """Determine the cyclone season for each track
 
     Parameters
     ----------

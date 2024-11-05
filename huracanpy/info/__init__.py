@@ -34,8 +34,7 @@ def add_all_info(
     hour_name="hour",
     season_convention="short",
 ):
-    """
-
+    """Add all possible information from this module to the dataset
 
     Parameters
     ----------

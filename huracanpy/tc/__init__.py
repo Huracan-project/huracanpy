@@ -1,3 +1,5 @@
+"""Tropical Cyclone specific calculations"""
+
 __all__ = ["ace", "pace", "get_sshs_cat", "get_pressure_cat"]
 
 from ._ace import ace, pace

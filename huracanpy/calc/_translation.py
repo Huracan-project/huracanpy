@@ -55,6 +55,26 @@ def _get_distance_haversine(lon, lat, track_id):
 
 
 def get_distance(lon, lat, track_id=None, method="geod", ellps="WGS84"):
+    """Compute the distance between successive lon, lat points, without including
+    differences between the end and start points of different tracks
+
+    Parameters
+    ----------
+    lon : xarray.DataArray
+    lat : xarray.DataArray
+    track_id : array_like, optional
+    method : str, optional
+        The method of computing distances, either geodesic (`"geod"`) or haversine
+        (`"haversine"`)
+    ellps : str, optional
+        The definition of the globe to use for the geodesic calculation (see
+        `pyproj.Geod`). Default is "WGS84".
+
+    Returns
+    -------
+    xarray.DataArray
+
+    """
     # TODO: Provide option for centering forward, backwards, centered
 
     # Curate input
@@ -81,10 +101,21 @@ def get_translation_speed(lon, lat, time, track_id=None, method="geod", ellps="W
 
     Parameters
     ----------
+    lon : xarray.DataArray
+    lat : xarray.DataArray
+    time : xarray.DataArray
+    track_id : array_like, optional
+    method : str, optional
+        The method of computing distances, either geodesic (`"geod"`) or haversine
+        (`"haversine"`)
+    ellps : str, optional
+        The definition of the globe to use for the geodesic calculation (see
+        `pyproj.Geod`). Default is "WGS84".
 
 
     Returns
     -------
+    xarray.DataArray
 
     """
     # TODO: Provide option for centering forward, backwards, centered

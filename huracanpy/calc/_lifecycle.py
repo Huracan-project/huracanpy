@@ -34,17 +34,21 @@ def get_time_from_genesis(time, track_ids):
 
 
 def get_time_from_apex(time, track_ids, intensity_var, stat="max"):
-    """
+    """The time relative to a maxima/minima in a given variable for each individual
+    track
 
     Parameters
     ----------
-    time
-    track_ids
-    intensity_var
-    stat
+    time : array_like
+    track_ids : array_like
+    intensity_var : array_like
+    stat : str, optional
+        Take either the maxima ("max") or minima ("min") of `intensity_var`. Default is
+        "max"
 
     Returns
     -------
+    xarray.DataArray
 
     """
     if stat == "max":

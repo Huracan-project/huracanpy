@@ -15,6 +15,22 @@ def density(
     fig_kws=dict(),
     cbar_kwargs={"label": ""},
 ):
+    """Create a map showing the input density
+
+    Parameters
+    ----------
+    d : xarray.Dataset
+    contourf_kws : dict, optional
+    subplot_kws : dict, optional
+    fig_kws : dict, optional
+    cbar_kwargs: dict, optional
+
+    Returns
+    -------
+    tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]
+        The figure and axes instances created for the plot
+
+    """
     fig, ax = plt.subplots(subplot_kw=subplot_kws, **fig_kws)
     ax.coastlines()
     ax.gridlines(draw_labels=True)

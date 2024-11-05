@@ -3,9 +3,22 @@ import xarray as xr
 __all__ = ["trackswhere", "sel_id"]
 
 
-def sel_id(data, tid, track_id_name="track_id"):
+def sel_id(data, track_id, track_ids):
+    """Select an individual track from a set of tracks by ID
+
+    Parameters
+    ----------
+    data : xarray.Dataset
+    track_id : scalar
+    track_ids : xarray.DataArray
+
+    Returns
+    -------
+    xarray.Dataset
+
+    """
     df = data.to_dataframe()
-    track = df[df[track_id_name] == tid]
+    track = df[track_ids == track_id]
     return track.to_xarray()
 
 

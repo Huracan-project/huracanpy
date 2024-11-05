@@ -32,8 +32,8 @@ def test_scores():
     UZ = huracanpy.load(huracanpy.example_year_file)
     M = huracanpy.assess.match([UZ, ref_1996], ["UZ", "ib"])
 
-    POD = huracanpy.assess.pod(M, ref_1996)
-    FAR = huracanpy.assess.far(M, UZ)
+    POD = huracanpy.assess.pod(M, ref_1996, ref_name="ib")
+    FAR = huracanpy.assess.far(M, UZ, detected_name="UZ")
 
     assert 0.63 < POD < 0.64
     assert 0.14 < FAR < 0.15

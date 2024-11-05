@@ -1,5 +1,5 @@
-info
-====
+tc
+==
 
 .. automodule:: huracanpy.tc
 .. currentmodule:: huracanpy.tc

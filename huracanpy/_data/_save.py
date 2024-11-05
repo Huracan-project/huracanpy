@@ -14,10 +14,6 @@ def save(dataset, filename):
     filename : str
         Must end in ".nc" or ".csv"
 
-    Returns
-    -------
-    None
-
     """
     if filename.split(".")[-1] == "nc":
         _netcdf.save(dataset, filename)

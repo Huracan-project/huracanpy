@@ -30,7 +30,7 @@ def get_category(variable, bins, labels=None, variable_units=None):
 
     Returns
     -------
-    numpy.ndarray
+    array_like
         The category label for each value in the input variable
 
     """
