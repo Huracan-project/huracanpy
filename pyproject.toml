@@ -60,7 +60,12 @@ extend-include = ["*.ipynb"]
 [tool.ruff.lint]
 extend-select = [
     "ARG", # Flake8 unused arguments
+    "S", # Flake8 bandit
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore all directories named `tests`.
+"!huracanpy/**" = ["S101"]
 
 [tool.tox]
 requires = ["tox>=4.15.0"]

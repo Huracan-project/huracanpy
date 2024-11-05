@@ -50,5 +50,7 @@ def trackswhere(tracks, condition):
         track for n, (track_id, track) in enumerate(track_groups) if is_match[n]
     ]
 
-    assert len(tracks.time.dims) == 1
+    if len(tracks.time.dims) == 1:
+        raise ValueError("trackswhere input must have exactly 1 time dimension")
+
     return xr.concat(track_groups, dim=tracks.time.dims[0])

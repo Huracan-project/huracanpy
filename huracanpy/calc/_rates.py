@@ -37,10 +37,8 @@ def get_delta(var, track_ids=None, var_units=None, centering="forward"):
         var = var.astype(float)
         var_units = "ns"
     ## Check that centering is supported
-    assert centering in [
-        "forward",
-        "backward",
-    ], "centering must be one of ['forward', 'backward']"
+    if centering not in ["forward", "backward"]:
+        raise ValueError("centering must be one of ['forward', 'backward']")
 
     # Compute delta
     delta = var[1:] - var[:-1]

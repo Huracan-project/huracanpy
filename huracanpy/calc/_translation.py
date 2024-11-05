@@ -11,7 +11,8 @@ from haversine import haversine
 
 
 def _get_distance_geod(lon, lat, track_id, ellps="WGS84"):
-    assert len(lon) == len(lat) == len(track_id)
+    if len(lon) != len(lat) or len(lon) != len(track_id):
+        raise ValueError("Length of lat, lon, and track_id must match")
 
     # initialize Geod object
     geodesic = pyproj.Geod(ellps=ellps)

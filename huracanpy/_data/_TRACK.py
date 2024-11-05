@@ -88,8 +88,19 @@ def load(filename, calendar=None, variable_names=None):
         has_coords = [int(x) == 1 for x in header["var_has_coords"]]
 
         # Check header data is consistent
-        assert len(has_coords) == nfields
-        assert sum([3 if x == 1 else 1 for x in has_coords]) == nvars
+        if len(has_coords) != nfields:
+            raise ValueError(
+                f"TRACK file header is inconsistent. Number of fields "
+                f"({len(has_coords)}) does not match nfields from header ({nfields})."
+            )
+
+        nvars_expected = sum([3 if x == 1 else 1 for x in has_coords])
+        if nvars_expected != nvars:
+            raise ValueError(
+                f"TRACK file header is inconsistent. Number of variables including"
+                f"lat/lon for variables ({nvars_expected}) does not match nvars from"
+                f"header ({nvars})."
+            )
 
         # Create a list of variables stored in each track
         # Generic names for variables as there is currently no information otherwise
@@ -97,7 +108,11 @@ def load(filename, calendar=None, variable_names=None):
         if variable_names is None:
             variable_names = [f"feature_{n}" for n in range(nfields)]
         else:
-            assert len(variable_names) == nfields
+            if len(variable_names) != nfields:
+                raise ValueError(
+                    f"Number of variable names given ({len(variable_names)}) does not"
+                    f"match number of fields in file ({len(nfields)})"
+                )
         for n, variable_name in enumerate(variable_names):
             if has_coords[n]:
                 var_labels.append(f"{variable_name}_lon")
