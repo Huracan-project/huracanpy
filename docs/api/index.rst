@@ -6,8 +6,9 @@ API
 
     self
     huracanpy
-    utils
-    diags
+    info
+    calc
+    tc
     assess
     plot
 
@@ -16,9 +17,11 @@ Modules
 ================ ================================
 :doc:`huracanpy` .. automodule:: huracanpy
                      :no-index:
-:doc:`utils`     .. automodule:: huracanpy.utils
+:doc:`info`      .. automodule:: huracanpy.info
                      :no-index:
-:doc:`diags`     .. automodule:: huracanpy.diags
+:doc:`calc`      .. automodule:: huracanpy.calc
+                     :no-index:
+:doc:`tc`        .. automodule:: huracanpy.tc
                      :no-index:
 :doc:`assess`    .. automodule:: huracanpy.assess
                      :no-index:

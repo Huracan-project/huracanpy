@@ -1,8 +1,13 @@
-utils
-=====
+info
+====
 
-.. automodule:: huracanpy.utils
-.. currentmodule:: huracanpy.utils
+.. automodule:: huracanpy.info
+.. currentmodule:: huracanpy.info
+
+.. autosummary::
+    :toctree: _autosummary
+
+    add_all_info
 
 Geographic
 ----------
@@ -23,8 +28,6 @@ Categorisation
     :toctree: _autosummary
 
     get_category
-    get_sshs_cat
-    get_pressure_cat
 
 Time
 ----
@@ -34,22 +37,3 @@ Time
 
     get_season
     get_time_components
-    interp_time
-
-ACE
----
-
-.. autosummary::
-    :toctree: _autosummary
-
-    get_ace
-    get_pace
-
-Translation
------------
-
-.. autosummary::
-    :toctree: _autosummary
-
-    get_distance
-    get_translation_speed
