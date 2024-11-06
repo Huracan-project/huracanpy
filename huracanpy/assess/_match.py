@@ -12,7 +12,7 @@ def match(tracksets, names=["1", "2"], max_dist=300, min_overlap=0):
 
     Parameters
     ----------
-    tracksets : list
+    tracksets : list[xarray.Dataset]
         list of track datasets to match together. Must be of length two or more.
     names : list, optional
         list of track datasets names. Must be the same size as tracksets. The default is ['1','2'].
@@ -23,7 +23,7 @@ def match(tracksets, names=["1", "2"], max_dist=300, min_overlap=0):
 
     Returns
     -------
-    pd.DataFrame
+    pandas.DataFrame
         Dataframe containing the matching tracks with
             the id from corresponding datasets
             the number of matching time steps (if only two datasets provided)

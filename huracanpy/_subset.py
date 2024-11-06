@@ -1,28 +1,36 @@
+import numpy as np
 import xarray as xr
 
 __all__ = ["trackswhere", "sel_id"]
 
 
-def sel_id(data, track_id, track_ids):
+def sel_id(tracks, track_ids, track_id):
     """Select an individual track from a set of tracks by ID
 
     Parameters
     ----------
-    data : xarray.Dataset
-    track_id : scalar
+    tracks : xarray.Dataset
     track_ids : xarray.DataArray
+        The track_ids corresponding to the tracks Dataset
+    track_id : Any
+        The track ID to match in track_ids. Must be the same type as the track_ids.
+        Usually `int` or `str`
 
     Returns
     -------
     xarray.Dataset
 
     """
-    df = data.to_dataframe()
-    track = df[track_ids == track_id]
-    return track.to_xarray()
+    if track_ids.ndim != 1:
+        raise ValueError("track_ids must be 1d")
+
+    dim = track_ids.dims[0]
+    idx = np.where(track_ids == track_id)[0]
+
+    return tracks.isel(**{dim: idx})
 
 
-def trackswhere(tracks, condition):
+def trackswhere(tracks, track_ids, condition):
     """Subset tracks from the input
 
     e.g select all tracks that are solely in the Northern hemisphere
@@ -31,7 +39,8 @@ def trackswhere(tracks, condition):
     Parameters
     ----------
     tracks : xarray.Dataset
-    condition : function
+    track_ids : xarray.DataArray
+    condition : callable
         A function that takes an `xarray.Dataset` of an individual track and returns
         True or False
 
@@ -41,6 +50,9 @@ def trackswhere(tracks, condition):
         A dataset with the subset of tracks from the input that match the given criteria
 
     """
+    if track_ids.ndim != 1:
+        raise ValueError("track_ids must be 1d")
+
     track_groups = tracks.groupby("track_id")
 
     if callable(condition):
@@ -50,7 +62,4 @@ def trackswhere(tracks, condition):
         track for n, (track_id, track) in enumerate(track_groups) if is_match[n]
     ]
 
-    if len(tracks.time.dims) == 1:
-        raise ValueError("trackswhere input must have exactly 1 time dimension")
-
-    return xr.concat(track_groups, dim=tracks.time.dims[0])
+    return xr.concat(track_groups, dim=track_ids.dims[0])
