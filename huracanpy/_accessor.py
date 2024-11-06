@@ -2,7 +2,7 @@ import xarray as xr
 from metpy.units import units
 import pandas as pd
 
-from . import plot, tc, info, calc, save, interp_time
+from . import plot, tc, info, calc, save, interp_time, sel_id, trackswhere
 
 
 @xr.register_dataarray_accessor("hrcn")
@@ -46,6 +46,12 @@ class HuracanPyDatasetAccessor:
         """
 
         save(self._dataset, filename)
+
+    def sel_id(self, track_id, track_id_name="track_id"):
+        return sel_id(self._dataset, self._dataset[track_id_name], track_id)
+
+    def trackswhere(self, condition, track_id_name="track_id"):
+        return trackswhere(self._dataset, self._dataset[track_id_name], condition)
 
     # %% utils
     # ---- geography
