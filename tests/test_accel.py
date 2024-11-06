@@ -3,6 +3,7 @@ Test functions that use tricks to speed up their code produce the same result as
 slower method
 """
 
+import pytest
 from haversine import haversine_vector, Unit
 import numpy as np
 import xarray as xr
@@ -10,10 +11,15 @@ import xarray as xr
 import huracanpy
 
 
-def test_accel_sel_id(tracks_csv):
-    result = huracanpy.sel_id(tracks_csv, tracks_csv.track_id, 0)
+@pytest.mark.parametrize(
+    ("tracks",),
+    (["tracks_csv"], ["tracks_with_extra_coord"]),
+)
+def test_accel_sel_id(tracks, request):
+    tracks = request.getfixturevalue(tracks)
+    result = huracanpy.sel_id(tracks, tracks.track_id, 0)
 
-    expected = tracks_csv.groupby("track_id")[0]
+    expected = tracks.groupby("track_id")[0]
 
     xr.testing.assert_identical(result, expected)
 
@@ -23,30 +29,41 @@ def test_accel_trackswhere():
     pass
 
 
-def test_accel_get_gen_vals(tracks_csv):
-    result = huracanpy.calc.get_gen_vals(
-        tracks_csv, tracks_csv.time, tracks_csv.track_id
-    )
+@pytest.mark.parametrize(
+    ("tracks",),
+    (["tracks_csv"], ["tracks_with_extra_coord"]),
+)
+def test_accel_get_gen_vals(tracks, request):
+    tracks = request.getfixturevalue(tracks)
+    result = huracanpy.calc.get_gen_vals(tracks, tracks.time, tracks.track_id)
 
-    expected = tracks_csv.groupby("track_id").first()
-
-    xr.testing.assert_identical(result, expected)
-
-
-def test_accel_get_apex_vals(tracks_csv):
-    result = huracanpy.calc.get_apex_vals(
-        tracks_csv, tracks_csv.wind10, tracks_csv.track_id
-    )
-
-    expected = tracks_csv.sortby("wind10", ascending=False).groupby("track_id").first()
+    expected = tracks.groupby("track_id").first()
 
     xr.testing.assert_identical(result, expected)
 
 
-def test_accel_get_time_from_genesis(tracks_csv):
-    result = huracanpy.calc.get_time_from_genesis(tracks_csv.time, tracks_csv.track_id)
+@pytest.mark.parametrize(
+    ("tracks",),
+    (["tracks_csv"], ["tracks_with_extra_coord"]),
+)
+def test_accel_get_apex_vals(tracks, request):
+    tracks = request.getfixturevalue(tracks)
+    result = huracanpy.calc.get_apex_vals(tracks, tracks.wind10, tracks.track_id)
 
-    track_groups = tracks_csv.groupby("track_id")
+    expected = tracks.sortby("wind10", ascending=False).groupby("track_id").first()
+
+    xr.testing.assert_identical(result, expected)
+
+
+@pytest.mark.parametrize(
+    ("tracks",),
+    (["tracks_csv"], ["tracks_with_extra_coord"]),
+)
+def test_accel_get_time_from_genesis(tracks, request):
+    tracks = request.getfixturevalue(tracks)
+    result = huracanpy.calc.get_time_from_genesis(tracks.time, tracks.track_id)
+
+    track_groups = tracks.groupby("track_id")
     expected = []
     for track_id, track in track_groups:
         expected.append(track.time - track.time[0])
@@ -57,12 +74,17 @@ def test_accel_get_time_from_genesis(tracks_csv):
     xr.testing.assert_identical(result, expected)
 
 
-def test_accel_get_time_from_apex(tracks_csv):
+@pytest.mark.parametrize(
+    ("tracks",),
+    (["tracks_csv"], ["tracks_with_extra_coord"]),
+)
+def test_accel_get_time_from_apex(tracks, request):
+    tracks = request.getfixturevalue(tracks)
     result = huracanpy.calc.get_time_from_apex(
-        tracks_csv.time, tracks_csv.track_id, tracks_csv.wind10
+        tracks.time, tracks.track_id, tracks.wind10
     )
 
-    track_groups = tracks_csv.groupby("track_id")
+    track_groups = tracks.groupby("track_id")
     expected = []
     for track_id, track in track_groups:
         idx = track.wind10.argmax()
@@ -74,8 +96,12 @@ def test_accel_get_time_from_apex(tracks_csv):
     xr.testing.assert_identical(result, expected)
 
 
-def test_accel_match():
-    ref = huracanpy.load(huracanpy.example_csv_file)
+@pytest.mark.parametrize(
+    ("tracks",),
+    (["tracks_csv"], ["tracks_with_extra_coord"]),
+)
+def test_accel_match(tracks, request):
+    ref = request.getfixturevalue(tracks)
     tracks = ref.where(ref.track_id < 2, drop=True)
     tracks = tracks.where(tracks.time.dt.hour == 0, drop=True)
     tracks["lon"] = tracks.lon + 0.5
@@ -117,8 +143,12 @@ def test_accel_match():
     np.testing.assert_allclose(result.dist, np.array(dist), rtol=1e-12)
 
 
-def test_accel_overlap():
-    ref = huracanpy.load(huracanpy.example_csv_file)
+@pytest.mark.parametrize(
+    ("tracks",),
+    (["tracks_csv"], ["tracks_with_extra_coord"]),
+)
+def test_accel_overlap(tracks, request):
+    ref = request.getfixturevalue(tracks)
     tracks = ref.where(ref.track_id < 2, drop=True)
     tracks = tracks.where(tracks.time.dt.hour == 0, drop=True)
     tracks["lon"] = tracks.lon + 0.5
