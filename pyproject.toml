@@ -4,7 +4,6 @@ version = "1.0-beta2"
 authors = [
   { name="Leo Saffin", email="l.saffin@reading.ac.uk" },
   { name="Stella Bourdin", email="stella.bourdin@physics.ox.ac.uk" },
-  { name="Kelvin Ng" },
 ]
 description = "A python package for working with various forms of feature tracking data"
 requires-python = ">=3.8, <3.13"
