@@ -195,12 +195,14 @@ def load(
                         filename=f,
                         source="csv",
                         rename=rename,
+                        baselon=baselon,
                         **kwargs,
                     )
             else:
                 return load(
                     filename=ibtracs.offline(ibtracs_subset),
                     rename=rename,
+                    baselon=baselon,
                     **kwargs,
                 )
         else:
