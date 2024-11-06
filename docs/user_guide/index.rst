@@ -1,5 +1,5 @@
-User Guide
-==========
+Getting started with HuracanPy
+==============================
 
 Installation
 ------------
@@ -72,5 +72,5 @@ allows us to easily loop over or index tracks in this format.
     :hidden:
 
     self
-    data
+    load
     extract
