@@ -8,15 +8,17 @@ HuracanPy
 
 A python package for working with various forms of feature tracking data, including but not restricted to cyclone tracks.
 
-Statement of need
------------------
-The idea of this package is to be a standard way for working with cyclone track data. We
-were all working on track data, but in slightly different ways which makes sharing code
-more difficult.
+Why HuracanPy?
+--------------
+The idea of this package is to provide a common tool for working with cyclone track data. 
+In particular, HuracanPy can read tracks from many different sources/trackers. 
+It also provides useful functions to analyse these tracks, including many common diagnostics.
+Our goal is to make track data analysis more accessible, and to promote good reproducibility practices.
+
 
 Installation
 ------------
-To install the package, you can use ``pip``::
+To install the package, you can simply use ``pip``::
 
     pip install huracanpy
 
@@ -33,11 +35,12 @@ Package structure
 -----------------
 
 The package has several module that allow you to:
-* Add information to your tracks (e.g. geographical info, translation speed, etc.);
-* Subset part of the tracks;
-* Compute standard diagnostic metrics;
-* Make simple plots;
-* Compare several datasets between them.
+* Load cyclone tracks (`load`);
+* Add information to your tracks (`info`);
+* Subset (`subset`) and interpolate (`interp`) the tracks;
+* Compute standard diagnostic metrics  (`calc`);
+* Make simple plots (`plot`);
+* Compare several datasets between them (`assess`).
 The flowchart below illustrates this structure. 
 
 .. image:: images/package_structure_flowchart/flowchart.png
@@ -50,7 +53,7 @@ This package is distributed under the MIT licence. As such, you can [...]
 
 A JOSS paper is currently being prepared that you will be able to cite in your publication where HuracanPy was used.
 
-Please subscribe to the mailing list [TBA] to get information about HuracanPy. 
+Please watch the GitHub repository to get information about HuracanPy. 
 
 If you encounter any problem while using HuracanPy, please create an issue in GitHub (or consider contributing to the package!) 
 
