@@ -213,3 +213,19 @@ def test_interp_methods():
     np.testing.assert_array_equal(
         interpolated_data_acc.time, expected_interpolated_data.time
     )
+
+
+def test_accessor_sel_id(tracks_csv):
+    result = tracks_csv.hrcn.sel_id(0)
+    expected = huracanpy.sel_id(tracks_csv, tracks_csv.track_id, 0)
+
+    xr.testing.assert_identical(result, expected)
+
+
+def test_accessor_trackswhere(tracks_csv):
+    result = tracks_csv.hrcn.trackswhere(lambda x: (x.track_id != 1).any())
+    expected = huracanpy.trackswhere(
+        tracks_csv, tracks_csv.track_id, lambda x: (x.track_id != 1).any()
+    )
+
+    xr.testing.assert_identical(result, expected)

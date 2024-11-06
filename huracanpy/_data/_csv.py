@@ -3,7 +3,6 @@ Module to load tracks stored as csv files, including TempestExtremes output.
 """
 
 import pandas as pd
-from pandas.core.tools.datetimes import _unit_map
 
 # All values recognised as NaN by pandas.read_csv, except "NA" which we want to load
 # normally because it is a basin, and added "" to interpret empty entries as NaN
@@ -27,6 +26,30 @@ pandas_na_values = [
     "nan",
     "null ",
     "",
+]
+
+pandas_valid_time_labels = [
+    "year",
+    "years",
+    "month",
+    "months",
+    "day",
+    "days",
+    "hour",
+    "hours",
+    "minute",
+    "minutes",
+    "second",
+    "seconds",
+    "ms",
+    "millisecond",
+    "milliseconds",
+    "us",
+    "microsecond",
+    "microseconds",
+    "ns",
+    "nanosecond",
+    "nanoseconds",
 ]
 
 
@@ -75,7 +98,7 @@ def load(
     else:
         # Combine separate year/month/day etc. values into a time, and drop those
         # variables from the dataframe
-        time_vars = [var for var in tracks.columns if var in _unit_map]
+        time_vars = [var for var in tracks.columns if var in pandas_valid_time_labels]
         tracks["time"] = pd.to_datetime(tracks[time_vars])
         tracks = tracks.drop(time_vars, axis="columns")
 

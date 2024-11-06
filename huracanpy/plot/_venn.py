@@ -40,14 +40,14 @@ def venn(datasets, match, labels, colors=None, circle_color="k"):
             "We cannot plot Venn diagrams for more than 3 datasets."
         )
 
-    assert len(datasets) == len(labels), "datasets and labels must have the same length"
+    if len(datasets) != len(labels):
+        raise ValueError("datasets and labels must have the same length")
 
     if colors is None:
         colors = ["w"] * len(datasets)
     else:
-        assert len(colors) == len(
-            datasets
-        ), "datasets and colors must have the same length"
+        if len(colors) != len(datasets):
+            raise ValueError("datasets and colors must have the same length")
     f(*datasets, match, colors, labels, circle_color)
 
 

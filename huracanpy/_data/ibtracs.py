@@ -46,7 +46,10 @@ def online(subset, filename="ibtracs.csv", clean=True):
         + subset
         + ".list.v04r01.csv"
     )
-    urlretrieve(url, filename)
+
+    # Ruff (Flake8 bandit) complains that this url isn't checked, but it explicitly has
+    # "https:/" at the start anyway
+    urlretrieve(url, filename)  # noqa: S310
 
     yield filename
 

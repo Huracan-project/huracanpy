@@ -12,7 +12,7 @@ def match(tracksets, names=["1", "2"], max_dist=300, min_overlap=0):
 
     Parameters
     ----------
-    tracksets : list
+    tracksets : list[xarray.Dataset]
         list of track datasets to match together. Must be of length two or more.
     names : list, optional
         list of track datasets names. Must be the same size as tracksets. The default is ['1','2'].
@@ -23,7 +23,7 @@ def match(tracksets, names=["1", "2"], max_dist=300, min_overlap=0):
 
     Returns
     -------
-    pd.DataFrame
+    pandas.DataFrame
         Dataframe containing the matching tracks with
             the id from corresponding datasets
             the number of matching time steps (if only two datasets provided)
@@ -32,10 +32,12 @@ def match(tracksets, names=["1", "2"], max_dist=300, min_overlap=0):
     """
 
     # Check input
-    assert len(tracksets) >= 2, "You must provide at least two datasets to match"
-    assert len(names) == len(
-        tracksets
-    ), "Number of names provided do not correspond to the number of track sets"
+    if len(tracksets) < 2:
+        raise ValueError("You must provide at least two datasets to match")
+    if len(names) != len(tracksets):
+        raise ValueError(
+            "Number of names provided do not correspond to the number of track sets"
+        )
 
     # Two track sets
     if len(tracksets) == 2:
@@ -141,7 +143,8 @@ def _match_multiple(
 
     """
 
-    assert len(datasets) == len(names), "datasets and names must have the same length."
+    if len(datasets) != len(names):
+        raise ValueError("datasets and names must have the same length.")
 
     M = pd.DataFrame(columns=["id_" + n for n in names[:2]])
     for names_pair, dataset_pair in zip(

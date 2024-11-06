@@ -9,9 +9,9 @@ def overlap(tracks1, tracks2, matches=None):
 
     Parameters
     ----------
-    tracks1 (pd.Dataframe)
-    tracks2 (pd.Dataframe)
-    matches (pd.Dataframe): The output from match_tracks on tracks1 and tracks2.
+    tracks1 (xarray.Dataset)
+    tracks2 (xarray.Dataset)
+    matches (pandas.Dataframe): The output from match_tracks on tracks1 and tracks2.
         If None, match_tracks is run on tracks1 and tracks2.
 
     Returns
@@ -20,7 +20,7 @@ def overlap(tracks1, tracks2, matches=None):
         Match dataset with added deltas in days
     """
     if matches is None:
-        matches = match(tracks1, tracks2)
+        matches = match([tracks1, tracks2])
     c1, c2 = matches.columns[:2].str.slice(3)
     tracks1, tracks2 = tracks1.to_dataframe(), tracks2.to_dataframe()
     matches = (

@@ -11,8 +11,8 @@ def get_time_from_genesis(time, track_ids):
 
     Parameters
     ----------
-    data : TYPE
-        DESCRIPTION.
+    time
+    track_ids
 
     Returns
     -------
@@ -29,21 +29,29 @@ def get_time_from_genesis(time, track_ids):
     )
     time_from_start = data_df.time_actual - data_df.time_gen
     return (
-        time_from_start.to_xarray().rename({"index": "obs"}).rename("time_from_genesis")
+        time_from_start.to_xarray()
+        .rename({"index": track_ids.dims[0]})
+        .drop(track_ids.dims[0])
+        .rename("time_from_genesis")
     )
 
 
 def get_time_from_apex(time, track_ids, intensity_var, stat="max"):
-    """
+    """The time relative to a maxima/minima in a given variable for each individual
+    track
 
     Parameters
     ----------
-    data
-    varname
-    stat
+    time : array_like
+    track_ids : xarray.DataArray
+    intensity_var : array_like
+    stat : str, optional
+        Take either the maxima ("max") or minima ("min") of `intensity_var`. Default is
+        "max"
 
     Returns
     -------
+    xarray.DataArray
 
     """
     if stat == "max":
@@ -60,6 +68,7 @@ def get_time_from_apex(time, track_ids, intensity_var, stat="max"):
     time_from_extr = data_df.time_actual - data_df.time_extr
     return (
         time_from_extr.to_xarray()
-        .rename({"index": time.dims[0]})
+        .rename({"index": track_ids.dims[0]})
+        .drop(track_ids.dims[0])
         .rename("time_from_extremum")
     )

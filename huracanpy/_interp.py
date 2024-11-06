@@ -23,12 +23,13 @@ def interp_time(
         name of the track_id variable in data. The default is "track_id".
     freq : str, optional
         Frequency at which you want to interpolate the data. The default is '1h'.
+    prog_bar : bool, optional
 
     Returns
     -------
-    TYPE
-        DESCRIPTION.
-
+    xarray.Dataset
+        The input `xarray.Dataset` with each individual track interpolated to the
+        requested frequencu
     """
 
     T = []

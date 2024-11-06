@@ -12,7 +12,8 @@ def get_track_duration(time, track_ids):
 
     Parameters
     ----------
-    tracks : xarray.Dataset
+    time
+    track_ids
 
     Returns
     -------
@@ -59,7 +60,12 @@ def get_gen_vals(tracks, time, track_id):
     # Could check that track_id is 1d, but the function would already have failed by now
     # if not
     dim = track_id.dims[0]
-    return tracks.isel(**{dim: idx})
+    tracks = tracks.isel(**{dim: idx})
+
+    # Promote track_id to a coordinate and remove record
+    return tracks.assign_coords(**{track_id.name: tracks[track_id.name]}).swap_dims(
+        **{dim: track_id.name}
+    )
 
 
 def get_apex_vals(tracks, variable, track_id, stat="max"):
@@ -108,4 +114,9 @@ def get_apex_vals(tracks, variable, track_id, stat="max"):
     idx = np.array(df.sort_values("var", ascending=asc).groupby("track_id").first().idx)
 
     dim = track_id.dims[0]
-    return tracks.isel(**{dim: idx})
+    tracks = tracks.isel(**{dim: idx})
+
+    # Promote track_id to a coordinate and remove record
+    return tracks.assign_coords(**{track_id.name: tracks[track_id.name]}).swap_dims(
+        **{dim: track_id.name}
+    )

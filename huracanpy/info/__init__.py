@@ -32,16 +32,9 @@ def add_all_info(
     month_name="month",
     day_name="day",
     hour_name="hour",
-    wind_name="wind10",
-    wind_units="m s-1",
-    slp_name="slp",
-    slp_units="hPa",
-    sshs_convention="Saffir-Simpson",
-    pres_cat_convention="Klotzbach",
     season_convention="short",
 ):
-    """
-
+    """Add all possible information from this module to the dataset
 
     Parameters
     ----------
@@ -51,7 +44,7 @@ def add_all_info(
     lon_name : str, optional
         Name of the longitude variable. The default is "lon".
     track_id_name : str, optional
-        Name of the track ID variable.. The default is "track_id".
+        Name of the track ID variable. The default is "track_id".
     time_name : str, optional
         Name of the time variable. If set to None, no time-related attributes are computed. The default is "time".
     year_name : str, optional
@@ -62,18 +55,7 @@ def add_all_info(
         Name of the day variable. The default is "day".
     hour_name : str, optional
         Name of the hour variable. The default is "hour".
-    wind_name : str, optional
-        Name of the winf variable. The default is "wind10".
-    wind_units : str, optional
-        The default is "m s-1".
-    slp_name : str, optional
-        Name of the SLP variable. The default is "slp".
-    slp_units : str, optional
-        The default is "hPa".
-    sshs_convention : str, optional
-        The default is "Saffir-Simpson".
-    pres_cat_convention : str, optional
-        The default is "Klotzbach".
+    season_convention : str, default="short"
 
     Returns
     -------

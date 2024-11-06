@@ -8,6 +8,21 @@ from metpy.units import units
 
 
 def get_delta(var, track_ids=None, var_units=None, centering="forward"):
+    """Take the differences across var, without including differences between the end
+    and start of different tracks
+
+    Parameters
+    ----------
+    var : xarray.DataArray
+    track_ids : array_like, optional
+    var_units : str, optional
+    centering : str, optional
+
+    Returns
+    -------
+    xarray.DataArray
+
+    """
     # TODO: centered centering
 
     # Curate input
@@ -22,10 +37,8 @@ def get_delta(var, track_ids=None, var_units=None, centering="forward"):
         var = var.astype(float)
         var_units = "ns"
     ## Check that centering is supported
-    assert centering in [
-        "forward",
-        "backward",
-    ], "centering must be one of ['forward', 'backward']"
+    if centering not in ["forward", "backward"]:
+        raise ValueError("centering must be one of ['forward', 'backward']")
 
     # Compute delta
     delta = var[1:] - var[:-1]
@@ -54,6 +67,22 @@ def get_delta(var, track_ids=None, var_units=None, centering="forward"):
 
 
 def get_rate(var, time, track_ids=None, var_units=None, centering="forward"):
+    """Compute rate of change of var, without including differences between the end
+    and start of different tracks
+
+    Parameters
+    ----------
+    var : xarray.DataArray
+    time : xarray.DataArray
+    track_ids : array_like, optional
+    var_units : str, optional
+    centering : str, optional
+
+    Returns
+    -------
+    xarray.DataArray
+
+    """
     # Curate input
     ## If track_id is not provided, all points are considered to belong to the same track
     if track_ids is None:

@@ -23,10 +23,6 @@ def get_category(variable, bins, labels=None, variable_units=None):
         Bounds for the categories, including upper and lower bounds
     labels : array_like
         Name of the categories. len(labels) = len(bins) -1
-    convention : str
-        * Klotzbach
-        * Simpson
-        * Saffir-Simpson
     variable_units : str
         The units of the input variable. Only needs to be specified if they are
         different to the units of the bins and they are not already in the attributes of
@@ -34,7 +30,7 @@ def get_category(variable, bins, labels=None, variable_units=None):
 
     Returns
     -------
-    numpy.ndarray
+    array_like
         The category label for each value in the input variable
 
     """

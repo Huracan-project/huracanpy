@@ -6,7 +6,7 @@ import pint
 
 from metpy.xarray import preprocess_and_wrap
 
-from ..info._category import get_category
+from ..info import get_category
 from ._conventions import _thresholds
 
 
@@ -17,15 +17,17 @@ def get_sshs_cat(wind, convention="Saffir-Simpson", wind_units="m s-1"):
 
     Parameters
     ----------
-    wind : xarray.DataArray
+    wind : array_like
         10-minutes averaged 10m wind in m/s
+
+    convention : str
 
     wind_units : str, default="m s-1"
         The units of the input array if they are not already provided by the attributes
 
     Returns
     -------
-    xarray.DataArray
+    array_like
         The category series.
         You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
     """

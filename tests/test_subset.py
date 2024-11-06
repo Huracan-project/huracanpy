@@ -7,7 +7,7 @@ def test_trackswhere():
     tracks["category"] = huracanpy.tc.get_pressure_cat(tracks.slp, slp_units="Pa")
 
     tracks_subset = huracanpy.trackswhere(
-        tracks, lambda track: track.category.max() >= 2
+        tracks, tracks.track_id, lambda track: track.category.max() >= 2
     )
 
     assert set(tracks_subset.track_id.data) == {0, 2}

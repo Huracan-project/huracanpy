@@ -37,7 +37,12 @@ def load(
         for i in range(nfields - len(varnames) - 4):
             varnames.append(f"feature_{i}")
     else:
-        assert len(variable_names) == nfields - len(varnames) - 4
+        nvars = nfields - len(varnames) - 4
+        if len(variable_names) != nvars:
+            raise ValueError(
+                f"Number of variable names does not match expected number of variables:"
+                f"{nvars}"
+            )
         varnames += variable_names
 
     while lineno < len(data):

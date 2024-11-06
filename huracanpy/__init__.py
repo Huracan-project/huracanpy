@@ -1,7 +1,5 @@
 """huracanpy - A python package for working with various forms of feature tracking data"""
 
-__version__ = "0.1.0"
-__author__ = "Leo Saffin <l.saffin@reading.ac.uk>, Stella Bourdin <stella.bourdin@physics.ox.ac.uk>, Kelvin Ng "
 __all__ = [
     # Modules
     "calc",
@@ -42,6 +40,7 @@ from ._data import (
     example_CHAZ_file,
     example_MIT_file,
 )
+from ._basins import basins
 from ._interp import interp_time
 from ._subset import sel_id, trackswhere
 from . import calc, plot, assess, info, tc
