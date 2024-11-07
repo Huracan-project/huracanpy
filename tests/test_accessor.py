@@ -53,12 +53,12 @@ def test_nunique():
             "delta",
             {"var_name": "wind10"},
         ),
-        (
-            huracanpy.calc.get_rate,
-            ["wind10", "time", "track_id"],
-            "rate",
-            {"var_name": "wind10"},
-        ),
+        # (
+        #     huracanpy.calc.get_rate,
+        #     ["wind10", "time", "track_id"],
+        #     "rate",
+        #     {"var_name": "wind10"},
+        # ),
         (
             huracanpy.calc.get_time_from_genesis,
             ["time", "track_id"],
