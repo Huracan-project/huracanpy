@@ -8,7 +8,7 @@ from huracanpy._data import ibtracs
 
 
 def prepare_offline(wmo=True, usa=True):
-    ib = ibtracs.online("since1980", "tmp/ibtracs.csv")
+    ib = huracanpy.load(source="ibtracs", ibtracs_subset="since1980")
 
     # Remove season with tracks that are still provisional
     first_season_provi = ib.where(
