@@ -74,20 +74,28 @@ class HuracanPyDatasetAccessor:
         self._dataset["basin"] = self.get_basin(lon_name, lat_name, convention, crs)
         return self._dataset
 
-    def get_land_or_ocean(
-        self, lon_name="lon", lat_name="lat", resolution="10m", crs=None
-    ):
-        return info.get_land_or_ocean(
+    def get_is_land(self, lon_name="lon", lat_name="lat", resolution="10m", crs=None):
+        return info.is_land(
             self._dataset[lon_name],
             self._dataset[lat_name],
             resolution=resolution,
             crs=crs,
         )
 
-    def add_land_or_ocean(
-        self, lon_name="lon", lat_name="lat", resolution="10m", crs=None
-    ):
-        self._dataset["land_or_ocean"] = self.get_land_or_ocean(
+    def add_is_land(self, lon_name="lon", lat_name="lat", resolution="10m", crs=None):
+        self._dataset["is_land"] = self.get_is_land(lon_name, lat_name, resolution, crs)
+        return self._dataset
+
+    def get_is_ocean(self, lon_name="lon", lat_name="lat", resolution="10m", crs=None):
+        return info.is_ocean(
+            self._dataset[lon_name],
+            self._dataset[lat_name],
+            resolution=resolution,
+            crs=crs,
+        )
+
+    def add_is_ocean(self, lon_name="lon", lat_name="lat", resolution="10m", crs=None):
+        self._dataset["is_ocean"] = self.get_is_ocean(
             lon_name, lat_name, resolution, crs
         )
         return self._dataset

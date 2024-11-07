@@ -17,7 +17,8 @@ Geographic
 
     get_hemisphere
     get_basin
-    get_land_or_ocean
+    is_land
+    is_ocean
     get_country
     get_continent
 

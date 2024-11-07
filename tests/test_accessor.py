@@ -20,7 +20,8 @@ def test_nunique():
     [
         (huracanpy.info.get_hemisphere, ["lat"], "hemisphere", {}),
         (huracanpy.info.get_basin, ["lon", "lat"], "basin", {}),
-        (huracanpy.info.get_land_or_ocean, ["lon", "lat"], "land_or_ocean", {}),
+        (huracanpy.info.is_land, ["lon", "lat"], "is_land", {}),
+        (huracanpy.info.is_ocean, ["lon", "lat"], "is_ocean", {}),
         (huracanpy.info.get_country, ["lon", "lat"], "country", {}),
         (huracanpy.info.get_continent, ["lon", "lat"], "continent", {}),
         (huracanpy.tc.ace, ["wind10"], "ace", {"wind_name": "wind10"}),

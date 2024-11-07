@@ -5,7 +5,8 @@ __all__ = [
     "get_basin",
     "get_country",
     "get_continent",
-    "get_land_or_ocean",
+    "is_land",
+    "is_ocean",
     "get_category",
     "get_time_components",
     "get_season",
@@ -16,7 +17,8 @@ from ._geography import (
     get_basin,
     get_country,
     get_continent,
-    get_land_or_ocean,
+    is_land,
+    is_ocean,
 )
 from ._category import get_category
 from ._time import get_time_components, get_season
@@ -69,7 +71,7 @@ def add_all_info(
         data["hemisphere"] = get_hemisphere(data[lat_name])
         if lon_name is not None:
             data["basin"] = get_basin(data[lon_name], data[lat_name])
-            data["is_ocean"] = get_land_or_ocean(data[lon_name], data[lat_name])
+            data["is_ocean"] = is_ocean(data[lon_name], data[lat_name])
             data["country"] = get_country(data[lon_name], data[lat_name])
             data["continent"] = get_continent(data[lon_name], data[lat_name])
 

@@ -119,9 +119,9 @@ def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, cr
     return result
 
 
-def get_land_or_ocean(lon, lat, resolution="10m", crs=None):
+def is_ocean(lon, lat, resolution="10m", crs=None):
     """
-    Detect whether each point is over land or ocean
+    Detect whether each point is over ocean
 
     Parameters
     ----------
@@ -137,24 +137,60 @@ def get_land_or_ocean(lon, lat, resolution="10m", crs=None):
 
     Returns
     -------
-    array_like
+    array_like[bool]
         Array of "Land" or "Ocean" for each lon/lat point. Should return the same type
         of array as the input lon/lat, or a length 1 :py:class:`numpy.ndarray` if
         lon/lat are floats
     """
-    is_ocean = _get_natural_earth_feature(
-        lon,
-        lat,
-        feature="featurecla",
-        category="physical",
-        name="ocean",
-        resolution=resolution,
-        crs=crs,
+    return (
+        _get_natural_earth_feature(
+            lon,
+            lat,
+            feature="featurecla",
+            category="physical",
+            name="ocean",
+            resolution=resolution,
+            crs=crs,
+        )
+        == "Ocean"
     )
 
-    is_ocean[is_ocean == ""] = "Land"
 
-    return is_ocean
+def is_land(lon, lat, resolution="10m", crs=None):
+    """
+    Detect whether each point is over land
+
+    Parameters
+    ----------
+    lon, lat : float or array_like
+    resolution : str
+        The resolution of the Land/Sea outlines dataset to use. One of
+
+        * 10m (1:10,000,000)
+        * 50m (1:50,000,000)
+        * 110m (1:110,000,000)
+
+    crs : cartopy.crs.CRS
+
+    Returns
+    -------
+    array_like[bool]
+        Array of "Land" or "Ocean" for each lon/lat point. Should return the same type
+        of array as the input lon/lat, or a length 1 :py:class:`numpy.ndarray` if
+        lon/lat are floats
+    """
+    return (
+        _get_natural_earth_feature(
+            lon,
+            lat,
+            feature="featurecla",
+            category="physical",
+            name="ocean",
+            resolution=resolution,
+            crs=crs,
+        )
+        == ""
+    )
 
 
 def get_country(lon, lat, resolution="10m", crs=None):
