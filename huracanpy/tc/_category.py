@@ -2,8 +2,9 @@
 Module with function to compute TC-specific categories
 """
 
-import pint
+import warnings
 
+import pint
 from metpy.xarray import preprocess_and_wrap
 
 from ..info import get_category
@@ -64,7 +65,7 @@ def get_pressure_cat(slp, convention="Klotzbach", slp_units="hPa"):
     """
     if not isinstance(slp, pint.Quantity) or slp.unitless:
         if slp.min() > 10000 and slp_units == "hPa":
-            print(
+            warnings.warn(
                 "Caution, pressure are likely in Pa, they are being converted to hPa "
                 "for categorization. In future specify the units explicitly by passing "
                 'slp_units="Pa" to this function or setting '

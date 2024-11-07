@@ -2,6 +2,8 @@
 Module containing functions to compute rates.
 """
 
+import warnings
+
 import numpy as np
 import xarray as xr
 from metpy.units import units
@@ -26,11 +28,12 @@ def get_delta(var, track_ids=None, var_units=None, centering="forward"):
     # TODO: centered centering
 
     # Curate input
-    ## If track_id is not provided, all points are considered to belong to the same track
+    # If track_id is not provided, all points are considered to belong to the same track
     if track_ids is None:
         track_ids = xr.DataArray([0] * len(var), dims=var.dims)
-        print(
-            "track_id is not provided, all points are considered to come from the same track"
+        warnings.warn(
+            "track_id is not provided, all points are considered to come from the same"
+            "track"
         )
     ## If time is provided, convert to numeric ns
     if var.dtype == "<M8[ns]":
@@ -84,11 +87,12 @@ def get_rate(var, time, track_ids=None, var_units=None, centering="forward"):
 
     """
     # Curate input
-    ## If track_id is not provided, all points are considered to belong to the same track
+    # If track_id is not provided, all points are considered to belong to the same track
     if track_ids is None:
         track_ids = xr.DataArray([0] * len(time), dims=time.dims)
-        print(
-            "track_id is not provided, all points are considered to come from the same track"
+        warnings.warn(
+            "track_id is not provided, all points are considered to come from the same"
+            "track"
         )
     ## Sort data by track_id and time
     # rate_var, track_ids, time = [a.sortby(time) for a in [rate_var, track_ids, time]]

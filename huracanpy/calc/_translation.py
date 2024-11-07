@@ -2,6 +2,8 @@
 Utils related to translation distance and time
 """
 
+import warnings
+
 import numpy as np
 import xarray as xr
 from metpy.units import units
@@ -79,10 +81,10 @@ def get_distance(lon, lat, track_id=None, method="geod", ellps="WGS84"):
     # TODO: Provide option for centering forward, backwards, centered
 
     # Curate input
-    ## If track_id is not provided, all points are considered to belong to the same track
+    # If track_id is not provided, all points are considered to belong to the same track
     if track_id is None:
         track_id = [0] * len(lon)
-        print(
+        warnings.warn(
             "track_id is not provided, all points are considered to come from the same track"
         )
 
@@ -122,11 +124,12 @@ def get_translation_speed(lon, lat, time, track_id=None, method="geod", ellps="W
     # TODO: Provide option for centering forward, backwards, centered
 
     # Curate input
-    ## If track_id is not provided, all points are considered to belong to the same track
+    # If track_id is not provided, all points are considered to belong to the same track
     if track_id is None:
         track_id = xr.DataArray([0] * len(lon), dims=lon.dims)
-        print(
-            "track_id is not provided, all points are considered to come from the same track"
+        warnings.warn(
+            "track_id is not provided, all points are considered to come from the same"
+            "track"
         )
     ## Sort data by track_id and time
     lon, lat, track_id, time = [a.sortby(time) for a in [lon, lat, track_id, time]]
