@@ -9,25 +9,25 @@ from metpy.xarray import preprocess_and_wrap
 from ._geography import get_hemisphere
 
 
-def get_time_components(time):
+def get_time_components(time, components=("year", "month", "day", "hour")):
     """
     Expand the time variable into year/month/day/hour
 
     Parameters
     ----------
     time : xr.DataArray
-        The time time series.
+        The time series
+    components : iterable[str], optional
+        The time components of `time` to return. Can include any valid attribute of
+        `xarray.core.accessor_dt.DatetimeAccessor`. Default is year, month, day, hour
 
     Returns
     -------
-    year, month, day, hour : xr.DataArrays
+    list[xarray.DataArray]
+        A DataArray for each requested time component
 
     """
-    year = time.dt.year
-    month = time.dt.month
-    day = time.dt.day
-    hour = time.dt.hour
-    return year, month, day, hour
+    return [getattr(time.dt, component) for component in components]
 
 
 @preprocess_and_wrap(wrap_like="track_id")
