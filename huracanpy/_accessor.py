@@ -481,7 +481,7 @@ class HuracanPyDatasetAccessor:
         Interpolate track data at a given frequency.
         """
         return interp_time(
-            self._dataset, freq=freq, track_id_name=track_id_name, prog_bar=prog_bar
+            self._dataset, self._dataset[track_id_name], freq=freq, prog_bar=prog_bar
         )
 
     # ---- lifecycle

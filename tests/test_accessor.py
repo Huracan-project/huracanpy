@@ -208,7 +208,7 @@ def test_interp_methods():
         freq="1h", track_id_name="track_id", prog_bar=False
     )
     expected_interpolated_data = huracanpy.interp_time(
-        data, freq="1h", track_id_name="track_id", prog_bar=False
+        data, data.track_id, freq="1h", prog_bar=False
     )
     np.testing.assert_array_equal(
         interpolated_data_acc.time, expected_interpolated_data.time
