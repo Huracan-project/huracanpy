@@ -12,20 +12,20 @@ def get_track_duration(time, track_ids):
 
     Parameters
     ----------
-    time
-    track_ids
+    time : xarray.DataArray
+    track_ids : array_like
 
     Returns
     -------
     xarray.DataArray
-        Duration of each track
+        Duration of each track (in hours)
 
     """
     duration = (
         time.groupby(track_ids).map(lambda x: x.max() - x.min()).rename("duration")
     )
-    duration = (duration * 1e-9 / 3600).astype(float)
-    duration.attrs["units"] = "h"
+    duration = duration / np.timedelta64(1, "h")
+    duration.attrs["units"] = "hours"
     return duration
 
 
