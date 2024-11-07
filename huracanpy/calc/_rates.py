@@ -22,7 +22,6 @@ def get_delta(var, track_ids=None, centering="forward"):
     ----------
     var : xarray.DataArray
     track_ids : array_like, optional
-    var_units : str, optional
     centering : str, optional
 
     Returns
