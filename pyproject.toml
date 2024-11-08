@@ -44,6 +44,7 @@ docs = [
     "sphinx-copybutton",
     "nbsphinx",
     "IPython",
+    "sphinx-design",
 ]
 
 [build-system]
