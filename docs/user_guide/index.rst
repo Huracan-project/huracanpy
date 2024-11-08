@@ -48,3 +48,4 @@ The flowchart below illustrates this structure. The present user guide details h
     plot
     assess
     speed
+    accessor
