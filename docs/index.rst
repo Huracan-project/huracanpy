@@ -3,6 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+=========
 HuracanPy
 =========
 
@@ -31,21 +32,7 @@ About xarray
 Our package is designed to load track data as xarray objects. 
 We recommend you get familiar with xarray to make the most of this package (https://tutorial.xarray.dev/intro.html). 
 
-Package structure
------------------
 
-The package has several module that allow you to:
-* Load cyclone tracks (`load`);
-* Add information to your tracks (`info`);
-* Subset (`subset`) and interpolate (`interp`) the tracks;
-* Compute standard diagnostic metrics  (`calc`);
-* Make simple plots (`plot`);
-* Compare several datasets between them (`assess`).
-The flowchart below illustrates this structure. 
-
-.. image:: images/package_structure_flowchart/flowchart.png
-  :width: 400
-  :alt: Alternative text
 
 What you need to know to use huracanpy
 --------------------------------------
