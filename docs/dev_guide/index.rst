@@ -36,5 +36,6 @@ Alternatively, if you think you have something useful to contribute like a funct
     :hidden:
 
     setup
+    examples
     doc
     tests
