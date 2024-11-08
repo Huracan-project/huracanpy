@@ -17,8 +17,10 @@ It is important that you know the basics of Git to contribute. [LINK]
 
 1. Set up your environment and install the package with developer's options. [LINK]
 2. 
+
     * If you do not have a specific change in mind, check out the `GitHub issues <https://github.com/Huracan-project/huracanpy/issues>`_, or contact the developers [LINK]. 
     * If you already do, move on to the next step.
+
 3. Identify the sources files that require modification, and go ahead with implementing what you need. Remember to commit regularly your changes.
 4. Implement relevant test. [LINK]
 5. Update or create relevant documentation. [LINK]
