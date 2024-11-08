@@ -33,7 +33,7 @@ The flowchart below illustrates this structure. The present user guide details h
 
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 4
     :hidden:
 
     install
