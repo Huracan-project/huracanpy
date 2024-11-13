@@ -24,6 +24,7 @@ def load(
     source=None,
     variable_names=None,
     rename=dict(),
+    units=None,
     baselon=None,
     ibtracs_subset="wmo",
     tempest_extremes_unstructured=False,
@@ -72,6 +73,9 @@ def load(
         To override any of these defaults, you can pass the same name, e.g.
 
         >>> tracks = huracanpy.load(..., rename=dict(longitude="longitude"))
+
+    units : dict, optional
+        A mapping of variable names to units
 
     baselon : scalar, optional
         Force the loaded longitudes into the range (baselon, baselon + 360). e.g.
@@ -171,6 +175,10 @@ def load(
 
     if len(rename) > 0:
         data = data.rename(rename)
+
+    if units is not None:
+        for varname in units:
+            data[varname].attrs["units"] = units[varname]
 
     if baselon is not None:
         data["lon"] = ((data.lon - baselon) % 360) + baselon
