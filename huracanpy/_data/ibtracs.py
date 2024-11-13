@@ -12,24 +12,22 @@ ibdata_dir = here / "_ibtracs_files/"
 wmo_file = str(ibdata_dir / "wmo.csv")
 usa_file = str(ibdata_dir / "usa.csv")
 
-online_default_kwargs = (
-    dict(
-        header=0,
-        skiprows=[1],
-        converters={
-            "SID": str,
-            "SEASON": int,
-            "BASIN": str,
-            "SUBBASIN": str,
-            "LON": float,
-            "LAT": float,
-        },
-    ),
+online_default_kwargs = dict(
+    header=0,
+    skiprows=[1],
+    converters={
+        "SID": str,
+        "SEASON": int,
+        "BASIN": str,
+        "SUBBASIN": str,
+        "LON": float,
+        "LAT": float,
+    },
 )
 
 
 def load(subset, filename, **kwargs):
-    if subset.lower() in ["wmo", "usa"]:
+    if subset.lower() in ["wmo", "usa", "jtwc"]:
         return offline(subset)
     else:
         return online(subset, filename=filename, **kwargs)
