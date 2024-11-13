@@ -3,6 +3,7 @@ import pytest
 import datetime
 from collections import namedtuple
 
+import cftime
 import numpy as np
 import xarray as xr
 
@@ -12,6 +13,21 @@ import huracanpy
 @pytest.fixture()
 def tracks_csv():
     return huracanpy.load(huracanpy.example_csv_file)
+
+
+@pytest.fixture()
+def tracks_year():
+    return huracanpy.load(huracanpy.example_year_file)
+
+
+@pytest.fixture()
+def tracks_year_cftime():
+    tracks = huracanpy.load(huracanpy.example_year_file)
+    time = [
+        cftime.datetime(t.dt.year, t.dt.month, t.dt.day, t.dt.hour) for t in tracks.time
+    ]
+    tracks["time"] = ("record", time)
+    return tracks
 
 
 @pytest.fixture()
