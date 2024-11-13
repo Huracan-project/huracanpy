@@ -88,9 +88,15 @@ def get_season(track_id, lat, time, convention="short"):
     # Derive values
     hemi = get_hemisphere(lat)
 
-    time = pd.to_datetime(time)
-    year = time.year
-    month = time.month
+    try:
+        time = pd.to_datetime(time)
+        year = time.year
+        month = time.month
+    except TypeError:
+        # Fix for cftime
+        year = np.array([t.year for t in time])
+        month = np.array([t.month for t in time])
+
     # Store in a dataframe
     df = pd.DataFrame(
         {"hemi": hemi, "year": year, "month": month, "track_id": track_id}
