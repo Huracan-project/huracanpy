@@ -574,12 +574,3 @@ class HuracanPyDatasetAccessor:
             track_id=self._dataset[track_id_name],
             stat=stat,
         )
-
-    # ---- climato
-
-
-#    def get_freq(self, track_id_name="track_id"):
-#        return calc.get_freq(self._dataset[track_id_name])
-#
-#    def get_tc_days(self, time_name="time", track_id_name="track_id"):
-#        return calc.get_tc_days(self._dataset[time_name], self._dataset[track_id_name])
