@@ -53,6 +53,8 @@ def load(
         * **track.tilt**
         * **te**, **tempest**, **tempestextremes**, **uz**:
         * **ibtracs**
+        * **csv**
+        * **netcdf**, **nc**
 
     variable_names : list of str, optional
           When loading data from an ASCII file (TRACK or TempestExtremes), specify the
@@ -147,26 +149,29 @@ def load(
 
     # If source is given, use the relevant function
     else:
-        if source.lower() == "track":
+        source = source.lower()
+        if source == "track":
             data = _TRACK.load(
                 filename, calendar=track_calendar, variable_names=variable_names
             )
-        elif source.lower() == "track.tilt":
+        elif source == "track.tilt":
             data = _TRACK.load_tilts(
                 filename,
                 calendar=track_calendar,
             )
-        elif source.lower() in ["csv", "uz"]:
+        elif source in ["csv", "uz"]:
             data = _csv.load(filename, **kwargs)
-        elif source.lower() in ["te", "tempest", "tempestextremes"]:
+        elif source in ["te", "tempest", "tempestextremes"]:
             data = _tempestextremes.load(
                 filename,
                 variable_names,
                 tempest_extremes_unstructured,
                 tempest_extremes_header_str,
             )
-        elif source.lower() == "ibtracs":
+        elif source == "ibtracs":
             data = ibtracs.load(ibtracs_subset, filename, **kwargs)
+        elif source == "netcdf":
+            data = _netcdf.load(filename, rename, **kwargs)
         else:
             raise ValueError(f"Source {source} unsupported or misspelled")
 
