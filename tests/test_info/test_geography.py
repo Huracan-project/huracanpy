@@ -15,7 +15,7 @@ import huracanpy
 )
 def test_hemisphere(data, expected, request):
     data = request.getfixturevalue(data)
-    result = huracanpy.info.get_hemisphere(data.lat)
+    result = huracanpy.info.hemisphere(data.lat)
     assert (result == expected).all()
 
 
@@ -35,7 +35,7 @@ def test_hemisphere(data, expected, request):
 )
 def test_basin(data, expected, request):
     data = request.getfixturevalue(data)
-    result = huracanpy.info.get_basin(data.lon, data.lat)
+    result = huracanpy.info.basin(data.lon, data.lat)
     assert (result == expected).all()
 
 
@@ -122,7 +122,7 @@ def test_get_land_ocean(data, expected, request):
 )
 def test_get_country(data, expected, request):
     data = request.getfixturevalue(data)
-    result = huracanpy.info.get_country(data.lon, data.lat)
+    result = huracanpy.info.country(data.lon, data.lat)
     assert (result == expected).all()
 
 
@@ -162,5 +162,5 @@ def test_get_country(data, expected, request):
 )
 def test_get_continent(data, expected, request):
     data = request.getfixturevalue(data)
-    result = huracanpy.info.get_continent(data.lon, data.lat)
+    result = huracanpy.info.continent(data.lon, data.lat)
     assert (result == expected).all()

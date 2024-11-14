@@ -7,8 +7,8 @@ import huracanpy
 def test_get_distance():
     data = huracanpy.load(huracanpy.example_csv_file)
 
-    dist_geod = huracanpy.calc.get_distance(data.lon, data.lat, data.track_id)
-    dist_haversine = huracanpy.calc.get_distance(
+    dist_geod = huracanpy.calc.distance(data.lon, data.lat, data.track_id)
+    dist_haversine = huracanpy.calc.distance(
         data.lon, data.lat, data.track_id, method="haversine"
     )
 
@@ -20,9 +20,7 @@ def test_get_distance():
 def test_get_translation_speed():
     data = huracanpy.load(huracanpy.example_csv_file)
 
-    ts = huracanpy.calc.get_translation_speed(
-        data.lon, data.lat, data.time, data.track_id
-    )
+    ts = huracanpy.calc.translation_speed(data.lon, data.lat, data.time, data.track_id)
 
     np.testing.assert_approx_equal(ts[0], 7.9, significant=2)
     np.testing.assert_approx_equal(ts.mean(), 6.04, significant=3)

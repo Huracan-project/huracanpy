@@ -7,12 +7,12 @@ import warnings
 import pint
 from metpy.xarray import preprocess_and_wrap
 
-from ..info import get_category
+from ..info import category
 from ._conventions import _thresholds
 
 
 @preprocess_and_wrap(wrap_like="wind")
-def get_sshs_cat(wind, convention="Saffir-Simpson", wind_units="m s-1"):
+def saffir_simpson_category(wind, convention="Saffir-Simpson", wind_units="m s-1"):
     """
     Function to determine the Saffir-Simpson Hurricane Scale (SSHS) category.
 
@@ -32,7 +32,7 @@ def get_sshs_cat(wind, convention="Saffir-Simpson", wind_units="m s-1"):
         The category series.
         You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
     """
-    return get_category(
+    return category(
         wind,
         bins=_thresholds[convention]["bins"],
         labels=_thresholds[convention]["labels"],
@@ -41,7 +41,7 @@ def get_sshs_cat(wind, convention="Saffir-Simpson", wind_units="m s-1"):
 
 
 @preprocess_and_wrap(wrap_like="slp")
-def get_pressure_cat(slp, convention="Klotzbach", slp_units="hPa"):
+def pressure_category(slp, convention="Klotzbach", slp_units="hPa"):
     """
     Determine the pressure category according to selected convention.
 
@@ -73,7 +73,7 @@ def get_pressure_cat(slp, convention="Klotzbach", slp_units="hPa"):
             )
             slp = slp / 100
 
-    return get_category(
+    return category(
         slp,
         bins=_thresholds[convention]["bins"],
         labels=_thresholds[convention]["labels"],

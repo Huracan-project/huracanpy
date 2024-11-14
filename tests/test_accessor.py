@@ -18,12 +18,12 @@ def test_nunique():
 @pytest.mark.parametrize(
     "function, function_args, accessor_name, accessor_function_kwargs",
     [
-        (huracanpy.info.get_hemisphere, ["lat"], "hemisphere", {}),
-        (huracanpy.info.get_basin, ["lon", "lat"], "basin", {}),
+        (huracanpy.info.hemisphere, ["lat"], "hemisphere", {}),
+        (huracanpy.info.basin, ["lon", "lat"], "basin", {}),
         (huracanpy.info.is_land, ["lon", "lat"], "is_land", {}),
         (huracanpy.info.is_ocean, ["lon", "lat"], "is_ocean", {}),
-        (huracanpy.info.get_country, ["lon", "lat"], "country", {}),
-        (huracanpy.info.get_continent, ["lon", "lat"], "continent", {}),
+        (huracanpy.info.country, ["lon", "lat"], "country", {}),
+        (huracanpy.info.continent, ["lon", "lat"], "continent", {}),
         (huracanpy.tc.ace, ["wind10"], "ace", {"wind_name": "wind10"}),
         (
             huracanpy.tc.ace,
@@ -32,23 +32,28 @@ def test_nunique():
             {"wind_name": "wind10", "sum_by": "track_id"},
         ),
         # (huracanpy.tc.pace, ["slp", "wind10"], "pace", {"pressure_name": "slp", "wind_name": "wind10"}),
-        (huracanpy.info.get_season, ["track_id", "lat", "time"], "season", {}),
-        (huracanpy.tc.get_sshs_cat, ["wind10"], "sshs_cat", {"wind_name": "wind10"}),
+        (huracanpy.info.season, ["track_id", "lat", "time"], "season", {}),
         (
-            huracanpy.tc.get_pressure_cat,
+            huracanpy.tc.saffir_simpson_category,
+            ["wind10"],
+            "saffir_simpson_category",
+            {"wind_name": "wind10"},
+        ),
+        (
+            huracanpy.tc.pressure_category,
             ["slp"],
-            "pressure_cat",
+            "pressure_category",
             {"slp_name": "slp"},
         ),
-        (huracanpy.calc.get_distance, ["lon", "lat", "track_id"], "distance", {}),
+        (huracanpy.calc.distance, ["lon", "lat", "track_id"], "distance", {}),
         (
-            huracanpy.calc.get_translation_speed,
+            huracanpy.calc.translation_speed,
             ["lon", "lat", "time", "track_id"],
             "translation_speed",
             {},
         ),
         (
-            huracanpy.calc.get_delta,
+            huracanpy.calc.delta,
             ["wind10", "track_id"],
             "delta",
             {"var_name": "wind10"},
@@ -60,19 +65,19 @@ def test_nunique():
         #     {"var_name": "wind10"},
         # ),
         (
-            huracanpy.calc.get_time_from_genesis,
+            huracanpy.calc.time_from_genesis,
             ["time", "track_id"],
             "time_from_genesis",
             {},
         ),
         (
-            huracanpy.calc.get_time_from_apex,
+            huracanpy.calc.time_from_apex,
             ["time", "track_id", "wind10"],
             "time_from_apex",
             {"intensity_var_name": "wind10"},
         ),
         (
-            huracanpy.calc.get_track_duration,
+            huracanpy.calc.track_duration,
             ["time", "track_id"],
             "track_duration",
             {},
@@ -157,12 +162,8 @@ def test_get_methods(tracks_csv):
     )
 
     ## - time components
-    year_acc, month_acc, day_acc, hour_acc = data.hrcn.get_time_components(
-        time_name="time"
-    )
-    year_fct, month_fct, day_fct, hour_fct = huracanpy.info.get_time_components(
-        data.time
-    )
+    year_acc, month_acc, day_acc, hour_acc = data.hrcn.get_time_components()
+    year_fct, month_fct, day_fct, hour_fct = huracanpy.info.time_components(data.time)
     np.testing.assert_array_equal(
         year_acc, year_fct, err_msg="Year component does not match"
     )
@@ -190,14 +191,14 @@ def test_get_methods(tracks_csv):
         time_name="time",
         track_id_name="track_id",
     )
-    gen_vals_fct = huracanpy.calc.get_gen_vals(data, data.time, data.track_id)
+    gen_vals_fct = huracanpy.calc.gen_vals(data, data.time, data.track_id)
     xr.testing.assert_equal(gen_vals_acc, gen_vals_fct)
 
     ## - Apex Values
     apex_vals_acc = data.hrcn.get_apex_vals(
         track_id_name="track_id", varname="wind10", stat="max"
     )
-    apex_vals_fct = huracanpy.calc.get_apex_vals(
+    apex_vals_fct = huracanpy.calc.apex_vals(
         data, data.wind10, data.track_id, stat="max"
     )
     xr.testing.assert_equal(apex_vals_acc, apex_vals_fct)

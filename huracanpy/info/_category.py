@@ -14,7 +14,7 @@ from metpy.units import units
 
 
 @preprocess_and_wrap(wrap_like="variable")
-def get_category(variable, bins, labels=None, variable_units=None):
+def category(variable, bins, labels=None, variable_units=None):
     """Calculate a generic category from a variable and a set of thresholds
 
     Parameters

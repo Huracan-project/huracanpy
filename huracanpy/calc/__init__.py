@@ -2,23 +2,23 @@
 
 __all__ = [
     "density",
-    "get_track_duration",
-    "get_gen_vals",
-    "get_apex_vals",
-    "get_time_from_genesis",
-    "get_time_from_apex",
-    "get_delta",
-    "get_rate",
-    "get_distance",
-    "get_translation_speed",
+    "track_duration",
+    "gen_vals",
+    "apex_vals",
+    "time_from_genesis",
+    "time_from_apex",
+    "delta",
+    "rate",
+    "distance",
+    "translation_speed",
 ]
 
 from ._density import density
 from ._track_stats import (
-    get_track_duration,
-    get_gen_vals,
-    get_apex_vals,
+    track_duration,
+    gen_vals,
+    apex_vals,
 )
-from ._lifecycle import get_time_from_genesis, get_time_from_apex
-from ._rates import get_delta, get_rate
-from ._translation import get_distance, get_translation_speed
+from ._lifecycle import time_from_genesis, time_from_apex
+from ._rates import delta, rate
+from ._translation import distance, translation_speed

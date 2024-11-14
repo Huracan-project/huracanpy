@@ -32,7 +32,7 @@ def test_get_delta(tracks_csv, var, track_id, expected, unit, centering):
     if track_id is not None:
         track_id = tracks_csv[track_id]
 
-    delta = huracanpy.calc.get_delta(var, track_id, centering=centering)
+    delta = huracanpy.calc.delta(var, track_id, centering=centering)
 
     assert len(delta) == len(var)
     np.testing.assert_approx_equal(delta.mean(), expected, significant=6)
@@ -52,10 +52,8 @@ def test_get_rate():
 
     data.wind10.attrs["units"] = "m / s"
 
-    intensification_rate_wind = huracanpy.calc.get_rate(
-        data.wind10,
-        data.time,
-        data.track_id,
+    intensification_rate_wind = huracanpy.calc.rate(
+        data.wind10, data.time, data.track_id
     )
     np.testing.assert_approx_equal(
         intensification_rate_wind.mean(), 2.76335962e-06, significant=6
@@ -63,10 +61,8 @@ def test_get_rate():
     assert intensification_rate_wind.metpy.units == units("m/s^2")
 
     data.slp.attrs["units"] = "hPa"
-    intensification_rate_slp = huracanpy.calc.get_rate(
-        data.slp,
-        data.time,
-        data.track_id,
+    intensification_rate_slp = huracanpy.calc.rate(
+        data.slp, data.time, data.track_id
     ).metpy.convert_units("hectopascals/hour")
     np.testing.assert_approx_equal(
         intensification_rate_slp.min(), -124.115, significant=6

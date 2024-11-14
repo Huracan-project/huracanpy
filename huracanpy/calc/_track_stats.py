@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 
-def get_track_duration(time, track_ids):
+def track_duration(time, track_ids):
     """
     Compute the duration of each track
 
@@ -29,7 +29,7 @@ def get_track_duration(time, track_ids):
     return duration
 
 
-def get_gen_vals(tracks, time, track_id):
+def gen_vals(tracks, time, track_id):
     """
     Shows the attributes for the genesis point of each track
 
@@ -68,7 +68,7 @@ def get_gen_vals(tracks, time, track_id):
     )
 
 
-def get_apex_vals(tracks, variable, track_id, stat="max"):
+def apex_vals(tracks, variable, track_id, stat="max"):
     """
     Shows the attribute for the extremum point of each track
 

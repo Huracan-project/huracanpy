@@ -1,27 +1,27 @@
 """Huracanpy module for useful auxilliary functions"""
 
 __all__ = [
-    "get_hemisphere",
-    "get_basin",
-    "get_country",
-    "get_continent",
+    "hemisphere",
+    "basin",
+    "country",
+    "continent",
     "is_land",
     "is_ocean",
-    "get_category",
-    "get_time_components",
-    "get_season",
+    "category",
+    "time_components",
+    "season",
 ]
 
 from ._geography import (
-    get_hemisphere,
-    get_basin,
-    get_country,
-    get_continent,
+    hemisphere,
+    basin,
+    country,
+    continent,
     is_land,
     is_ocean,
 )
-from ._category import get_category
-from ._time import get_time_components, get_season
+from ._category import category
+from ._time import time_components, season
 
 
 def add_all_info(
@@ -68,12 +68,12 @@ def add_all_info(
 
     # Geographical
     if lat_name is not None:
-        data["hemisphere"] = get_hemisphere(data[lat_name])
+        data["hemisphere"] = hemisphere(data[lat_name])
         if lon_name is not None:
-            data["basin"] = get_basin(data[lon_name], data[lat_name])
+            data["basin"] = basin(data[lon_name], data[lat_name])
             data["is_ocean"] = is_ocean(data[lon_name], data[lat_name])
-            data["country"] = get_country(data[lon_name], data[lat_name])
-            data["continent"] = get_continent(data[lon_name], data[lat_name])
+            data["country"] = country(data[lon_name], data[lat_name])
+            data["continent"] = continent(data[lon_name], data[lat_name])
 
     # Time
     if time_name is not None:
@@ -88,7 +88,7 @@ def add_all_info(
                     hour=data[hour_name],
                 )
             )
-        data["season"] = get_season(
+        data["season"] = season(
             data[track_id_name],
             data[lat_name],
             data[time_name],

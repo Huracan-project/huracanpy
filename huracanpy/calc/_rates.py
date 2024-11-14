@@ -14,7 +14,7 @@ from .._metpy import dequantify_results
 
 @dequantify_results
 @preprocess_and_wrap(wrap_like="var")
-def get_delta(var, track_ids=None, centering="forward"):
+def delta(var, track_ids=None, centering="forward"):
     """Take the differences across var, without including differences between the end
     and start of different tracks
 
@@ -68,7 +68,7 @@ def get_delta(var, track_ids=None, centering="forward"):
 
 @dequantify_results
 @preprocess_and_wrap(wrap_like="var")
-def get_rate(var, time, track_ids=None, centering="forward"):
+def rate(var, time, track_ids=None, centering="forward"):
     """Compute rate of change of var, without including differences between the end
     and start of different tracks
 
@@ -99,7 +99,7 @@ def get_rate(var, time, track_ids=None, centering="forward"):
     # TODO: If var has units, retrieve those
 
     # Compute deltas
-    dx = get_delta(var, track_ids, centering=centering)
-    dt = get_delta(time, track_ids, centering=centering)
+    dx = delta(var, track_ids, centering=centering)
+    dt = delta(time, track_ids, centering=centering)
 
     return dx / dt

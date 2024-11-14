@@ -6,10 +6,10 @@ import pandas as pd
 import numpy as np
 from metpy.xarray import preprocess_and_wrap
 
-from ._geography import get_hemisphere
+from ._geography import hemisphere
 
 
-def get_time_components(time, components=("year", "month", "day", "hour")):
+def time_components(time, components=("year", "month", "day", "hour")):
     """
     Expand the time variable into year/month/day/hour
 
@@ -31,7 +31,7 @@ def get_time_components(time, components=("year", "month", "day", "hour")):
 
 
 @preprocess_and_wrap(wrap_like="track_id")
-def get_season(track_id, lat, time, convention="short"):
+def season(track_id, lat, time, convention="short"):
     """Determine the cyclone season for each track
 
     Parameters
@@ -56,7 +56,7 @@ def get_season(track_id, lat, time, convention="short"):
     """
 
     # Derive values
-    hemi = get_hemisphere(lat)
+    hemi = hemisphere(lat)
 
     time = pd.to_datetime(time)
     year = time.year

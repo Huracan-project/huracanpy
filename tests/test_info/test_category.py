@@ -5,7 +5,7 @@ def test_get_category():
     data = huracanpy.load(huracanpy.example_csv_file)
 
     # Test with made up data for each category
-    result = huracanpy.info.get_category(
+    result = huracanpy.info.category(
         data.wind10, bins=[0, 10, 20, 30], labels=[0, 1, 2]
     )
 

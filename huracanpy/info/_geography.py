@@ -17,7 +17,7 @@ from .._basins import basins
 
 
 @preprocess_and_wrap(wrap_like="lat")
-def get_hemisphere(lat):
+def hemisphere(lat):
     """
     Function to detect which hemisphere each point corresponds to
 
@@ -35,7 +35,7 @@ def get_hemisphere(lat):
     return np.where(lat >= 0, "N", "S")
 
 
-def get_basin(lon, lat, convention="WMO-TC", crs=None):
+def basin(lon, lat, convention="WMO-TC", crs=None):
     """
     Function to determine the basin of each point, according to the selected convention.
 
@@ -193,7 +193,7 @@ def is_land(lon, lat, resolution="10m", crs=None):
     )
 
 
-def get_country(lon, lat, resolution="10m", crs=None):
+def country(lon, lat, resolution="10m", crs=None):
     """Detect the country each point is over
 
     Parameters
@@ -226,7 +226,7 @@ def get_country(lon, lat, resolution="10m", crs=None):
     )
 
 
-def get_continent(lon, lat, resolution="10m", crs=None):
+def continent(lon, lat, resolution="10m", crs=None):
     """Detect the continent each point is over
 
     Parameters
