@@ -33,10 +33,9 @@ def density(lon, lat, *, method="histogram", bin_size=5, n_seasons=1):
     if method == "histogram":
         return _histogram(lon, lat, bin_size=bin_size) / n_seasons
     else:
-        print(
-            "This method was not implemented (yet?)!"
-        )  # TODO: Make into a proper error
-        return None
+        raise NotImplementedError(
+            f"Method {method} not implemented yet. Use one 'histogram'"
+        )
 
 
 def _histogram(lon, lat, bin_size=5):

@@ -5,7 +5,7 @@ Module containing functions to compute lifecycle stage
 import pandas as pd
 
 
-def get_time_from_genesis(time, track_ids):
+def time_from_genesis(time, track_ids):
     """
     Output the time since genesis for each TC point
 
@@ -36,7 +36,7 @@ def get_time_from_genesis(time, track_ids):
     )
 
 
-def get_time_from_apex(time, track_ids, intensity_var, stat="max"):
+def time_from_apex(time, track_ids, intensity_var, stat="max"):
     """The time relative to a maxima/minima in a given variable for each individual
     track
 

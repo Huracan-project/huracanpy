@@ -2,12 +2,19 @@
 Module containing functions to compute rates.
 """
 
+import warnings
+
 import numpy as np
 import xarray as xr
 from metpy.units import units
+from metpy.xarray import preprocess_and_wrap
+
+from .._metpy import dequantify_results
 
 
-def get_delta(var, track_ids=None, var_units=None, centering="forward"):
+@dequantify_results
+@preprocess_and_wrap(wrap_like="var")
+def delta(var, track_ids=None, centering="forward"):
     """Take the differences across var, without including differences between the end
     and start of different tracks
 
@@ -15,7 +22,6 @@ def get_delta(var, track_ids=None, var_units=None, centering="forward"):
     ----------
     var : xarray.DataArray
     track_ids : array_like, optional
-    var_units : str, optional
     centering : str, optional
 
     Returns
@@ -26,17 +32,15 @@ def get_delta(var, track_ids=None, var_units=None, centering="forward"):
     # TODO: centered centering
 
     # Curate input
-    ## If track_id is not provided, all points are considered to belong to the same track
+    # If track_id is not provided, all points are considered to belong to the same track
     if track_ids is None:
-        track_ids = xr.DataArray([0] * len(var), dims=var.dims)
-        print(
-            "track_id is not provided, all points are considered to come from the same track"
+        track_ids = np.zeros(var.shape)
+        warnings.warn(
+            "track_id is not provided, all points are considered to come from the same"
+            "track"
         )
-    ## If time is provided, convert to numeric ns
-    if var.dtype == "<M8[ns]":
-        var = var.astype(float)
-        var_units = "ns"
-    ## Check that centering is supported
+
+    # Check that centering is supported
     if centering not in ["forward", "backward"]:
         raise ValueError("centering must be one of ['forward', 'backward']")
 
@@ -44,29 +48,27 @@ def get_delta(var, track_ids=None, var_units=None, centering="forward"):
     delta = var[1:] - var[:-1]
 
     # Mask points where track_id changes
-    tid_switch = track_ids[1:] == track_ids[:-1]
-    delta = delta.where(tid_switch)
+    # Multiplying np.nan by an array element gives us the correct type of nan for both
+    # np.timedelta and pint.Quantity
+    delta[track_ids[1:] != track_ids[:-1]] = np.nan * delta[0]
 
     # Apply centering
     if centering == "forward":
-        delta = xr.concat([delta, xr.DataArray([np.nan], dims="record")], dim="record")
+        delta = np.concatenate([delta, [np.nan * delta[0]]])
     elif centering == "backward":
-        delta = xr.concat(
-            [
-                xr.DataArray([np.nan], dims="record"),
-                delta,
-            ],
-            dim="record",
-        )
+        delta = np.concatenate([[np.nan * delta[0]], delta])
 
-    # return with units # TODO: If var has units, retrieve those
-    if var_units is None:
-        return xr.DataArray(delta, dims=var.dims)
-    else:
-        return xr.DataArray(delta, dims=var.dims) * units(var_units)
+    # Fix for timedeltas
+    if np.issubdtype(delta.magnitude.dtype, np.timedelta64):
+        delta = delta / np.timedelta64(1, "s")
+        delta = delta.magnitude * units("s")
+
+    return delta
 
 
-def get_rate(var, time, track_ids=None, var_units=None, centering="forward"):
+@dequantify_results
+@preprocess_and_wrap(wrap_like="var")
+def rate(var, time, track_ids=None, centering="forward"):
     """Compute rate of change of var, without including differences between the end
     and start of different tracks
 
@@ -75,7 +77,6 @@ def get_rate(var, time, track_ids=None, var_units=None, centering="forward"):
     var : xarray.DataArray
     time : xarray.DataArray
     track_ids : array_like, optional
-    var_units : str, optional
     centering : str, optional
 
     Returns
@@ -84,11 +85,12 @@ def get_rate(var, time, track_ids=None, var_units=None, centering="forward"):
 
     """
     # Curate input
-    ## If track_id is not provided, all points are considered to belong to the same track
+    # If track_id is not provided, all points are considered to belong to the same track
     if track_ids is None:
         track_ids = xr.DataArray([0] * len(time), dims=time.dims)
-        print(
-            "track_id is not provided, all points are considered to come from the same track"
+        warnings.warn(
+            "track_id is not provided, all points are considered to come from the same"
+            "track"
         )
     ## Sort data by track_id and time
     # rate_var, track_ids, time = [a.sortby(time) for a in [rate_var, track_ids, time]]
@@ -97,8 +99,7 @@ def get_rate(var, time, track_ids=None, var_units=None, centering="forward"):
     # TODO: If var has units, retrieve those
 
     # Compute deltas
-    dx = get_delta(var, track_ids, var_units=var_units, centering=centering)
-    dt = get_delta(time, track_ids, centering=centering)
-    dt = dt.metpy.convert_units("s")  # Convert to seconds
+    dx = delta(var, track_ids, centering=centering)
+    dt = delta(time, track_ids, centering=centering)
 
     return dx / dt

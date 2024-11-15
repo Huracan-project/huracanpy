@@ -35,7 +35,7 @@ def test_accel_trackswhere():
 )
 def test_accel_get_gen_vals(tracks, request):
     tracks = request.getfixturevalue(tracks)
-    result = huracanpy.calc.get_gen_vals(tracks, tracks.time, tracks.track_id)
+    result = huracanpy.calc.gen_vals(tracks, tracks.time, tracks.track_id)
 
     expected = tracks.groupby("track_id").first()
 
@@ -48,7 +48,7 @@ def test_accel_get_gen_vals(tracks, request):
 )
 def test_accel_get_apex_vals(tracks, request):
     tracks = request.getfixturevalue(tracks)
-    result = huracanpy.calc.get_apex_vals(tracks, tracks.wind10, tracks.track_id)
+    result = huracanpy.calc.apex_vals(tracks, tracks.wind10, tracks.track_id)
 
     expected = tracks.sortby("wind10", ascending=False).groupby("track_id").first()
 
@@ -61,7 +61,7 @@ def test_accel_get_apex_vals(tracks, request):
 )
 def test_accel_get_time_from_genesis(tracks, request):
     tracks = request.getfixturevalue(tracks)
-    result = huracanpy.calc.get_time_from_genesis(tracks.time, tracks.track_id)
+    result = huracanpy.calc.time_from_genesis(tracks.time, tracks.track_id)
 
     track_groups = tracks.groupby("track_id")
     expected = []
@@ -80,9 +80,7 @@ def test_accel_get_time_from_genesis(tracks, request):
 )
 def test_accel_get_time_from_apex(tracks, request):
     tracks = request.getfixturevalue(tracks)
-    result = huracanpy.calc.get_time_from_apex(
-        tracks.time, tracks.track_id, tracks.wind10
-    )
+    result = huracanpy.calc.time_from_apex(tracks.time, tracks.track_id, tracks.wind10)
 
     track_groups = tracks.groupby("track_id")
     expected = []

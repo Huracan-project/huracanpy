@@ -2,6 +2,8 @@
 Utils related to translation distance and time
 """
 
+import warnings
+
 import numpy as np
 import xarray as xr
 from metpy.units import units
@@ -55,7 +57,7 @@ def _get_distance_haversine(lon, lat, track_id):
     return xr.DataArray(dist, dims=lon.dims) * units("m")
 
 
-def get_distance(lon, lat, track_id=None, method="geod", ellps="WGS84"):
+def distance(lon, lat, track_id=None, method="geod", ellps="WGS84"):
     """Compute the distance between successive lon, lat points, without including
     differences between the end and start points of different tracks
 
@@ -79,10 +81,10 @@ def get_distance(lon, lat, track_id=None, method="geod", ellps="WGS84"):
     # TODO: Provide option for centering forward, backwards, centered
 
     # Curate input
-    ## If track_id is not provided, all points are considered to belong to the same track
+    # If track_id is not provided, all points are considered to belong to the same track
     if track_id is None:
         track_id = [0] * len(lon)
-        print(
+        warnings.warn(
             "track_id is not provided, all points are considered to come from the same track"
         )
 
@@ -96,7 +98,7 @@ def get_distance(lon, lat, track_id=None, method="geod", ellps="WGS84"):
         )
 
 
-def get_translation_speed(lon, lat, time, track_id=None, method="geod", ellps="WGS84"):
+def translation_speed(lon, lat, time, track_id=None, method="geod", ellps="WGS84"):
     """
     Compute translation speed along tracks
 
@@ -122,17 +124,18 @@ def get_translation_speed(lon, lat, time, track_id=None, method="geod", ellps="W
     # TODO: Provide option for centering forward, backwards, centered
 
     # Curate input
-    ## If track_id is not provided, all points are considered to belong to the same track
+    # If track_id is not provided, all points are considered to belong to the same track
     if track_id is None:
         track_id = xr.DataArray([0] * len(lon), dims=lon.dims)
-        print(
-            "track_id is not provided, all points are considered to come from the same track"
+        warnings.warn(
+            "track_id is not provided, all points are considered to come from the same"
+            "track"
         )
     ## Sort data by track_id and time
     lon, lat, track_id, time = [a.sortby(time) for a in [lon, lat, track_id, time]]
     lon, lat, time, track_id = [a.sortby(track_id) for a in [lon, lat, time, track_id]]
 
-    dx = get_distance(
+    dx = distance(
         lon, lat, track_id, method=method, ellps=ellps
     )  # Distance between each points
     dt = (time[1:].values - time[:-1].values).astype(

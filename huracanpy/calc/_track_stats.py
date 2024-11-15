@@ -6,30 +6,30 @@ import numpy as np
 import pandas as pd
 
 
-def get_track_duration(time, track_ids):
+def track_duration(time, track_ids):
     """
     Compute the duration of each track
 
     Parameters
     ----------
-    time
-    track_ids
+    time : xarray.DataArray
+    track_ids : array_like
 
     Returns
     -------
     xarray.DataArray
-        Duration of each track
+        Duration of each track (in hours)
 
     """
     duration = (
         time.groupby(track_ids).map(lambda x: x.max() - x.min()).rename("duration")
     )
-    duration = (duration * 1e-9 / 3600).astype(float)
-    duration.attrs["units"] = "h"
+    duration = duration / np.timedelta64(1, "h")
+    duration.attrs["units"] = "hours"
     return duration
 
 
-def get_gen_vals(tracks, time, track_id):
+def gen_vals(tracks, time, track_id):
     """
     Shows the attributes for the genesis point of each track
 
@@ -68,7 +68,7 @@ def get_gen_vals(tracks, time, track_id):
     )
 
 
-def get_apex_vals(tracks, variable, track_id, stat="max"):
+def apex_vals(tracks, variable, track_id, stat="max"):
     """
     Shows the attribute for the extremum point of each track
 

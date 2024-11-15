@@ -15,7 +15,7 @@ import huracanpy
 )
 def test_hemisphere(data, expected, request):
     data = request.getfixturevalue(data)
-    result = huracanpy.info.get_hemisphere(data.lat)
+    result = huracanpy.info.hemisphere(data.lat)
     assert (result == expected).all()
 
 
@@ -35,7 +35,7 @@ def test_hemisphere(data, expected, request):
 )
 def test_basin(data, expected, request):
     data = request.getfixturevalue(data)
-    result = huracanpy.info.get_basin(data.lon, data.lat)
+    result = huracanpy.info.basin(data.lon, data.lat)
     assert (result == expected).all()
 
 
@@ -45,36 +45,39 @@ def test_basin(data, expected, request):
         (
             "tracks_minus180_plus180",
             np.array(
-                ["Land"]
-                + ["Ocean"] * 6
-                + ["Land"] * 2
-                + ["Ocean"] * 4
-                + ["Land"]
-                + ["Ocean"]
-                + ["Land"] * 6
-                + ["Ocean"] * 3
+                [False]
+                + [True] * 6
+                + [False] * 2
+                + [True] * 4
+                + [False]
+                + [True]
+                + [False] * 6
+                + [True] * 3
             ),
         ),
         (
             "tracks_0_360",
             np.array(
-                ["Land"]
-                + ["Ocean"] * 6
-                + ["Land"] * 2
-                + ["Ocean"] * 4
-                + ["Land"]
-                + ["Ocean"]
-                + ["Land"] * 6
-                + ["Ocean"] * 3
+                [False]
+                + [True] * 6
+                + [False] * 2
+                + [True] * 4
+                + [False]
+                + [True]
+                + [False] * 6
+                + [True] * 3
             ),
         ),
-        ("tracks_csv", np.array(["Ocean"] * 15 + ["Land"] * 15 + ["Ocean"] * 69)),
+        ("tracks_csv", np.array([True] * 15 + [False] * 15 + [True] * 69)),
     ],
 )
 def test_get_land_ocean(data, expected, request):
     data = request.getfixturevalue(data)
-    result = huracanpy.info.get_land_or_ocean(data.lon, data.lat)
-    assert (result == expected).all()
+    result = huracanpy.info.is_ocean(data.lon, data.lat)
+    result_land = huracanpy.info.is_land(data.lon, data.lat)
+
+    np.testing.assert_equal(result, expected)
+    np.testing.assert_equal(~result_land, expected)
 
 
 @pytest.mark.parametrize(
@@ -119,7 +122,7 @@ def test_get_land_ocean(data, expected, request):
 )
 def test_get_country(data, expected, request):
     data = request.getfixturevalue(data)
-    result = huracanpy.info.get_country(data.lon, data.lat)
+    result = huracanpy.info.country(data.lon, data.lat)
     assert (result == expected).all()
 
 
@@ -159,5 +162,5 @@ def test_get_country(data, expected, request):
 )
 def test_get_continent(data, expected, request):
     data = request.getfixturevalue(data)
-    result = huracanpy.info.get_continent(data.lon, data.lat)
+    result = huracanpy.info.continent(data.lon, data.lat)
     assert (result == expected).all()

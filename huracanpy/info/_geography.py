@@ -17,7 +17,7 @@ from .._basins import basins
 
 
 @preprocess_and_wrap(wrap_like="lat")
-def get_hemisphere(lat):
+def hemisphere(lat):
     """
     Function to detect which hemisphere each point corresponds to
 
@@ -35,7 +35,7 @@ def get_hemisphere(lat):
     return np.where(lat >= 0, "N", "S")
 
 
-def get_basin(lon, lat, convention="WMO-TC", crs=None):
+def basin(lon, lat, convention="WMO-TC", crs=None):
     """
     Function to determine the basin of each point, according to the selected convention.
 
@@ -119,9 +119,9 @@ def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, cr
     return result
 
 
-def get_land_or_ocean(lon, lat, resolution="10m", crs=None):
+def is_ocean(lon, lat, resolution="10m", crs=None):
     """
-    Detect whether each point is over land or ocean
+    Detect whether each point is over ocean
 
     Parameters
     ----------
@@ -137,27 +137,63 @@ def get_land_or_ocean(lon, lat, resolution="10m", crs=None):
 
     Returns
     -------
-    array_like
+    array_like[bool]
         Array of "Land" or "Ocean" for each lon/lat point. Should return the same type
         of array as the input lon/lat, or a length 1 :py:class:`numpy.ndarray` if
         lon/lat are floats
     """
-    is_ocean = _get_natural_earth_feature(
-        lon,
-        lat,
-        feature="featurecla",
-        category="physical",
-        name="ocean",
-        resolution=resolution,
-        crs=crs,
+    return (
+        _get_natural_earth_feature(
+            lon,
+            lat,
+            feature="featurecla",
+            category="physical",
+            name="ocean",
+            resolution=resolution,
+            crs=crs,
+        )
+        == "Ocean"
     )
 
-    is_ocean[is_ocean == ""] = "Land"
 
-    return is_ocean
+def is_land(lon, lat, resolution="10m", crs=None):
+    """
+    Detect whether each point is over land
+
+    Parameters
+    ----------
+    lon, lat : float or array_like
+    resolution : str
+        The resolution of the Land/Sea outlines dataset to use. One of
+
+        * 10m (1:10,000,000)
+        * 50m (1:50,000,000)
+        * 110m (1:110,000,000)
+
+    crs : cartopy.crs.CRS
+
+    Returns
+    -------
+    array_like[bool]
+        Array of "Land" or "Ocean" for each lon/lat point. Should return the same type
+        of array as the input lon/lat, or a length 1 :py:class:`numpy.ndarray` if
+        lon/lat are floats
+    """
+    return (
+        _get_natural_earth_feature(
+            lon,
+            lat,
+            feature="featurecla",
+            category="physical",
+            name="ocean",
+            resolution=resolution,
+            crs=crs,
+        )
+        == ""
+    )
 
 
-def get_country(lon, lat, resolution="10m", crs=None):
+def country(lon, lat, resolution="10m", crs=None):
     """Detect the country each point is over
 
     Parameters
@@ -190,7 +226,7 @@ def get_country(lon, lat, resolution="10m", crs=None):
     )
 
 
-def get_continent(lon, lat, resolution="10m", crs=None):
+def continent(lon, lat, resolution="10m", crs=None):
     """Detect the continent each point is over
 
     Parameters

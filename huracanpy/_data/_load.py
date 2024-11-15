@@ -24,10 +24,9 @@ def load(
     source=None,
     variable_names=None,
     rename=dict(),
+    units=None,
     baselon=None,
-    ibtracs_online=False,
     ibtracs_subset="wmo",
-    ibtracs_clean=True,
     tempest_extremes_unstructured=False,
     tempest_extremes_header_str="start",
     track_calendar=None,
@@ -37,13 +36,15 @@ def load(
 
     The optional parameters for different sources of tracks (currently **IBTrACS**,
     **TRACK** and **TempestExtremes**) are named {source}_{parameter} (in lower case),
-    e.g. "ibtracs_online".
+    e.g. "ibtracs_subset".
 
     Parameters
     ----------
     filename : str, optional
         The file to be loaded. If `source="ibtracs"`, this is not needed as the data is
-        either included in huracanpy or downloaded when called
+        either included in huracanpy or downloaded when called. If the filename is
+        provided for an online IBTrACS subset, then the raw downloaded data will be
+        saved there.
     source : str, optional
         If the file is not a CSV or NetCDF (identified by the file extension) then the
         source needs to be specified to decide how to load the data
@@ -52,6 +53,8 @@ def load(
         * **track.tilt**
         * **te**, **tempest**, **tempestextremes**, **uz**:
         * **ibtracs**
+        * **csv**
+        * **netcdf**, **nc**
 
     variable_names : list of str, optional
           When loading data from an ASCII file (TRACK or TempestExtremes), specify the
@@ -73,18 +76,18 @@ def load(
 
         >>> tracks = huracanpy.load(..., rename=dict(longitude="longitude"))
 
+    units : dict, optional
+        A mapping of variable names to units
+
     baselon : scalar, optional
         Force the loaded longitudes into the range (baselon, baselon + 360). e.g.
         (0, 360) or (-180, 180)
-    ibtracs_online : bool, default=False
-        * **False**: Use a small subset of the IBTrACS data included in this package
-        * **True**: Download the IBTrACS data
-    ibtracs_subset : str, default="ALL"
+    ibtracs_subset : str, default="wmo"
         IBTrACS subset. When loading offline data it is one of
 
-        * **WMO**: Data with the wmo_* variables. The data as reported by the WMO agency
+        * **wmo**: Data with the wmo_* variables. The data as reported by the WMO agency
           responsible for each basin, so methods are not consistent across basins
-        * **USA** or **JTWC**: Data with the usa_* variables. The data as recorded by
+        * **usa** or **JTWC**: Data with the usa_* variables. The data as recorded by
           the USA/Joint Typhoon Warning Centre. Methods are consistent across basins,
           but may not be complete.
 
@@ -97,10 +100,6 @@ def load(
         * **last3years**: self-explanatory
         * **since1980**: Entire IBTrACS database since 1980 (advent of satellite era,
           considered reliable from then on)
-
-    ibtracs_clean : bool, default=True
-        If downloading IBTrACS data, this parameter says whether to delete the
-        downloaded file after loading it into memory.
 
     tempest_extremes_unstructured : bool, default=False,
         By default the first two columns in TempestExtremes files are the i, j indices
@@ -150,61 +149,29 @@ def load(
 
     # If source is given, use the relevant function
     else:
-        if source.lower() == "track":
+        source = source.lower()
+        if source == "track":
             data = _TRACK.load(
                 filename, calendar=track_calendar, variable_names=variable_names
             )
-        elif source.lower() == "track.tilt":
+        elif source == "track.tilt":
             data = _TRACK.load_tilts(
                 filename,
                 calendar=track_calendar,
             )
-        elif source.lower() in ["csv", "uz"]:
+        elif source in ["csv", "uz"]:
             data = _csv.load(filename, **kwargs)
-        elif source.lower() in ["te", "tempest", "tempestextremes"]:
+        elif source in ["te", "tempest", "tempestextremes"]:
             data = _tempestextremes.load(
                 filename,
                 variable_names,
                 tempest_extremes_unstructured,
                 tempest_extremes_header_str,
             )
-        elif source.lower() == "ibtracs":
-            if ibtracs_online:
-                if filename is None:
-                    filename = "ibtracs.csv"
-
-                with ibtracs.online(ibtracs_subset, filename, ibtracs_clean) as f:
-                    # Put IBTrACS specific arguments to read_csv second, so it
-                    # overwrites any arguments passed
-                    kwargs = {
-                        **kwargs,
-                        **dict(
-                            header=0,
-                            skiprows=[1],
-                            converters={
-                                "SID": str,
-                                "SEASON": int,
-                                "BASIN": str,
-                                "SUBBASIN": str,
-                                "LON": float,
-                                "LAT": float,
-                            },
-                        ),
-                    }
-                    return load(
-                        filename=f,
-                        source="csv",
-                        rename=rename,
-                        baselon=baselon,
-                        **kwargs,
-                    )
-            else:
-                return load(
-                    filename=ibtracs.offline(ibtracs_subset),
-                    rename=rename,
-                    baselon=baselon,
-                    **kwargs,
-                )
+        elif source == "ibtracs":
+            data = ibtracs.load(ibtracs_subset, filename, **kwargs)
+        elif source == "netcdf":
+            data = _netcdf.load(filename, rename, **kwargs)
         else:
             raise ValueError(f"Source {source} unsupported or misspelled")
 
@@ -213,6 +180,10 @@ def load(
 
     if len(rename) > 0:
         data = data.rename(rename)
+
+    if units is not None:
+        for varname in units:
+            data[varname].attrs["units"] = units[varname]
 
     if baselon is not None:
         data["lon"] = ((data.lon - baselon) % 360) + baselon

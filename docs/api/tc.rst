@@ -9,5 +9,5 @@ tc
 
     ace
     pace
-    get_sshs_cat
-    get_pressure_cat
+    saffir_simpson_category
+    pressure_category

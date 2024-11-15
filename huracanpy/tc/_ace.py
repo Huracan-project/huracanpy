@@ -4,10 +4,11 @@ Module containing functions to compute ACE
 
 import numpy as np
 from numpy.polynomial.polynomial import Polynomial
-import xarray as xr
 import pint
 from metpy.xarray import preprocess_and_wrap
 from metpy.units import units
+
+from .._metpy import dequantify_results
 
 
 def ace(
@@ -140,6 +141,8 @@ def pace(
     return pace_values, model
 
 
+@dequantify_results
+@preprocess_and_wrap(wrap_like="wind")
 def get_ace(wind, threshold=34 * units("knots"), wind_units="m s-1"):
     """Calculate accumulate cyclone energy (ACE) for each individual point
 
@@ -162,23 +165,6 @@ def get_ace(wind, threshold=34 * units("knots"), wind_units="m s-1"):
         The ACE at each point in wind
 
     """
-    ace_values = _ace_by_point(wind, threshold, wind_units)
-
-    # The return value has units so stays as a pint.Quantity
-    # This can be annoying if you still want to do other things with the array
-    # Metpy dequantify keeps the units as an attribute so it can still be used later
-    # TODO - extend preprocess_and_wrap to include this if it is needed for more
-    #  functions
-    if isinstance(ace_values, xr.DataArray) and isinstance(
-        ace_values.data, pint.Quantity
-    ):
-        ace_values = ace_values.metpy.dequantify()
-
-    return ace_values
-
-
-@preprocess_and_wrap(wrap_like="wind")
-def _ace_by_point(wind, threshold=34 * units("knots"), wind_units="m s-1"):
     if not isinstance(wind, pint.Quantity) or wind.unitless:
         wind = wind * units(wind_units)
     wind = wind.to(units("knots"))

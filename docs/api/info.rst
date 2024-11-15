@@ -15,11 +15,12 @@ Geographic
 .. autosummary::
     :toctree: _autosummary
 
-    get_hemisphere
-    get_basin
-    get_land_or_ocean
-    get_country
-    get_continent
+    hemisphere
+    basin
+    is_land
+    is_ocean
+    country
+    continent
 
 Categorisation
 --------------
@@ -27,7 +28,7 @@ Categorisation
 .. autosummary::
     :toctree: _autosummary
 
-    get_category
+    category
 
 Time
 ----
@@ -35,5 +36,5 @@ Time
 .. autosummary::
     :toctree: _autosummary
 
-    get_season
-    get_time_components
+    season
+    time_components
