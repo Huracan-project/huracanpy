@@ -31,7 +31,7 @@ def time_components(time, components=("year", "month", "day", "hour")):
 
 
 @preprocess_and_wrap(wrap_like="track_id")
-def season(track_id, lat, time, convention="short"):
+def season(track_id, lat, time, convention="tc-short"):
     """Determine the cyclone season for each track
 
     Parameters
@@ -40,13 +40,13 @@ def season(track_id, lat, time, convention="short"):
     lat : xarray.DataArray
     time : xarray.DataArray
     convention : str
-        * 'short' : In the southern hemisphere, the season n corresponds to July n-1 to June n
-        * 'long' : In the southern hemisphere, the season from July n-1 to June n is named "(n-1)n"
+        * 'tc-short' : In the southern hemisphere, the season n corresponds to July n-1 to June n
+        * 'tc-long' : In the southern hemisphere, the season from July n-1 to June n is named "(n-1)n"
 
     Raises
     ------
     NotImplementedError
-        If convention given is not 'short' or 'long'
+        If convention given is not 'tc-short' or 'tc-long'
 
     Returns
     -------
@@ -78,13 +78,13 @@ def season(track_id, lat, time, convention="short"):
     )
 
     # Assign season
-    if convention == "short":
+    if convention == "tc-short":
         season = np.where(group.hemi == "N", group.year, np.nan)
         season = np.where(
             (group.hemi == "S") & (group.month >= 7), group.year + 1, season
         )
         season = np.where((group.hemi == "S") & (group.month <= 6), group.year, season)
-    elif convention == "long":
+    elif convention == "tc-long":
         season = np.where(group.hemi == "N", group.year.astype(str), np.nan)
         season = np.where(
             (group.hemi == "S") & (group.month >= 7),
