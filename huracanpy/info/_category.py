@@ -4,9 +4,7 @@ Function to categorise
 
 import warnings
 
-import numpy as np
 import pint
-import xarray as xr
 import pandas as pd
 
 from metpy.xarray import preprocess_and_wrap
@@ -49,32 +47,4 @@ def category(variable, bins, labels=None, variable_units=None):
             variable_units = str(bins.units)
         variable = variable * units(variable_units)
 
-    categories = np.zeros_like(variable) * np.nan
-    for n, label in enumerate(labels):
-        categories[(bins[n] < variable) & (variable <= bins[n + 1])] = label
-
-    return categories
-
-
-# [Stella] Leaving that here as an alternative method memo if we encounter performance issues.
-def categorize_alt(var, bins, labels=None):
-    """
-    Provides category according to provided bins and labels
-
-    Parameters
-    ----------
-    var : xarray.DataArray
-        The variable to categorize
-    bins : array_like
-        bins boundaries
-    labels : array_like, optional
-        Name of the categories. len(labels) = len(bins) -1
-
-    Returns
-    -------
-    xarray.DataArray
-        The category series.
-        You can append it to your tracks by running tracks["cat"] = categorize(tracks.var, bins)
-    """
-    cat = pd.cut(var, bins, labels=labels)
-    return xr.DataArray(cat, dims="record", coords={"record": var.record})
+    return pd.cut(variable, bins, labels=labels)
