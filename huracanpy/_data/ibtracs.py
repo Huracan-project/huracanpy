@@ -10,7 +10,7 @@ here = pathlib.Path(__file__).parent
 ibdata_dir = here / "_ibtracs_files/"
 
 wmo_file = str(ibdata_dir / "wmo.csv")
-usa_file = str(ibdata_dir / "usa.csv")
+jtwc_file = str(ibdata_dir / "jtwc.csv")
 
 online_default_kwargs = dict(
     header=0,
@@ -93,7 +93,7 @@ def offline(subset="wmo"):
           responsible for the area of a given point. (see https://community.wmo.int/en/tropical-cyclone-regional-bodies)
           Note that within this dataset, wind units are not homogeneous: they are provided as collected from the
           meteorological agencies, which means that they have different time-averaging for wind extrema.
-        * "usa" contains the data provided in the "wmo" columns, which is provided by the NHC or the JTWC.
+        * "jtwc" contains the data provided in the "wmo" columns, which is provided by the NHC or the JTWC.
 
     For more information, you may see the IBTrACS column documentation at
     https://www.ncei.noaa.gov/sites/default/files/2021-07/IBTrACS_v04_column_documentation.pdf
@@ -101,7 +101,7 @@ def offline(subset="wmo"):
     Parameters
     ----------
     subset : str, optional
-        "usa" or "wmo". The default is "wmo".
+        "jtwc" or "wmo". The default is "wmo".
 
     Returns
     -------
@@ -111,7 +111,7 @@ def offline(subset="wmo"):
     """
     warnings.warn(
         "This offline function loads a light version of IBTrACS which is embedded within the package, based on a file produced manually by the developers.\n\
-                  It was last updated on the 24nd May 2024, based on the IBTrACS file at that date.\n\
+                  It was last updated on the 15th Nov 2024, based on the IBTrACS file at that date.\n\
                   It contains only data from 1980 up to the last year with no provisional tracks. All spur tracks were removed. Only 6-hourly time steps were kept."
     )
     if subset.lower() == "wmo":
@@ -124,7 +124,53 @@ def offline(subset="wmo"):
         )
         return _csv.load(wmo_file)
     if subset.lower() in ["usa", "jtwc"]:
-        return _csv.load(usa_file)
+        return _csv.load(jtwc_file)
+
+
+def _update_offline_files():
+    # Load the current since1980 file
+    ib = online("since1980")
+    # Filter out years with provisionnal tracks
+    min_provisional_season = ib.where(ib.track_type == "PROVISIONAL").season.min()
+    ib = ib.where(ib.season < min_provisional_season, drop=True)
+    # Select 6-hourly only
+    ib = ib.where(ib.time.dt.hour % 6 == 0, drop=True)
+
+    # Extract specific columns and save files
+    ## WMO
+    ### Extract columns
+    wmo = ib[["sid", "season", "basin", "time", "lon", "lat", "wmo_wind", "wmo_pres"]]
+    wmo = wmo.rename({"sid": "track_id", "wmo_wind": "wind", "wmo_pres": "slp"})
+    ### Save
+    wmo.to_dataframe().to_csv(wmo_file)
+
+    ## JTWC
+    ### Extract columns
+    jtwc = ib[
+        [
+            "sid",
+            "season",
+            "basin",
+            "time",
+            "lon",
+            "lat",
+            "usa_status",
+            "usa_wind",
+            "usa_pres",
+            "usa_sshs",
+        ]
+    ]
+    jtwc = jtwc.rename(
+        {
+            "sid": "track_id",
+            "usa_wind": "wind",
+            "usa_pres": "slp",
+            "usa_sshs": "saffir_simpson_category",
+            "usa_status": "status",
+        }
+    )
+    ### Save
+    jtwc.to_dataframe().to_csv(jtwc_file)
 
 
 # TODOS:
