@@ -51,10 +51,10 @@ def load(
 
         * **track**
         * **track.tilt**
-        * **te**, **tempest**, **tempestextremes**, **uz**:
+        * **te**, **tempest**, **tempestextremes**, **uz** (For textual format, not csv)
         * **ibtracs**
         * **csv**
-        * **netcdf**, **nc**
+        * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided appropriate variable_names)
 
     variable_names : list of str, optional
           When loading data from an ASCII file (TRACK or TempestExtremes), specify the
