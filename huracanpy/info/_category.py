@@ -4,6 +4,7 @@ Function to categorise
 
 import warnings
 
+import numpy as np
 import pint
 import pandas as pd
 
@@ -47,4 +48,9 @@ def category(variable, bins, labels=None, variable_units=None):
             variable_units = str(bins.units)
         variable = variable * units(variable_units)
 
-    return pd.cut(variable, bins, labels=labels)
+    if not isinstance(bins, pint.Quantity) or bins.unitless:
+        bins = bins * units(variable_units)
+
+    bins = bins.to(variable.units)
+
+    return np.array(pd.cut(variable, bins, labels=labels))
