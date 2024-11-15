@@ -8,6 +8,7 @@ import pint
 from metpy.xarray import preprocess_and_wrap
 
 from ..info import category
+from .._metpy import dequantify_results
 from ._conventions import _thresholds
 
 
@@ -40,6 +41,7 @@ def saffir_simpson_category(wind, convention="Saffir-Simpson", wind_units="m s-1
     )
 
 
+@dequantify_results
 @preprocess_and_wrap(wrap_like="slp")
 def pressure_category(slp, convention="Klotzbach", slp_units="hPa"):
     """
