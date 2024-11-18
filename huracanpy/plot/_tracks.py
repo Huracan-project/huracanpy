@@ -13,7 +13,7 @@ def tracks(
     intensity_var=None,
     subplot_kws=dict(projection=ccrs.PlateCarree(180)),
     fig_kws=dict(figsize=(10, 10)),
-    scatter_kws=dict(palette="nipy_spectral", s=2, color="k"),
+    scatter_kws=dict(palette="nipy_spectral", color="k"),
 ):
     """Create a map of all lon/lat points
 
