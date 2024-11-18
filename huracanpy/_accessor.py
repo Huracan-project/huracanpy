@@ -232,7 +232,7 @@ class HuracanPyDatasetAccessor:
         track_id_name="track_id",
         lat_name="lat",
         time_name="time",
-        convention="short",
+        convention="tc-short",
     ):
         """
         Derive the season for each track based on latitude and time.
@@ -249,7 +249,7 @@ class HuracanPyDatasetAccessor:
         track_id_name="track_id",
         lat_name="lat",
         time_name="time",
-        convention="short",
+        convention="tc-short",
     ):
         """
         Add the season as a new variable to the dataset.
