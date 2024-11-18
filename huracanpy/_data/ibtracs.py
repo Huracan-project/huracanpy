@@ -127,52 +127,6 @@ def offline(subset="wmo"):
         return _csv.load(jtwc_file)
 
 
-def _update_offline_files():
-    # Load the current since1980 file
-    ib = online("since1980")
-    # Filter out years with provisionnal tracks
-    min_provisional_season = ib.where(ib.track_type == "PROVISIONAL").season.min()
-    ib = ib.where(ib.season < min_provisional_season, drop=True)
-    # Select 6-hourly only
-    ib = ib.where(ib.time.dt.hour % 6 == 0, drop=True)
-
-    # Extract specific columns and save files
-    ## WMO
-    ### Extract columns
-    wmo = ib[["sid", "season", "basin", "time", "lon", "lat", "wmo_wind", "wmo_pres"]]
-    wmo = wmo.rename({"sid": "track_id", "wmo_wind": "wind", "wmo_pres": "slp"})
-    ### Save
-    wmo.to_dataframe().to_csv(wmo_file)
-
-    ## JTWC
-    ### Extract columns
-    jtwc = ib[
-        [
-            "sid",
-            "season",
-            "basin",
-            "time",
-            "lon",
-            "lat",
-            "usa_status",
-            "usa_wind",
-            "usa_pres",
-            "usa_sshs",
-        ]
-    ]
-    jtwc = jtwc.rename(
-        {
-            "sid": "track_id",
-            "usa_wind": "wind",
-            "usa_pres": "slp",
-            "usa_sshs": "saffir_simpson_category",
-            "usa_status": "status",
-        }
-    )
-    ### Save
-    jtwc.to_dataframe().to_csv(jtwc_file)
-
-
 # TODOS:
 # Make warnings better
 # Deal with units, in general

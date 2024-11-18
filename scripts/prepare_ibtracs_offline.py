@@ -7,7 +7,7 @@ import huracanpy
 from huracanpy._data import ibtracs
 
 
-def prepare_offline(wmo=True, usa=True):
+def prepare_offline(wmo=True, jtwc=True):
     ib = huracanpy.load(source="ibtracs", ibtracs_subset="since1980")
 
     # Remove season with tracks that are still provisional
@@ -41,10 +41,10 @@ def prepare_offline(wmo=True, usa=True):
         ## Save WMO file
         huracanpy.save(ib_wmo, ibtracs.wmo_file)
 
-    if usa:
-        # - USA subset
-        print("... USA ...")
-        ## Select USA variables
+    if jtwc:
+        # - jtwc subset
+        print("... jtwc ...")
+        ## Select usa variables
         ib_usa = ib[
             [
                 "sid",
@@ -85,7 +85,7 @@ def prepare_offline(wmo=True, usa=True):
             ib_usa[var] = ib_usa[var].astype(np.int8)
 
         ## Save
-        huracanpy.save(ib_usa, ibtracs.usa_file)
+        huracanpy.save(ib_usa, ibtracs.jtwc_file)
 
     warnings.warn(
         "If you just updated the offline files within the package, do not forget to update information in offline loader warnings"
@@ -95,6 +95,6 @@ def prepare_offline(wmo=True, usa=True):
 if __name__ == "__main__":
     args = [arg.lower() for arg in sys.argv[1:]]
     wmo = "wmo" in args
-    usa = "usa" in args
+    jtwc = "jtwc" in args
 
-    prepare_offline(wmo=wmo, usa=usa)
+    prepare_offline(wmo=wmo, jtwc=jtwc)
