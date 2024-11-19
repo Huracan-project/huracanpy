@@ -12,7 +12,6 @@ from .._metpy import dequantify_results
 from ._conventions import _thresholds
 
 
-@preprocess_and_wrap(wrap_like="wind")
 def saffir_simpson_category(wind, convention="Saffir-Simpson", wind_units="m s-1"):
     """
     Function to determine the Saffir-Simpson Hurricane Scale (SSHS) category.

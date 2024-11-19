@@ -1,3 +1,4 @@
+import pint
 import pytest
 import numpy as np
 import xarray as xr
@@ -48,6 +49,7 @@ def test_sshs_units(units, expected, pass_as_numpy):
         assert isinstance(result, np.ndarray)
     else:
         assert isinstance(result, xr.DataArray)
+        assert not isinstance(result.data, pint.Quantity)
 
 
 @pytest.mark.parametrize("pass_as_numpy", [False, True])
@@ -79,3 +81,4 @@ def test_pressure_cat_units(units, expected, convention, pass_as_numpy):
         assert isinstance(result, np.ndarray)
     else:
         assert isinstance(result, xr.DataArray)
+        assert not isinstance(result.data, pint.Quantity)
