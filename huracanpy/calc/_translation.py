@@ -5,58 +5,36 @@ Utils related to translation distance and time
 import warnings
 
 import numpy as np
-import xarray as xr
 from metpy.units import units
+from metpy.xarray import preprocess_and_wrap
 
 import pyproj
-from haversine import haversine
+from haversine import haversine_vector
+
+from ._rates import delta
+from .._metpy import dequantify_results
 
 
-def _get_distance_geod(lon, lat, track_id, ellps="WGS84"):
-    if len(lon) != len(lat) or len(lon) != len(track_id):
-        raise ValueError("Length of lat, lon, and track_id must match")
-
+def _get_distance_geod(lon, lat, ellps="WGS84"):
     # initialize Geod object
     geodesic = pyproj.Geod(ellps=ellps)
 
     # Compute distance for all data
-    dist = []
-    for i in range(len(lon) - 1):
-        if track_id[i] == track_id[i + 1]:  # If both points belong to the same track
-            fwd_azimuth, back_azimuth, distance = geodesic.inv(
-                lon[i], lat[i], lon[i + 1], lat[i + 1]
-            )
-            dist.append(distance)
-        else:
-            dist.append(np.nan)
-    dist.append(np.nan)  # Add NaN for last point
+    fwd_azimuth, back_azimuth, dist = geodesic.inv(lon[:-1], lat[:-1], lon[1:], lat[1:])
 
-    return xr.DataArray(dist, dims=lon.dims) * units("m")
+    return dist
 
 
-def _get_distance_haversine(lon, lat, track_id):
+def _get_distance_haversine(lon, lat):
     # Convert longitudes beyond 180° (necessary for haversine to work)
-    lon = xr.DataArray(
-        np.where(lon > 180, lon - 360, lon),
-        dims=lon.dims,
-    )
+    lon = ((lon + 180) % 360) - 180
 
-    dist = []
-    for i in range(len(lon) - 1):
-        if track_id[i] == track_id[i + 1]:  # If both points belong to the same track
-            dx = haversine(
-                (float(lat[i].values), float(lon[i].values)),
-                (float(lat[i + 1].values), float(lon[i + 1].values)),
-                unit="m",
-            )  # Displacement in m
-            dist.append(dx)
-        else:
-            dist.append(np.nan)
-    dist.append(np.nan)  # Add NaN for last point
-
-    return xr.DataArray(dist, dims=lon.dims) * units("m")
+    yx = np.array([lat, lon]).T
+    return haversine_vector(yx[:-1], yx[1:], unit="m")
 
 
+@dequantify_results
+@preprocess_and_wrap(wrap_like="lon")
 def distance(lon, lat, track_id=None, method="geod", ellps="WGS84"):
     """Compute the distance between successive lon, lat points, without including
     differences between the end and start points of different tracks
@@ -89,15 +67,23 @@ def distance(lon, lat, track_id=None, method="geod", ellps="WGS84"):
         )
 
     if method == "geod":
-        return _get_distance_geod(lon, lat, track_id, ellps=ellps)
+        dist = _get_distance_geod(lon, lat, ellps=ellps)
     elif method == "haversine":
-        return _get_distance_haversine(
-            lon,
-            lat,
-            track_id,
+        dist = _get_distance_haversine(lon, lat)
+    else:
+        raise ValueError(
+            f"Method {method} for distance calculation not recognised, use one of"
+            f"('geod', 'haversince')"
         )
 
+    dist[track_id[1:] != track_id[:-1]] = np.nan * dist[0]
+    dist = np.concatenate([dist, [np.nan * dist[0]]])
 
+    return dist * units("m")
+
+
+@dequantify_results
+@preprocess_and_wrap(wrap_like="lon")
 def translation_speed(lon, lat, time, track_id=None, method="geod", ellps="WGS84"):
     """
     Compute translation speed along tracks
@@ -126,28 +112,16 @@ def translation_speed(lon, lat, time, track_id=None, method="geod", ellps="WGS84
     # Curate input
     # If track_id is not provided, all points are considered to belong to the same track
     if track_id is None:
-        track_id = xr.DataArray([0] * len(lon), dims=lon.dims)
+        np.zeros_like(lon)
         warnings.warn(
             "track_id is not provided, all points are considered to come from the same"
             "track"
         )
-    ## Sort data by track_id and time
-    lon, lat, track_id, time = [a.sortby(time) for a in [lon, lat, track_id, time]]
-    lon, lat, time, track_id = [a.sortby(track_id) for a in [lon, lat, time, track_id]]
 
-    dx = distance(
-        lon, lat, track_id, method=method, ellps=ellps
-    )  # Distance between each points
-    dt = (time[1:].values - time[:-1].values).astype(
-        "timedelta64[s]"
-    )  # time between each points
-    V = []
-    for i in range(len(lon) - 1):
-        if track_id[i] == track_id[i + 1]:  # If both points belong to the same track
-            v = dx[i] / dt[i].astype(float)  # translation speed in m/s
-            V.append(v)
-        else:
-            V.append(np.nan)
-    V.append(np.nan)
+    # Distance between each points
+    dx = distance(lon, lat, track_id, method=method, ellps=ellps)
 
-    return xr.DataArray(V, dims=lon.dims) * units("m/s")
+    # time between each points
+    dt = delta(time, track_id)
+
+    return dx / dt
