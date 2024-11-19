@@ -53,13 +53,8 @@ def trackswhere(tracks, track_ids, condition):
     if track_ids.ndim != 1:
         raise ValueError("track_ids must be 1d")
 
-    track_groups = tracks.groupby("track_id")
-
-    if callable(condition):
-        is_match = track_groups.map(condition)
-
     track_groups = [
-        track for n, (track_id, track) in enumerate(track_groups) if is_match[n]
+        track for track_id, track in tracks.groupby(track_ids) if condition(track)
     ]
 
     return xr.concat(track_groups, dim=track_ids.dims[0])
