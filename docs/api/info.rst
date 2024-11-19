@@ -4,11 +4,6 @@ info
 .. automodule:: huracanpy.info
 .. currentmodule:: huracanpy.info
 
-.. autosummary::
-    :toctree: _autosummary
-
-    add_all_info
-
 Geographic
 ----------
 

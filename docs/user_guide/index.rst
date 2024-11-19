@@ -36,6 +36,7 @@ The flowchart below illustrates this structure. The present user guide details h
     :maxdepth: 4
     :hidden:
 
+    self
     install
     demo
     load
