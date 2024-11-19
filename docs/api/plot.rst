@@ -1,5 +1,14 @@
-Plot
+plot
 ====
 
 .. automodule:: huracanpy.plot
-    :members:
+.. currentmodule:: huracanpy.plot
+.. autosummary::
+    :toctree: _autosummary
+
+    tracks
+    density
+    fancyline
+    venn
+    doughnut
+

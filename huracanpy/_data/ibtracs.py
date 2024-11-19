@@ -1,22 +1,42 @@
 """Module for functions related to the ibtracs database"""
 
 from urllib.request import urlretrieve
-import os
 import warnings
 import pathlib
-from contextlib import contextmanager
+
+from . import _csv
 
 here = pathlib.Path(__file__).parent
 ibdata_dir = here / "_ibtracs_files/"
 
 wmo_file = str(ibdata_dir / "wmo.csv")
-usa_file = str(ibdata_dir / "usa.csv")
+jtwc_file = str(ibdata_dir / "jtwc.csv")
+
+online_default_kwargs = dict(
+    header=0,
+    skiprows=[1],
+    converters={
+        "SID": str,
+        "SEASON": int,
+        "BASIN": str,
+        "SUBBASIN": str,
+        "LON": float,
+        "LAT": float,
+    },
+)
 
 
-@contextmanager
-def online(subset, filename="ibtracs.csv", clean=True):
+def load(subset, filename, **kwargs):
+    if subset.lower() in ["wmo", "usa", "jtwc"]:
+        return offline(subset)
+    else:
+        return online(subset, filename=filename, **kwargs)
+
+
+def online(subset, filename=None, **kwargs):
     """
-    Downloads an load into the current workspace the specified ibtracs subset from the IBTrACS archive online.
+    Downloads and load into the current workspace the specified ibtracs subset from the
+    IBTrACS archive online.
 
     Parameters
     ----------
@@ -26,32 +46,34 @@ def online(subset, filename="ibtracs.csv", clean=True):
         * ALL: Entire IBTrACS database
         * Specific basins: EP, NA, NI, SA, SI, SP, WP
         * last3years: self-explanatory
-        * since1980: Entire IBTrACS database since 1980 (advent of satellite era, considered reliable from then on)
+        * since1980: Entire IBTrACS database since 1980 (advent of satellite era,
+                     considered reliable from then on)
 
-    filename : str
-        (temporary) file to which to save the data
-        The default is "tmp/ibtracs_ACTIVE.csv".
-
-    clean : bool
-        If True (default), remove the temporary file after loading the data.
+    filename : str, optional
+        file to which to save the raw data. None to use a temporary file. Default is
+        None
 
     Returns
     -------
-    ib : the IBTrACS subset requested
-
+    xarray.DataArray
+        the IBTrACS subset requested
     """
-    # TODO: Make it so that the user does not need to specify the filename
+    # Put IBTrACS specific arguments to read_csv second, so it
+    # overwrites any arguments passed
+    kwargs = {**kwargs, **online_default_kwargs}
+
     url = (
-        "https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/ibtracs."
-        + subset
-        + ".list.v04r01.csv"
+        "https://www.ncei.noaa.gov/data/"
+        "international-best-track-archive-for-climate-stewardship-ibtracs/"
+        f"v04r01/access/csv/ibtracs.{subset}.list.v04r01.csv"
     )
-    urlretrieve(url, filename)
 
-    yield filename
+    # filename=None downloads the data to a temporary file
+    # Ruff (Flake8 bandit) complains that this url isn't checked, but it explicitly has
+    # "https:/" at the start anyway
+    filename, _ = urlretrieve(url, filename)  # noqa: S310
 
-    if clean:
-        os.remove(filename)  # Somehow, this is slower than the rest ofthe function (??)
+    return _csv.load(filename, **kwargs)
 
 
 def offline(subset="wmo"):
@@ -71,7 +93,7 @@ def offline(subset="wmo"):
           responsible for the area of a given point. (see https://community.wmo.int/en/tropical-cyclone-regional-bodies)
           Note that within this dataset, wind units are not homogeneous: they are provided as collected from the
           meteorological agencies, which means that they have different time-averaging for wind extrema.
-        * "usa" contains the data provided in the "wmo" columns, which is provided by the NHC or the JTWC.
+        * "jtwc" contains the data provided in the "wmo" columns, which is provided by the NHC or the JTWC.
 
     For more information, you may see the IBTrACS column documentation at
     https://www.ncei.noaa.gov/sites/default/files/2021-07/IBTrACS_v04_column_documentation.pdf
@@ -79,7 +101,7 @@ def offline(subset="wmo"):
     Parameters
     ----------
     subset : str, optional
-        "usa" or "wmo". The default is "wmo".
+        "jtwc" or "wmo". The default is "wmo".
 
     Returns
     -------
@@ -89,7 +111,7 @@ def offline(subset="wmo"):
     """
     warnings.warn(
         "This offline function loads a light version of IBTrACS which is embedded within the package, based on a file produced manually by the developers.\n\
-                  It was last updated on the 24nd May 2024, based on the IBTrACS file at that date.\n\
+                  It was last updated on the 15th Nov 2024, based on the IBTrACS file at that date.\n\
                   It contains only data from 1980 up to the last year with no provisional tracks. All spur tracks were removed. Only 6-hourly time steps were kept."
     )
     if subset.lower() == "wmo":
@@ -100,9 +122,9 @@ def offline(subset="wmo"):
                       which means in particular that wind speeds are in knots and averaged over different time periods.\n\
                     For more information, see the IBTrACS column documentation at https://www.ncei.noaa.gov/sites/default/files/2021-07/IBTrACS_v04_column_documentation.pdf"
         )
-        return wmo_file
+        return _csv.load(wmo_file)
     if subset.lower() in ["usa", "jtwc"]:
-        return usa_file
+        return _csv.load(jtwc_file)
 
 
 # TODOS:

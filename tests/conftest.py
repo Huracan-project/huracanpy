@@ -16,6 +16,24 @@ def tracks_csv():
 
 
 @pytest.fixture()
+def tracks_with_extra_coord(tracks_csv):
+    # Test that the same results apply if a variable has an additional dimension to the
+    # time/track_id dimension (e.g. if each point had a profile on pressure levels)
+    # Most functions should work fine but using pandas can cause the data to be
+    # broadcast across the dimensions to be able to represent it as 1d
+    return tracks_csv.assign(
+        thing=(
+            (
+                ("record", "level"),
+                np.array(
+                    [np.ones_like(tracks_csv.lon), np.ones_like(tracks_csv.lon) * 2],
+                ).T,
+            )
+        )
+    )
+
+
+@pytest.fixture()
 def tracks_year():
     return huracanpy.load(huracanpy.example_year_file)
 

@@ -1,14 +1,14 @@
 [project]
 name = "huracanpy"
-version = "1.0-beta2"
+version = "1.0.0"
 authors = [
   { name="Leo Saffin", email="l.saffin@reading.ac.uk" },
   { name="Stella Bourdin", email="stella.bourdin@physics.ox.ac.uk" },
-  { name="Kelvin Ng" },
 ]
 description = "A python package for working with various forms of feature tracking data"
+requires-python = ">=3.8, <3.13"
 dependencies = [
-    "numpy<2",
+    "numpy",
     "xarray",
     "cftime",
     "parse",
@@ -30,6 +30,7 @@ dependencies = [
     "metpy",
     "tqdm",
     "pyarrow",
+    "pyproj"
 ]
 
 [project.optional-dependencies]
@@ -43,6 +44,7 @@ docs = [
     "sphinx-copybutton",
     "nbsphinx",
     "IPython",
+    "sphinx-design",
 ]
 
 [build-system]
@@ -54,6 +56,29 @@ huracanpy = ["_data/example_data/*", "_data/_ibtracs_files/*"]
 
 [tool.ruff]
 extend-include = ["*.ipynb"]
+
+[tool.ruff.lint]
+extend-select = [
+    "ARG", # Flake8 unused arguments
+    "S", # Flake8 bandit
+    "T20", # Flake8 print
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Only check for use of assert/print in main module
+"!huracanpy/**" = ["S101", "T20"]
+
+[tool.tox]
+requires = ["tox>=4.15.0"]
+env_list = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+[tool.tox.env_run_base]
+extras = ["dev"]
+commands = [
+    ["ruff", "format", "--check"],
+    ["ruff", "check"],
+    ["pytest"]
+]
 
 # - How to distribute the package
 

@@ -1,8 +1,12 @@
-Assess
+assess
 ======
 
 .. automodule:: huracanpy.assess
-    :members:
+.. currentmodule:: huracanpy.assess
+.. autosummary::
+    :toctree: _autosummary
 
-.. automodule:: huracanpy.assess.scores
-    :members:
+    match
+    pod
+    far
+    overlap

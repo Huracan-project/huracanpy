@@ -1,45 +1,60 @@
 import pandas as pd
 
-from . import _csv, _TRACK, _netcdf, _tempestextremes, _CHAZ, _MIT
+
+from . import _csv, _TRACK, _netcdf, _tempestextremes
 from . import ibtracs
-from huracanpy import utils
+
+
+rename_defaults = dict(
+    longitude="lon",
+    latitude="lat",
+    # Names for MIT netCDF
+    n_track="track_id",
+    lon_track="lon",
+    lat_track="lat",
+    # Names for CHAZ netCDF
+    stormID="track_id",
+    # Names for TRACK netCDF
+    TRACK_ID="track_id",
+)
 
 
 def load(
     filename=None,
-    tracker=None,
+    source=None,
     variable_names=None,
-    add_info=False,
-    ibtracs_online=False,
+    rename=dict(),
+    units=None,
+    baselon=None,
     ibtracs_subset="wmo",
-    ibtracs_clean=True,
     tempest_extremes_unstructured=False,
     tempest_extremes_header_str="start",
     track_calendar=None,
-    n_track_name="n_track",
-    lat_track_name="lat_track",
     **kwargs,
 ):
     """Load track data
 
-    The optional parameters for different trackers (currently **IBTrACS**, **TRACK** and
-    **TempestExtremes**) are named {tracker}_{parameter} (in lower case),
-    e.g. "ibtracs_online".
+    The optional parameters for different sources of tracks (currently **IBTrACS**,
+    **TRACK** and **TempestExtremes**) are named {source}_{parameter} (in lower case),
+    e.g. "ibtracs_subset".
 
     Parameters
     ----------
     filename : str, optional
-        The file to be loaded. If `tracker="ibtracs"`, this is not needed as the data is
-        either included in huracanpy or downloaded when called
-    tracker : str, optional
+        The file to be loaded. If `source="ibtracs"`, this is not needed as the data is
+        either included in huracanpy or downloaded when called. If the filename is
+        provided for an online IBTrACS subset, then the raw downloaded data will be
+        saved there.
+    source : str, optional
         If the file is not a CSV or NetCDF (identified by the file extension) then the
-        tracker needs to be specified to decide how to load the data
+        source needs to be specified to decide how to load the data
 
         * **track**
         * **track.tilt**
-        * **te**, **tempest**, **tempestextremes**, **uz**:
+        * **te**, **tempest**, **tempestextremes**, **uz** (For textual format, not csv)
         * **ibtracs**
-        * **CHAZ**, **MIT**
+        * **csv**
+        * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided appropriate variable_names)
 
     variable_names : list of str, optional
           When loading data from an ASCII file (TRACK or TempestExtremes), specify the
@@ -51,16 +66,28 @@ def load(
           variables will be named variable_n, where n goes from 0 to the number of
           variables
 
-    add_info : bool, default=False
-    ibtracs_online : bool, default=False
-        * **False**: Use a small subset of the IBTrACS data included in this package
-        * **True**: Download the IBTrACS data
-    ibtracs_subset : str, default="ALL"
+    rename : dict, optional
+        A mapping of variable names to rename. Defaults are
+
+        * longitude -> lon
+        * latitude -> lat
+
+        To override any of these defaults, you can pass the same name, e.g.
+
+        >>> tracks = huracanpy.load(..., rename=dict(longitude="longitude"))
+
+    units : dict, optional
+        A mapping of variable names to units
+
+    baselon : scalar, optional
+        Force the loaded longitudes into the range (baselon, baselon + 360). e.g.
+        (0, 360) or (-180, 180)
+    ibtracs_subset : str, default="wmo"
         IBTrACS subset. When loading offline data it is one of
 
-        * **WMO**: Data with the wmo_* variables. The data as reported by the WMO agency
+        * **wmo**: Data with the wmo_* variables. The data as reported by the WMO agency
           responsible for each basin, so methods are not consistent across basins
-        * **USA** or **JTWC**: Data with the usa_* variables. The data as recorded by
+        * **usa** or **JTWC**: Data with the usa_* variables. The data as recorded by
           the USA/Joint Typhoon Warning Centre. Methods are consistent across basins,
           but may not be complete.
 
@@ -73,10 +100,6 @@ def load(
         * **last3years**: self-explanatory
         * **since1980**: Entire IBTrACS database since 1980 (advent of satellite era,
           considered reliable from then on)
-
-    ibtracs_clean : bool, default=True
-        If downloading IBTrACS data, this parameter says whether to delete the
-        downloaded file after loading it into memory.
 
     tempest_extremes_unstructured : bool, default=False,
         By default the first two columns in TempestExtremes files are the i, j indices
@@ -99,82 +122,70 @@ def load(
         * CSV file - :func:`pandas.read_csv`
         * parquet file - :func:`pandas.read_parquet`
 
+        For CSV files pandas interprets "NA" as `nan` by default, which is overriden in
+        this function. To restore the pandas default behavious set
+        :code:`keep_default_NA=True` and :code:`na_values=[]`
+
     Returns
     -------
     xarray.Dataset
 
     """
-    # If tracker is not given, try to derive the right function from the file extension
-    if tracker is None:
+    # Overwrite default arguments with explicit arguments passed to rename by putting
+    # "rename" second in this dictionary combination
+    rename = {**rename_defaults, **rename}
+
+    # If source is not given, try to derive the right function from the file extension
+    if source is None:
         extension = filename.split(".")[-1]
         if extension == "csv":
             data = _csv.load(filename, **kwargs)
         elif extension == "parquet":
             data = _csv.load(filename, load_function=pd.read_parquet, **kwargs)
         elif filename.split(".")[-1] == "nc":
-            data = _netcdf.load(filename, **kwargs)
+            data = _netcdf.load(filename, rename, **kwargs)
         else:
-            raise ValueError(f"{tracker} is set to None and file type is not detected")
+            raise ValueError("Source is set to None and file type is not detected")
 
-    # If tracker is given, use the relevant function
+    # If source is given, use the relevant function
     else:
-        if tracker.lower() == "track":
+        source = source.lower()
+        if source == "track":
             data = _TRACK.load(
                 filename, calendar=track_calendar, variable_names=variable_names
             )
-        elif tracker.lower() == "track.tilt":
+        elif source == "track.tilt":
             data = _TRACK.load_tilts(
                 filename,
                 calendar=track_calendar,
             )
-        elif tracker.lower() in ["csv", "uz"]:
-            data = _csv.load(filename)
-        elif tracker.lower() in ["te", "tempest", "tempestextremes"]:
+        elif source in ["csv", "uz"]:
+            data = _csv.load(filename, **kwargs)
+        elif source in ["te", "tempest", "tempestextremes"]:
             data = _tempestextremes.load(
                 filename,
                 variable_names,
                 tempest_extremes_unstructured,
                 tempest_extremes_header_str,
             )
-        elif tracker.lower() == "chaz":
-            data = _CHAZ.load(filename)
-        elif tracker.lower() == "mit":
-            data = _MIT.load(filename, n_track_name, lat_track_name)
-        elif tracker.lower() == "ibtracs":
-            if ibtracs_online:
-                if filename is None:
-                    filename = "ibtracs.csv"
-
-                with ibtracs.online(ibtracs_subset, filename, ibtracs_clean) as f:
-                    data = _csv.load(
-                        f,
-                        read_csv_kws=dict(
-                            header=0,
-                            skiprows=[1],
-                            na_values=["", " "],
-                            keep_default_na=False,
-                            converters={
-                                "SID": str,
-                                "SEASON": int,
-                                "BASIN": str,
-                                "SUBBASIN": str,
-                                "LON": float,
-                                "LAT": float,
-                            },
-                        ),
-                    )
-            else:
-                data = _csv.load(ibtracs.offline(ibtracs_subset))
+        elif source == "ibtracs":
+            data = ibtracs.load(ibtracs_subset, filename, **kwargs)
+        elif source == "netcdf":
+            data = _netcdf.load(filename, rename, **kwargs)
         else:
-            raise ValueError(f"Tracker {tracker} unsupported or misspelled")
+            raise ValueError(f"Source {source} unsupported or misspelled")
 
-    if add_info:  # TODO : Manage potentially different variable names
-        data["hemisphere"] = utils.geography.get_hemisphere(data.lat)
-        data["basin"] = utils.geography.get_basin(data.lon, data.lat)
-        data["season"] = utils.time.get_season(data.track_id, data.lat, data.time)
-        if "wind10" in list(data.keys()):  # If 'wind10' is in the attributes
-            data["sshs"] = utils.category.get_sshs_cat(data.wind10)
-        if "slp" in list(data.keys()):  # If 'slp' is in the attributes
-            data["pres_cat"] = utils.category.get_pressure_cat(data.slp)
+    # xarray.Dataset.rename only accepts keys that are actually in the dataset
+    rename = {key: rename[key] for key in rename if key in data}
+
+    if len(rename) > 0:
+        data = data.rename(rename)
+
+    if units is not None:
+        for varname in units:
+            data[varname].attrs["units"] = units[varname]
+
+    if baselon is not None:
+        data["lon"] = ((data.lon - baselon) % 360) + baselon
 
     return data

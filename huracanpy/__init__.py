@@ -1,15 +1,20 @@
 """huracanpy - A python package for working with various forms of feature tracking data"""
 
-__version__ = "0.1.0"
-__author__ = "Leo Saffin <l.saffin@reading.ac.uk>, Stella Bourdin <stella.bourdin@physics.ox.ac.uk>, Kelvin Ng "
 __all__ = [
-    "load",
-    "save",
-    "utils",
-    "diags",
+    # Modules
+    "calc",
     "plot",
     "assess",
-    "subset",
+    "info",
+    "tc",
+    # Functions
+    "load",
+    "save",
+    "sel_id",
+    "trackswhere",
+    "interp_time",
+    # Parameters
+    "basins",
     "example_csv_file",
     "example_parquet_file",
     "example_year_file",
@@ -19,10 +24,9 @@ __all__ = [
     "example_TE_file",
     "example_CHAZ_file",
     "example_MIT_file",
+    "_accessor",
 ]
 
-
-from . import utils
 from ._data import (
     load,
     save,
@@ -36,7 +40,9 @@ from ._data import (
     example_CHAZ_file,
     example_MIT_file,
 )
-from . import diags
-from . import plot
-from . import assess
-from . import subset
+from ._basins import basins
+from ._interp import interp_time
+from ._subset import sel_id, trackswhere
+from . import calc, plot, assess, info, tc
+
+from . import _accessor

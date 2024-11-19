@@ -4,14 +4,59 @@ Module to load tracks stored as csv files, including TempestExtremes output.
 
 import pandas as pd
 
+# All values recognised as NaN by pandas.read_csv, except "NA" which we want to load
+# normally because it is a basin, and added "" to interpret empty entries as NaN
+pandas_na_values = [
+    " ",
+    "#N/A",
+    "#N/A N/A",
+    "#NA",
+    "-1.#IND",
+    "-1.#QNAN",
+    "-NaN",
+    "-nan",
+    "1.#IND",
+    "1.#QNAN",
+    "<NA>",
+    "N/A",
+    "NULL",
+    "NaN",
+    "None",
+    "n/a",
+    "nan",
+    "null ",
+    "",
+]
 
-from .. import utils
+pandas_valid_time_labels = [
+    "year",
+    "years",
+    "month",
+    "months",
+    "day",
+    "days",
+    "hour",
+    "hours",
+    "minute",
+    "minutes",
+    "second",
+    "seconds",
+    "ms",
+    "millisecond",
+    "milliseconds",
+    "us",
+    "microsecond",
+    "microseconds",
+    "ns",
+    "nanosecond",
+    "nanoseconds",
+]
 
 
 def load(
     filename,
     load_function=pd.read_csv,
-    read_csv_kws=dict(),
+    **kwargs,
 ):
     """Load csv tracks data as an xarray.Dataset
     These tracks may come from TempestExtremes StitchNodes, or any other source.
@@ -24,27 +69,25 @@ def load(
             - time must be defined a single `time`column or by four columns : year, month, day, hour
             - track ID must be within a column named track_id.
 
+    load_function : callable
+        One of the load functions in pandas
+
+    **kwargs
+        Remaining keywords are passed to the pandas
+
     Returns
     -------
     xarray.Dataset
     """
+    # Update keywords with extra defaults for dealing with "NA" as basin not nan
+    # Put kwargs second in this statement, so it can override defaults
+    if load_function is pd.read_csv:
+        kwargs = {**dict(na_values=pandas_na_values, keep_default_na=False), **kwargs}
 
     ## Read file
-    tracks = load_function(filename, **read_csv_kws)
-    if (
-        tracks.columns.str[0][1] == " "
-    ):  # Sometimes columns names are read starting with a space, which we remove
-        tracks = tracks.rename(columns={c: c[1:] for c in tracks.columns[1:]})
-    tracks.columns = tracks.columns.str.lower()  # Make all column names lowercase
-    tracks = tracks.rename(
-        {"longitude": "lon", "latitude": "lat"}
-    )  # Rename lon & lat columns if necessary
-
-    ## Geographical attributes
-    if "lon" in tracks.columns:
-        tracks.loc[tracks.lon < 0, "lon"] += (
-            360  # Longitude are converted to [0,360] if necessary
-        )
+    tracks = load_function(filename, **kwargs)
+    # Remove leading/trailing spaces and make all column names lowercase
+    tracks.columns = tracks.columns.str.strip().str.lower()
 
     ## Time attribute
     if "iso_time" in tracks.columns:
@@ -53,9 +96,11 @@ def load(
     elif "time" in tracks.columns:
         tracks["time"] = pd.to_datetime(tracks.time)
     else:
-        tracks["time"] = utils.time.get_time(
-            tracks.year, tracks.month, tracks.day, tracks.hour
-        )
+        # Combine separate year/month/day etc. values into a time, and drop those
+        # variables from the dataframe
+        time_vars = [var for var in tracks.columns if var in pandas_valid_time_labels]
+        tracks["time"] = pd.to_datetime(tracks[time_vars])
+        tracks = tracks.drop(time_vars, axis="columns")
 
     # Output xr dataset
     tracks = tracks.to_xarray().rename({"index": "record"}).drop_vars("record")

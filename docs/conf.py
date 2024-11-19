@@ -7,8 +7,6 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "HuracanPy"
-copyright = "2024, Stella Bourdin, Leo Saffin, Kelvin Ng"
-author = "Stella Bourdin, Leo Saffin, Kelvin Ng"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -22,6 +20,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "nbsphinx",
     "sphinx_copybutton",
+    "sphinx_design",
 ]
 
 templates_path = ["_templates"]
