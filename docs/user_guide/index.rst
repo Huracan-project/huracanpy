@@ -37,7 +37,7 @@ The flowchart below illustrates this structure. The present user guide details h
     :hidden:
 
     install
-    getting_started
+    demo
     load
     save
     info
