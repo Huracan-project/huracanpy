@@ -15,21 +15,27 @@ We recommend you get familiar with xarray to make the most of this package (http
 Package structure
 -----------------
 
-The package has several module that allow you to:
+The package has several modules that allow you to:
 
-* Load cyclone tracks (`load`);
-* Add information to your tracks (`info`);
-* Subset (`subset`) and interpolate (`interp`) the tracks;
-* Compute standard diagnostic metrics  (`calc`);
-* Make simple plots (`plot`);
-* Compare several datasets between them (`assess`).
+* Load  and save cyclone tracks;
+* Subset and interpolate the tracks;
+* Add information to your tracks (:ref:`api-info`);
+* Compute standard diagnostic metrics (:ref:`api-calc`);
+* Make simple plots (:ref:`api-plot`);
+* Compare several datasets between them (:ref:`api-assess`).
 
-The flowchart below illustrates this structure. The present user guide details how to use each of these modules.
+It also module containing TC-specific functions (:ref:`api-tc`). 
+
+The flowchart below illustrates this structure. The functions in each module are listed in the :ref:`api-index`.
 
 .. image:: ../images/package_structure_flowchart/flowchart.png
   :width: 1000
   :alt: Alternative text
 
+xarray accessor
+~~~~~~~~~~~~~~~
+
+The package also defines a `.hrcn` xarray accessor, which allow you to call most of the functions as methods on the dataset itself. 
 
 
 .. toctree::
@@ -41,12 +47,6 @@ The flowchart below illustrates this structure. The present user guide details h
     demo
     load
     save
-    info
     subset
-    interp
-    calc
-    tc
-    plot
-    assess
+..  hidden at the moment
     speed
-    accessor
