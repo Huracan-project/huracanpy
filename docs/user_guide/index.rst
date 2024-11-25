@@ -48,7 +48,6 @@ The package also defines a `.hrcn` xarray accessor, which allow you to call most
     load
     save
     subset
-    interp
     tc
     speed
     accessor
