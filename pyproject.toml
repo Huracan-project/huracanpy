@@ -45,6 +45,7 @@ docs = [
     "nbsphinx",
     "IPython",
     "sphinx-design",
+    "ipykernel"
 ]
 
 [build-system]
