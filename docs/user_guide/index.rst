@@ -48,6 +48,5 @@ The package also defines a `.hrcn` xarray accessor, which allow you to call most
     load
     save
     subset
-    tc
+..  hidden at the moment
     speed
-    accessor
