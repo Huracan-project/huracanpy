@@ -19,7 +19,7 @@ from .._basins import basins
 @preprocess_and_wrap(wrap_like="lat")
 def hemisphere(lat):
     """
-    Function to detect which hemisphere each point corresponds to
+    Function to detect which hemisphere each point corresponds to.
 
     Parameters
     ----------
@@ -29,7 +29,9 @@ def hemisphere(lat):
     -------
     xarray.DataArray
         The hemisphere series.
-        You can append it to your tracks by running tracks["hemisphere"] = get_hemisphere(tracks)
+        You can append it to your tracks by running 
+
+        >>> tracks["hemisphere"] = get_hemisphere(tracks.lat)
     """
 
     return np.where(lat >= 0, "N", "S")
@@ -46,7 +48,7 @@ def basin(lon, lat, convention="WMO-TC", crs=None):
     lat : xarray.DataArray
         Latitude series
     convention : str
-        Name of the basin convention you want to use.
+        Name of the basin convention you want to use
             * WMO
     crs : cartopy.crs.CRS, optional
         The coordinate reference system of the lon, lat inputs. The basins are defined
