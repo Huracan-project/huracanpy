@@ -40,8 +40,10 @@ def season(track_id, lat, time, convention="tc-short"):
     lat : xarray.DataArray
     time : xarray.DataArray
     convention : str
-        * 'tc-short' : In the southern hemisphere, the season n corresponds to July n-1 to June n
-        * 'tc-long' : In the southern hemisphere, the season from July n-1 to June n is named "(n-1)n"
+        * 'tc-short' : In the Northern hemisphere, the season is the same as calendar year. 
+        In the southern hemisphere, the season n corresponds to July n-1 to June n
+        * 'tc-long' : In the Northern hemisphere, the season is the same as calendar year.
+        In the southern hemisphere, the season from July n-1 to June n is named "(n-1)n"
 
     Raises
     ------

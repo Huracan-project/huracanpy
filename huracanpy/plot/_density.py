@@ -20,10 +20,15 @@ def density(
     Parameters
     ----------
     d : xarray.Dataset
+        Density map from :func:`huracanpy.calc.density`
     contourf_kws : dict, optional
+        Arguments to be passed to :func:`matplotlib.pyplot.contourf`
     subplot_kws : dict, optional
+        Arguments to be passed to :func:`matplotlib.pyplot.subplots`' subplot_kw argument 
     fig_kws : dict, optional
+        Arguments to be passed to :func:`matplotlib.pyplot.subplots`
     cbar_kwargs: dict, optional
+        Arguments to be passed to :func:`matplotlib.pyplot.colorbar`
 
     Returns
     -------
