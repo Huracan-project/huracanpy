@@ -47,6 +47,9 @@ intersphinx_mapping = {
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "pydata_sphinx_theme"
-html_theme_options = {"github_url": "https://github.com/Huracan-project/huracanpy"}
+html_theme_options = {
+    "github_url": "https://github.com/Huracan-project/huracanpy",
+    "show_toc_level": 3,
+}
 html_static_path = ["_static"]
 html_css_files = ["css/custom.css"]
