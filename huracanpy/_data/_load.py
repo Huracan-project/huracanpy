@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-from . import _csv, _TRACK, _netcdf, _tempestextremes
+from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack
 from . import ibtracs
 
 
@@ -52,6 +52,7 @@ def load(
         * **track**
         * **track.tilt**
         * **te**, **tempest**, **tempestextremes**, **uz** (For textual format, not csv)
+        * **witrack**
         * **ibtracs**
         * **csv**
         * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided appropriate variable_names)
@@ -169,6 +170,8 @@ def load(
                 tempest_extremes_unstructured,
                 tempest_extremes_header_str,
             )
+        elif source == "witrack":
+            data = witrack.load(filename)
         elif source == "ibtracs":
             data = ibtracs.load(ibtracs_subset, filename, **kwargs)
         elif source == "netcdf":
