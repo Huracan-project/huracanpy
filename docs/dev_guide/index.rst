@@ -35,7 +35,9 @@ Alternatively, if you think you have something useful to contribute like a funct
     :maxdepth: 3
     :hidden:
 
+    self
     setup
     examples
     doc
     tests
+    changelog
