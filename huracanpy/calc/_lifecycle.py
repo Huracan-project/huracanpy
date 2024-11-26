@@ -7,18 +7,20 @@ import pandas as pd
 
 def time_from_genesis(time, track_ids):
     """
-    Output the time since genesis for each TC point
+    Output the time since genesis for each TC point.
 
     Parameters
     ----------
-    time
-    track_ids
+    time: xr.DataArray
+    track_ids: xr.DataArray
 
     Returns
     -------
     xarray.DataArray
         The time_from_genesis series.
-        You can append it to your tracks by running tracks["time_from_genesis"] = time_from_genesis(tracks)
+        You can append it to your tracks by running 
+        
+        >>> tracks["time_from_genesis"] = time_from_genesis(tracks.time, tracks.track_id)
 
     """
     data_df = pd.DataFrame({"time": time, "track_id": track_ids})
@@ -39,6 +41,8 @@ def time_from_genesis(time, track_ids):
 def time_from_apex(time, track_ids, intensity_var, stat="max"):
     """The time relative to a maxima/minima in a given variable for each individual
     track
+    
+    >>> time_from_apex(tracks.time, tracks.track_id, tracks.wind, stat="max")
 
     Parameters
     ----------
