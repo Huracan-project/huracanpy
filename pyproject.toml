@@ -38,6 +38,7 @@ dev = [
   "pre-commit",
   "pytest",
   "ruff",
+  "tox",
 ]
 docs = [
     "pydata-sphinx-theme",

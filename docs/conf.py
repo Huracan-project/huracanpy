@@ -44,6 +44,11 @@ intersphinx_mapping = {
     "metpy": ("https://unidata.github.io/MetPy/latest/", None),
 }
 
+# myst parser (markdown)
+myst_enable_extensions = [
+    "colon_fence",
+]
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
