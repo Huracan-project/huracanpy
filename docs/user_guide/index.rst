@@ -44,6 +44,7 @@ The package also defines a `.hrcn` xarray accessor, which allow you to call most
 
     self
     install
+    quickstart
     demo
     load
     save
