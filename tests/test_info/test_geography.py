@@ -40,6 +40,24 @@ def test_basin(data, expected, request):
 
 
 @pytest.mark.parametrize(
+    "convention, expected",
+    [
+        ("Sainsbury2022JCLI", ["WEST"] + ["SUB", "MDR"] * 6 + ["SUB"] + [""] * 6),
+        (
+            "Sainsbury2022MWR",
+            [""] * 3 + ["NoEurope", ""] * 6 + ["Europe", ""] * 2 + ["Europe"],
+        ),
+    ],
+)
+def test_basin_definition(convention, expected):
+    lon = np.arange(-80, 20, 5)
+    lat = np.array([15, 45] * 10)
+    result = huracanpy.info.basin(lon, lat, convention=convention)
+
+    np.testing.assert_array_equal(result, expected)
+
+
+@pytest.mark.parametrize(
     "data, expected",
     [
         (
