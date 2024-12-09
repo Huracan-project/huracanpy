@@ -26,7 +26,7 @@ class HuracanPyDataArrayAccessor:
 @xr.register_dataset_accessor("hrcn")
 class HuracanPyDatasetAccessor:
     def __init__(self, dataset):
-        self._dataset = dataset.copy()
+        self._dataset = dataset
 
     # %% Save
     def save(self, filename):
