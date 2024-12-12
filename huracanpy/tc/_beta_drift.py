@@ -28,7 +28,7 @@ def beta_drift(lat, wind_max, radius_wind_max,):
         lat = lat / 180 * np.pi
     ## Convert rmw to m
     if radius_wind_max.max() < 10000: # We assume rmw are in km if they are below 10,000
-        radius_wind_max *= 1000
+        radius_wind_max = radius_wind_max*1000
     
     # Coriolis parameters
     Omega = 7.2921e-5 #rad/s Rotation rate of the Earth
