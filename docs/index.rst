@@ -11,7 +11,7 @@
     api/index
     examples/index
 
-.. image:: logo/logo-with-name/Slide1.png
+.. image:: images/logo/logo-with-name/Slide1.png
   :width: 800
   :alt: HuracanPy logo, a yellow and blue python spiralling as a cyclone.
 
