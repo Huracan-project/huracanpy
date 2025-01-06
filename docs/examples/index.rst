@@ -14,3 +14,5 @@ Examples
     doughnuts
     utils
     ERA-20C_assessment
+    beta_drift
+    speed

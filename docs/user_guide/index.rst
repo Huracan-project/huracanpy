@@ -2,7 +2,8 @@
 User Guide
 ==========
 
-This User Guide is here to help you use HuracanPy, by providing explanations about the most important aspacts of the packages. 
+This User Guide is here to help you use HuracanPy, by providing explanations about the most important aspects of the packages. 
+We recommend you read through the pages in the provided order if you are starting, but each of them can also be read as standalone for future reference. 
 
 
 .. toctree::
@@ -10,9 +11,11 @@ This User Guide is here to help you use HuracanPy, by providing explanations abo
     :hidden:
 
     install
+    xarray
     quickstart
-    demo
     structure
+    accessor
+    demo
     load
     save
     subset
