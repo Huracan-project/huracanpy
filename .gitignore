@@ -43,3 +43,6 @@ docs/_build/
 
 # Sphinx autosummary folder
 docs/api/_autosummary/
+
+# Powerpoint checkpoints
+*~$*
