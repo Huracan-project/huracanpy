@@ -18,31 +18,28 @@ HuracanPy
 A python package for working with various forms of feature tracking data, including but not restricted to cyclone tracks.
 
 **Why HuracanPy?**
-
 The idea of this package is to provide a common tool for working with cyclone track data. 
 In particular, HuracanPy can read tracks from many different sources/trackers. 
 It also provides useful functions to analyse these tracks, including many common diagnostics.
 Our goal is to make track data analysis more accessible, and to promote good reproducibility practices.
 
 
-**Need to know about HuracanPy**
+**Need to know about HuracanPy:**
 
-This package is distributed under the `MIT licence <https://github.com/Huracan-project/huracanpy/blob/master/LICENSE>`_. 
-A JOSS paper is currently being prepared. We ask that you cite it in published papers using HuracanPy. This help us get credit for the work we put in the development, and also to track how the package is used. 
+* This package is distributed under the `MIT licence <https://github.com/Huracan-project/huracanpy/blob/master/LICENSE>`_. 
 
-Please watch the GitHub repository to get information about HuracanPy. 
+* A JOSS paper is currently being prepared. We ask that you cite it in published papers using HuracanPy. This help us get credit for the work we put in the development, and also to track how the package is used. 
 
-**Contact**
+* Please watch the GitHub repository to get information about HuracanPy. 
 
+**Contact:**
 Please use GitHub's functions to communicate with HuracanPy's developers. In particular, use `Issues <https://github.com/Huracan-project/huracanpy/issues>`_ for feature requests or bug reporting; and use the `Dicussions <https://github.com/Huracan-project/huracanpy/discussions>`_ for Q&A and general feedback. Do not forget HuracanPy is an open-source project, and you can also contribute to it. 
 
-If that is not satisfactory, you may contact the developers' team using this address: [TODO]. 
-
-**Acknowledgments**
-
+**Acknowledgments:**
 HuracanPy's development is currently supported by the `Huracán NERC-NSF project <https://research.reading.ac.uk/huracan/about-huracan/project-overview/>`_.
 You can find a list of HuracanPy's contributors `here <https://github.com/Huracan-project/huracanpy/graphs/contributors>`_.
 
+**Getting started?** Head to the User Guide below!
 
 .. grid:: 1 2 2 2
     :gutter: 2
