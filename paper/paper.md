@@ -17,7 +17,7 @@ authors:
 affiliations:
  - name: University of Oxford, Department of Physics, Oxford, UK
    index: 1
-   ror: 00hx57361
+   ror: 05v62cm79
  - name: University of Reading, Department of Meteorology, Reading, UK # Please adjust
    index: 2
    ror: 05v62cm79
