@@ -93,7 +93,7 @@ def load(
     if "iso_time" in tracks.columns:
         tracks["time"] = pd.to_datetime(tracks.iso_time)
         tracks = tracks.drop(columns="iso_time")
-    if "isotime" in tracks.columns:
+    elif "isotime" in tracks.columns:
         tracks["time"] = pd.to_datetime(tracks.isotime)
         tracks = tracks.drop(columns="isotime")
     elif "time" in tracks.columns:
