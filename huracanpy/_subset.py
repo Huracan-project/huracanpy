@@ -34,15 +34,15 @@ def trackswhere(tracks, track_ids, condition):
     """Subset tracks that verify a condition.
 
     e.g select all tracks that are solely in the Northern hemisphere:
-        
+
     >>> tracks_subset = huracanpy.trackswhere(tracks, tracks.track_id, lambda x: (x.lat > 0).all())
-    
+
     e.g. select all tracks that are category 2 at least once in their lifetime:
-        
+
     >>> track_subset = huracanpy.trackswhere(
         tracks, tracks.track_id, lambda track: track.pressure_category.max() >= 2
         )
-    
+
     Parameters
     ----------
     tracks : xarray.Dataset

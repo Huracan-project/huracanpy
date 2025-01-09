@@ -15,7 +15,7 @@ from metpy.units import units
 @preprocess_and_wrap(wrap_like="variable")
 def category(variable, bins, labels=None, variable_units=None):
     """Calculate a generic category from a variable and a set of thresholds
-    
+
     >>> huracanpy.info.category(tracks.wind, bins = [0,10,20,30], labels = [1,2,3])
 
     Parameters

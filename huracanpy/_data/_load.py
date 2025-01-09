@@ -79,7 +79,7 @@ def load(
 
     units : dict, optional
         A mapping of variable names to units
-        
+
         >>> tracks = huracanpy.load(..., units=dict(vorticity="s**-1", slp="hPa"))
 
     baselon : scalar, optional
