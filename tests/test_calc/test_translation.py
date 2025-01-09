@@ -22,6 +22,16 @@ def test_get_distance():
         assert dist.metpy.units == units("m")
 
 
+def test_radius_of_maximum_wind():
+    data = huracanpy.load(huracanpy.example_TRACK_file, source="TRACK")
+    rmw = huracanpy.calc.distance(
+        data.lon, data.lat, data.feature_9_lon, data.feature_9_lat, method="haversine"
+    )
+    np.testing.assert_allclose(rmw.max(), 666749.2768932)
+    np.testing.assert_allclose(rmw.min(), 25218.89771)
+    np.testing.assert_allclose(rmw.mean(), 356360.39091)
+
+
 def test_get_translation_speed():
     data = huracanpy.load(huracanpy.example_csv_file)
 
