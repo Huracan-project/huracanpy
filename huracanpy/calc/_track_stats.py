@@ -35,9 +35,9 @@ def gen_vals(tracks, time, track_id):
 
     Parameters
     ----------
-    tracks : xarray.DataSet
+    tracks : xarray.Dataset
     time : array_like
-    track_id : xarray.Dataset
+    track_id : xarray.DataArray
 
     Returns
     -------

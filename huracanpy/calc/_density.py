@@ -24,10 +24,15 @@ def density(lon, lat, *, method="histogram", bin_size=5, n_seasons=1):
         Number of season (will be used to divide the final results, so that is
         represents points/year). The default is 1.
 
+    Raises
+    ------
+    NotImplementedError
+        If method given is not 'histogram'
+
     Returns
     -------
     xarray.DataArray
-        Histogram representing number of point per bin per season.
+        Track density as a 2D map.
 
     """
     if method == "histogram":

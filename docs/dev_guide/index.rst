@@ -15,16 +15,12 @@ Contributor's Guide
 
 It is important that you know the basics of Git to contribute. [LINK]
 
-1. Set up your environment and install the package with developer's options. [LINK]
-2. 
-
-    * If you do not have a specific change in mind, check out the `GitHub issues <https://github.com/Huracan-project/huracanpy/issues>`_, or contact the developers [LINK]. 
-    * If you already do, move on to the next step.
-
+1. Set up your environment and install the package with developer's options. [:doc:`link <setup>`]
+2. If you do not have a specific change in mind, check out the `GitHub issues <https://github.com/Huracan-project/huracanpy/issues>`_, or contact the developers [LINK]. If you already do, move on to the next step.
 3. Identify the sources files that require modification, and go ahead with implementing what you need. Remember to commit regularly your changes.
-4. Implement relevant test. [LINK]
-5. Update or create relevant documentation. [LINK]
-6. Create a pull request for your contribution. 
+4. Implement relevant test. [:doc:`link <tests>`]
+5. Update or create relevant documentation. [:doc:`link <doc>`]
+6. Create a pull request for your contribution. [`Github <https://github.com/Huracan-project/huracanpy/pulls>`_]
 
 If you know what it means, and think it is relevant, think about implementing your function in the `hrcn` accessor as well. 
 
@@ -35,7 +31,9 @@ Alternatively, if you think you have something useful to contribute like a funct
     :maxdepth: 3
     :hidden:
 
+    self
     setup
     examples
     doc
     tests
+    changelog

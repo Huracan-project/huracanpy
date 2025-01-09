@@ -38,6 +38,7 @@ dev = [
   "pre-commit",
   "pytest",
   "ruff",
+  "tox",
 ]
 docs = [
     "pydata-sphinx-theme",
@@ -45,7 +46,8 @@ docs = [
     "nbsphinx",
     "IPython",
     "sphinx-design",
-    "ipykernel"
+    "ipykernel",
+    "myst-parser",
 ]
 
 [build-system]

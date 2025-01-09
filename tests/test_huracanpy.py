@@ -15,6 +15,7 @@ import huracanpy
         (huracanpy.example_TE_file, dict(source="tempestextremes"), 8, 0, 210, 8),
         (huracanpy.example_CHAZ_file, dict(), 11, 0, 1078, 20),
         (huracanpy.example_MIT_file, dict(), 10, 1, 2138, 11),
+        (huracanpy.example_WiTRACK_file, dict(source="witrack"), 14, 0, 3194, 268),
         (None, dict(source="ibtracs", ibtracs_subset="wmo"), 8, 0, 143287, 4540),
         (None, dict(source="ibtracs", ibtracs_subset="usa"), 10, 0, 121806, 4170),
     ],
@@ -44,6 +45,7 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
         (huracanpy.example_TE_file, "tempestextremes"),
         (huracanpy.example_CHAZ_file, None),
         (huracanpy.example_MIT_file, None),
+        (huracanpy.example_WiTRACK_file, "witrack"),
         (None, "ibtracs"),
     ],
 )

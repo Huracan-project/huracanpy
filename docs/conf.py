@@ -21,6 +21,7 @@ extensions = [
     "nbsphinx",
     "sphinx_copybutton",
     "sphinx_design",
+    "myst_parser",
 ]
 
 templates_path = ["_templates"]
@@ -43,10 +44,21 @@ intersphinx_mapping = {
     "metpy": ("https://unidata.github.io/MetPy/latest/", None),
 }
 
+# myst parser (markdown)
+myst_enable_extensions = [
+    "colon_fence",
+]
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "pydata_sphinx_theme"
-html_theme_options = {"github_url": "https://github.com/Huracan-project/huracanpy"}
+html_theme_options = {
+    "github_url": "https://github.com/Huracan-project/huracanpy",
+    "show_toc_level": 3,
+    "logo_only": True,
+    "display_version": False,
+}
 html_static_path = ["_static"]
+html_logo = "images/logo/logo-with-name/Slide1.png"
 html_css_files = ["css/custom.css"]

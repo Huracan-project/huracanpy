@@ -19,7 +19,7 @@ from .._basins import basins
 @preprocess_and_wrap(wrap_like="lat")
 def hemisphere(lat):
     """
-    Function to detect which hemisphere each point corresponds to
+    Function to detect which hemisphere each point corresponds to.
 
     Parameters
     ----------
@@ -29,7 +29,9 @@ def hemisphere(lat):
     -------
     xarray.DataArray
         The hemisphere series.
-        You can append it to your tracks by running tracks["hemisphere"] = get_hemisphere(tracks)
+        You can append it to your tracks by running
+
+        >>> tracks["hemisphere"] = get_hemisphere(tracks.lat)
     """
 
     return np.where(lat >= 0, "N", "S")
@@ -47,7 +49,21 @@ def basin(lon, lat, convention="WMO-TC", crs=None):
         Latitude series
     convention : str
         Name of the basin convention you want to use.
-            * WMO
+            * **WMO-TC** - WMO defined tropical cyclone basins
+            * **Sainsbury2022JCLI** - Definitions from
+                (https://doi.org/10.1175/JCLI-D-21-0712.1) North Atlantic split up into:
+
+                * Main development region (MDR)
+                * Subtropical development region (SUB)
+                * Western basin / Caribbean sea (WEST)
+
+            * **Sainsbury2022MWR** - Definitions from
+                (https://doi.org/10.1175/MWR-D-22-0111.1). Extratropical transition in
+                North Atlantic divided into:
+
+                * Europe
+                * NoEurope
+
     crs : cartopy.crs.CRS, optional
         The coordinate reference system of the lon, lat inputs. The basins are defined
         in PlateCarree (-180, 180), so this will transform lon/lat to this projection
