@@ -29,7 +29,7 @@ def hemisphere(lat):
     -------
     xarray.DataArray
         The hemisphere series.
-        You can append it to your tracks by running 
+        You can append it to your tracks by running
 
         >>> tracks["hemisphere"] = get_hemisphere(tracks.lat)
     """

@@ -28,7 +28,7 @@ def density(lon, lat, *, method="histogram", bin_size=5, n_seasons=1):
     ------
     NotImplementedError
         If method given is not 'histogram'
-        
+
     Returns
     -------
     xarray.DataArray
