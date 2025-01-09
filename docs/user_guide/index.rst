@@ -2,51 +2,22 @@
 User Guide
 ==========
 
-Pre-requisites
---------------
-
-xarray
-~~~~~~
-
-Our package is designed to load track data as xarray objects. 
-We recommend you get familiar with xarray to make the most of this package (https://tutorial.xarray.dev/intro.html). 
-
-
-Package structure
------------------
-
-The package has several module that allow you to:
-
-* Load cyclone tracks (`load`);
-* Add information to your tracks (`info`);
-* Subset (`subset`) and interpolate (`interp`) the tracks;
-* Compute standard diagnostic metrics  (`calc`);
-* Make simple plots (`plot`);
-* Compare several datasets between them (`assess`).
-
-The flowchart below illustrates this structure. The present user guide details how to use each of these modules.
-
-.. image:: ../images/package_structure_flowchart/flowchart.png
-  :width: 1000
-  :alt: Alternative text
-
+This User Guide is here to help you use HuracanPy, by providing explanations about the most important aspects of the packages. 
+We recommend you read through the pages in the provided order if you are starting, but each of them can also be read as standalone for future reference. 
 
 
 .. toctree::
     :maxdepth: 4
     :hidden:
 
-    self
     install
+    xarray
+    quickstart
+    structure
+    accessor
     demo
     load
     save
-    info
     subset
-    interp
-    calc
-    tc
-    plot
-    assess
+..  hidden at the moment
     speed
-    accessor

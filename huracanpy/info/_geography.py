@@ -19,7 +19,7 @@ from .._basins import basins
 @preprocess_and_wrap(wrap_like="lat")
 def hemisphere(lat):
     """
-    Function to detect which hemisphere each point corresponds to
+    Function to detect which hemisphere each point corresponds to.
 
     Parameters
     ----------
@@ -29,7 +29,9 @@ def hemisphere(lat):
     -------
     xarray.DataArray
         The hemisphere series.
-        You can append it to your tracks by running tracks["hemisphere"] = get_hemisphere(tracks)
+        You can append it to your tracks by running
+
+        >>> tracks["hemisphere"] = get_hemisphere(tracks.lat)
     """
 
     return np.where(lat >= 0, "N", "S")

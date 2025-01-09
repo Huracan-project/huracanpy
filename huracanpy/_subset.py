@@ -31,15 +31,23 @@ def sel_id(tracks, track_ids, track_id):
 
 
 def trackswhere(tracks, track_ids, condition):
-    """Subset tracks from the input
+    """Subset tracks that verify a condition.
 
-    e.g select all tracks that are solely in the Northern hemisphere
-    >>> tracks_subset = huracanpy.trackswhere(tracks, lambda x: (x.lat > 0).all())
+    e.g select all tracks that are solely in the Northern hemisphere:
+
+    >>> tracks_subset = huracanpy.trackswhere(tracks, tracks.track_id, lambda x: (x.lat > 0).all())
+
+    e.g. select all tracks that are category 2 at least once in their lifetime:
+
+    >>> track_subset = huracanpy.trackswhere(
+        tracks, tracks.track_id, lambda track: track.pressure_category.max() >= 2
+        )
 
     Parameters
     ----------
     tracks : xarray.Dataset
     track_ids : xarray.DataArray
+        The track_ids corresponding to the tracks Dataset
     condition : callable
         A function that takes an `xarray.Dataset` of an individual track and returns
         True or False
