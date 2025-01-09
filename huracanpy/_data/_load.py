@@ -68,7 +68,7 @@ def load(
           variables
 
     rename : dict, optional
-        A mapping of variable names to rename. Defaults are
+        A mapping of variable names to rename (for netCDF files only). Defaults are
 
         * longitude -> lon
         * latitude -> lat
@@ -80,11 +80,13 @@ def load(
     units : dict, optional
         A mapping of variable names to units
 
+        >>> tracks = huracanpy.load(..., units=dict(vorticity="s**-1", slp="hPa"))
+
     baselon : scalar, optional
         Force the loaded longitudes into the range (baselon, baselon + 360). e.g.
         (0, 360) or (-180, 180)
     ibtracs_subset : str, default="wmo"
-        IBTrACS subset. When loading offline data it is one of
+        IBTrACS subset. Two offline versions are available:
 
         * **wmo**: Data with the wmo_* variables. The data as reported by the WMO agency
           responsible for each basin, so methods are not consistent across basins
@@ -92,8 +94,7 @@ def load(
           the USA/Joint Typhoon Warning Centre. Methods are consistent across basins,
           but may not be complete.
 
-        If you are downloading the online data, the subsets are the different files
-        provided by IBTrACS
+        To download online data, the subsets are the different filesp rovided by IBTrACS.
 
         * **ACTIVE**: TCs currently active
         * **ALL**: Entire IBTrACS database
@@ -102,7 +103,7 @@ def load(
         * **since1980**: Entire IBTrACS database since 1980 (advent of satellite era,
           considered reliable from then on)
 
-    tempest_extremes_unstructured : bool, default=False,
+    tempest_extremes_unstructured : bool, default=False
         By default the first two columns in TempestExtremes files are the i, j indices
         of the closest gridpoint, but for unstructured grids it is a single lookup index
         so there is one less column

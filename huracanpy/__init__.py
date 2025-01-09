@@ -24,6 +24,7 @@ __all__ = [
     "example_TE_file",
     "example_CHAZ_file",
     "example_MIT_file",
+    "example_ERA20C_file",
     "example_WiTRACK_file",
     "_accessor",
 ]
@@ -40,6 +41,7 @@ from ._data import (
     example_TE_file,
     example_CHAZ_file,
     example_MIT_file,
+    example_ERA20C_file,
     example_WiTRACK_file,
 )
 from ._basins import basins
