@@ -15,34 +15,51 @@ from ._rates import delta
 from .._metpy import dequantify_results
 
 
-def _get_distance_geod(lon, lat, ellps="WGS84"):
+def _get_distance_geod(lon1, lat1, lon2, lat2, ellps="WGS84"):
     # initialize Geod object
     geodesic = pyproj.Geod(ellps=ellps)
 
     # Compute distance for all data
-    fwd_azimuth, back_azimuth, dist = geodesic.inv(lon[:-1], lat[:-1], lon[1:], lat[1:])
+    fwd_azimuth, back_azimuth, dist = geodesic.inv(lon1, lat1, lon2, lat2)
 
     return dist
 
 
-def _get_distance_haversine(lon, lat):
+def _get_distance_haversine(lon1, lat1, lon2, lat2):
     # Convert longitudes beyond 180° (necessary for haversine to work)
-    lon = ((lon + 180) % 360) - 180
+    lon1 = ((lon1 + 180) % 360) - 180
+    lon2 = ((lon2 + 180) % 360) - 180
 
-    yx = np.array([lat, lon]).T
-    return haversine_vector(yx[:-1], yx[1:], unit="m")
+    yx1 = np.array([lat1, lon1]).T
+    yx2 = np.array([lat2, lon2]).T
+    return haversine_vector(yx1, yx2, unit="m")
 
 
 @dequantify_results
 @preprocess_and_wrap(wrap_like="lon")
-def distance(lon, lat, track_id=None, method="geod", ellps="WGS84"):
-    """Compute the distance between successive lon, lat points, without including
+def distance(lon, lat, *args, track_id=None, method="geod", ellps="WGS84"):
+    """Compute distance between longitude/latitude coordinates using
+    geodesic or haversine calculation
+
+    >>> distance(lon, lat, track_id)
+    Computes the distance between successive lon, lat points, without including
     differences between the end and start points of different tracks
+
+    >>> distance(lon1, lat1, lon2, lat2)
+    Computes the distance between each point in (lon1, lat1) and each point in
+    (lon2, lat2)
 
     Parameters
     ----------
     lon : xarray.DataArray
     lat : xarray.DataArray
+    *args : xarray.DataArray
+        * 0 arguments. Leave empty to calculate distance between successive points
+        * 1 argument, track_id. Same as 0 arguments but inserts NaNs where successive
+            points are from different tracks
+        * 2 arguments, lon and lat arrays. Calculate distances between two tracks,
+            e.g. radius of maximum wind speed, using storm centre locations and maximum
+            wind speed locations
     track_id : array_like, optional
     method : str, optional
         The method of computing distances, either geodesic (`"geod"`) or haversine
@@ -60,24 +77,44 @@ def distance(lon, lat, track_id=None, method="geod", ellps="WGS84"):
 
     # Curate input
     # If track_id is not provided, all points are considered to belong to the same track
-    if track_id is None:
-        track_id = [0] * len(lon)
-        warnings.warn(
-            "track_id is not provided, all points are considered to come from the same track"
+    if len(args) < 2:
+        lon1 = lon[:-1]
+        lat1 = lat[:-1]
+        lon2 = lon[1:]
+        lat2 = lat[1:]
+
+        if len(args) == 1:
+            track_id = args[0]
+
+        if track_id is None:
+            warnings.warn(
+                "track_id is not provided, all points are considered to come from the"
+                "same track"
+            )
+
+    elif len(args) == 2:
+        lon1 = lon
+        lat1 = lat
+        lon2, lat2 = args
+
+    else:
+        raise ValueError(
+            "Distance either takes 2 arrays (lon/lat) or 4 arrays 2x(lon/lat)"
         )
 
     if method == "geod":
-        dist = _get_distance_geod(lon, lat, ellps=ellps)
+        dist = _get_distance_geod(lon1, lat1, lon2, lat2, ellps=ellps)
     elif method == "haversine":
-        dist = _get_distance_haversine(lon, lat)
+        dist = _get_distance_haversine(lon1, lat1, lon2, lat2)
     else:
         raise ValueError(
             f"Method {method} for distance calculation not recognised, use one of"
             f"('geod', 'haversince')"
         )
 
-    dist[track_id[1:] != track_id[:-1]] = np.nan * dist[0]
-    dist = np.concatenate([dist, [np.nan * dist[0]]])
+    if len(args) < 2 and track_id is not None:
+        dist[track_id[1:] != track_id[:-1]] = np.nan * dist[0]
+        dist = np.concatenate([dist, [np.nan * dist[0]]])
 
     return dist * units("m")
 
