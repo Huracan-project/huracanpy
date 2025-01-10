@@ -61,3 +61,14 @@ B = dict(
     NoEurope=Polygon([(-70, 36), (-10, 36), (-10, 70), (-70, 70)]),
 )
 basins["Sainsbury2022MWR"] = gpd.GeoDataFrame(index=B.keys(), geometry=list(B.values()))
+
+# NOC storm surge 
+box = Polygon(
+    (
+        (-19.888672, 65.00098),
+        (-19.888672, 40.066406),
+        (12.888672, 40.066406),
+        (12.888672, 65.00098),
+    )
+)
+basins["NOC_surge_model"] = gpd.GeoDataFrame(index=["NOC_surge_model"], geometry=[box])
