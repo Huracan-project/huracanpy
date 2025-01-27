@@ -42,5 +42,4 @@ def density(
     d.plot.contourf(
         ax=ax, transform=ccrs.PlateCarree(), cbar_kwargs=cbar_kwargs, **contourf_kws
     )
-
     return fig, ax
