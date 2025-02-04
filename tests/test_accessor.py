@@ -137,9 +137,9 @@ def test_accessor_methods_match_functions(
         result_accessor = result_accessor[varname]
 
     # Check that the function and method return identical results
-    assert type(result) is type(
-        result_accessor
-    ), "accessor return type differs from function"
+    assert type(result) is type(result_accessor), (
+        "accessor return type differs from function"
+    )
     np.testing.assert_equal(
         np.array(result),
         np.array(result_accessor),
