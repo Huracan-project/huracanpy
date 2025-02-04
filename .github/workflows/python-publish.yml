@@ -8,10 +8,9 @@
 
 name: Publish Python distribution to PyPI 
 
-on:
-  release:
-    types: [published]
-  workflow_dispatch
+on: workflow_dispatch
+#  release:
+#    types: [published]
 
 
 permissions:
