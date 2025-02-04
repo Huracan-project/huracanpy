@@ -5,9 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.1.0 (unreleased)
+## v1.1.0 
 ### Added
 - Support for WiTRACK text files in huracanpy.load
+- Beta-drift computation (along with RMW support within distance function)
+- Full documentation incuding new examples
+- kde option for densities
+- Reference track set option for matching
+- Basin definitions from E. Sainsbury's papers
+
+### Fixes
+- Accessor was not behaving in the right way when the object was modified after the accessor's first call;
+- Allow for ISO time to be called "isotime" in csv/parquet
 
 ## v1.0.0
 ### Added
