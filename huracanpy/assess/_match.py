@@ -6,7 +6,7 @@ from haversine import haversine_vector, Unit
 from itertools import combinations
 
 
-def match(tracksets, names=["1", "2"], max_dist=300, min_overlap=0):
+def match(tracksets, names=["1", "2"], max_dist=300, min_overlap=0, tracks1_is_ref = False):
     """
     Match the provided track sets between them.
 
@@ -41,10 +41,10 @@ def match(tracksets, names=["1", "2"], max_dist=300, min_overlap=0):
 
     # Two track sets
     if len(tracksets) == 2:
-        return _match_pair(*tracksets, *names, max_dist, min_overlap)
+        return _match_pair(*tracksets, *names, max_dist, min_overlap, tracks1_is_ref)
     # More than two track sets
     else:
-        return _match_multiple(tracksets, names, max_dist, min_overlap)
+        return _match_multiple(tracksets, names, max_dist, min_overlap, tracks1_is_ref)
 
 
 def _match_pair(
@@ -54,6 +54,7 @@ def _match_pair(
     name2="2",
     max_dist=300,
     min_overlap=0,
+    tracks1_is_ref=False,
 ):
     """
 
@@ -85,30 +86,42 @@ def _match_pair(
 
     # Find corresponding points (same time step, less than max_dist km)
     merged = pd.merge(tracks1, tracks2, on="time")
-    X = np.concatenate([[merged.lat_x], [merged.lon_x]]).T
-    Y = np.concatenate([[merged.lat_y], [merged.lon_y]]).T
-    merged["dist"] = haversine_vector(X, Y, unit=Unit.KILOMETERS)
-    merged = merged[merged.dist <= max_dist]
-    # Compute temporal overlap
-    temp = (
-        merged.groupby(["track_id_x", "track_id_y"])[["dist"]]
-        .count()
-        .rename(columns={"dist": "temp"})
-    )
-    # Build a table of all pairs of tracks sharing at least one point
-    matches = (
-        merged[["track_id_x", "track_id_y"]]
-        .drop_duplicates()
-        .join(temp, on=["track_id_x", "track_id_y"])
-    )
-    matches = matches[matches.temp >= min_overlap]
-    dist = merged.groupby(["track_id_x", "track_id_y"])[["dist"]].mean()
-    matches = matches.merge(dist, on=["track_id_x", "track_id_y"])
-    # Rename columns before output
-    matches = matches.rename(
-        columns={"track_id_x": "id_" + name1, "track_id_y": "id_" + name2}
-    )
-    return matches
+    
+    if len(merged) > 0: # if there exist matching points, continue
+        X = np.concatenate([[merged.lat_x], [merged.lon_x]]).T
+        Y = np.concatenate([[merged.lat_y], [merged.lon_y]]).T
+        merged["dist"] = haversine_vector(X, Y, unit=Unit.KILOMETERS)
+        merged = merged[merged.dist <= max_dist]
+        # Compute temporal overlap
+        temp = (
+            merged.groupby(["track_id_x", "track_id_y"])[["dist"]]
+            .count()
+            .rename(columns={"dist": "temp"})
+        )
+        # Build a table of all pairs of tracks sharing at least one point
+        matches = (
+            merged[["track_id_x", "track_id_y"]]
+            .drop_duplicates()
+            .join(temp, on=["track_id_x", "track_id_y"])
+        )
+        matches = matches[matches.temp >= min_overlap]
+        dist = merged.groupby(["track_id_x", "track_id_y"])[["dist"]].mean()
+        matches = matches.merge(dist, on=["track_id_x", "track_id_y"])
+
+        # Treat duplicates if required
+        if tracks1_is_ref: 
+            ## Treat the duplicates where one tracks2 track has several corresponding tracks1:
+            ## Keep the couple with the longest overlap
+            matches = matches.sort_values("temp", ascending = False).groupby("track_id_y").first().reset_index() 
+        
+        # Rename columns before output
+        matches = matches.rename(
+            columns={"track_id_x": "id_" + name1, "track_id_y": "id_" + name2}
+        )
+        return matches
+        
+    else: # if there exist no matching points, return empty dataframe
+        return pd.DataFrame(columns = ["id_" + name1, "id_" + name2, "temp", "dist"])
 
 
 def _match_multiple(
@@ -116,6 +129,7 @@ def _match_multiple(
     names,
     max_dist=300,
     min_overlap=0,
+    tracks1_is_ref = False,
 ):
     """
     Function to match any number of tracks sets
@@ -150,7 +164,8 @@ def _match_multiple(
     for names_pair, dataset_pair in zip(
         combinations(names, 2), combinations(datasets, 2)
     ):
-        m = _match_pair(*dataset_pair, *names_pair, max_dist, min_overlap)
+        m = _match_pair(*dataset_pair, *names_pair, max_dist, min_overlap, 
+                        tracks1_is_ref = tracks1_is_ref * (names_pair[0] == names[0]))
         if len(m) == 0:
             raise NotImplementedError(
                 "For the moment, the case where two datasets have no match is not handled. Problem raised by datasets "  # TODO
