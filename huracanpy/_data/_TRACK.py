@@ -31,8 +31,12 @@ def _parse(fmt, string, **kwargs):
     return result
 
 
-def parse_date(date, calendar=None):
-    if len(date) == 10:  # i.e., YYYYMMDDHH
+def parse_date(date, calendar=None, initial_date = None, timestep=None):
+    if calendar == "timestep":
+        initial_date = np.datetime64(initial_date)
+        delta = np.timedelta64((int(date)-1) * timestep, 'h') 
+        return initial_date + delta
+    elif len(date) == 10:  # i.e., YYYYMMDDHH
         if calendar is not None:
             yr = int(date[0:4])
             mn = int(date[4:6])
@@ -41,17 +45,21 @@ def parse_date(date, calendar=None):
             return cftime.datetime(yr, mn, dy, hr, calendar=calendar)
         else:
             return datetime.datetime.strptime(date.strip(), "%Y%m%d%H")
-    else:
+    else :
         return int(date)
 
 
-def load(filename, calendar=None, variable_names=None):
+def load(filename, calendar=None, initial_date = None, timestep = 6, variable_names=None):
     """Load ASCII TRACK data as an xarray.Dataset
 
     Parameters
     ----------
     filename: str
     calendar : optional
+    initial_date : str, optional
+        When calendar is "timestep", is the date of the first timestep
+    timestep : int, optional
+        When calendar is "timestep", number of hours between two time steps
     variable_names : list of str, optional
         TRACK
 
@@ -143,7 +151,7 @@ def load(filename, calendar=None, variable_names=None):
             # Populate time and data line by line
             for m in range(npoints):
                 line = f.readline().strip()
-                times.append(parse_date(line.split(" ")[0], calendar=calendar))
+                times.append(parse_date(line.split(" ")[0], calendar=calendar, initial_date=initial_date, timestep=timestep))
                 output.append(line.replace("&", " "))
 
     output = np.genfromtxt(output)
