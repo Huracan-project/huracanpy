@@ -9,6 +9,7 @@ __all__ = [
     "example_TRACK_file",
     "example_TRACK_tilt_file",
     "example_TRACK_netcdf_file",
+    "example_TRACK_timestep_file",
     "example_TE_file",
     "example_CHAZ_file",
     "example_MIT_file",
@@ -41,6 +42,10 @@ example_TRACK_netcdf_file = str(
     / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind.tcident.new.nc"
 )
 
+example_TRACK_timestep_file = str(
+    testdata_dir
+    / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind.nolat.tcident.hart_sample"
+)
 example_TE_file = str(testdata_dir / "TempestExtremes-sample.txt")
 
 example_CHAZ_file = str(testdata_dir / "CHAZ_sample.nc")
