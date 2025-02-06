@@ -131,28 +131,31 @@ def load(filename, calendar=None, initial_date = None, timestep = 6, variable_na
         for n in range(ntracks):
             # Read individual track header (two lines)
             line = f.readline().strip()
-            try:
-                track_info = _parse(track_header_fmt, line).named
-            except ValueError:
-                track_info = _parse(track_header_fmt_new, line).named
-
-            line = f.readline().strip()
-            npoints = _parse(track_info_fmt, line)["npoints"]
-
-            # Generate arrays for time coordinate and variables
-            # Time is a list because it will hold datetime or cftime objects
-            # Other variables are a dictionary mapping variable name to a tuple of
-            # (time, data_array) as this is what is passed to xarray.Dataset
-
-            # Add track ID as a variable along the record dimension so that it can be used
-            # for groupby
-            track_id.extend([track_info["track_id"]] * npoints)
-
-            # Populate time and data line by line
-            for m in range(npoints):
+            if not line.replace(' ', '') == '': # If line is empty
+                try:
+                    track_info = _parse(track_header_fmt, line).named
+                except ValueError:
+                    track_info = _parse(track_header_fmt_new, line).named
+    
                 line = f.readline().strip()
-                times.append(parse_date(line.split(" ")[0], calendar=calendar, initial_date=initial_date, timestep=timestep))
-                output.append(line.replace("&", " "))
+                npoints = _parse(track_info_fmt, line)["npoints"]
+    
+                # Generate arrays for time coordinate and variables
+                # Time is a list because it will hold datetime or cftime objects
+                # Other variables are a dictionary mapping variable name to a tuple of
+                # (time, data_array) as this is what is passed to xarray.Dataset
+    
+                # Add track ID as a variable along the record dimension so that it can be used
+                # for groupby
+                track_id.extend([track_info["track_id"]] * npoints)
+    
+                # Populate time and data line by line
+                for m in range(npoints):
+                    line = f.readline().strip()
+                    times.append(parse_date(line.split(" ")[0], calendar=calendar, initial_date=initial_date, timestep=timestep))
+                    output.append(line.replace("&", " "))
+            else: 
+                print("Parsed line is empty. It is possible this problem arrises because the number of tracks expected from the header was not found in the file.") # TODO: Make a proper error message.
 
     output = np.genfromtxt(output)
     data_vars = {
