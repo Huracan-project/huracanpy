@@ -18,6 +18,7 @@ import huracanpy
         (huracanpy.example_WiTRACK_file, dict(source="witrack"), 14, 0, 3194, 268),
         (None, dict(source="ibtracs", ibtracs_subset="wmo"), 8, 0, 143287, 4540),
         (None, dict(source="ibtracs", ibtracs_subset="usa"), 10, 0, 121806, 4170),
+        (huracanpy.example_old_HURDAT_file, dict(source = "ecmwf"), 8, 0, 183, 29),
     ],
 )
 def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):

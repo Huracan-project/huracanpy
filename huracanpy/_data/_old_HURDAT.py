@@ -65,6 +65,6 @@ def load(filename):
     df["time"] = pd.to_datetime(df.time)
 
     # Return as xarray
-    return df.to_xarray().rename({"index":"record"})
+    return df.to_xarray().rename({"index":"record"}).drop_vars("record")
 
 
