@@ -10,6 +10,15 @@ import xarray as xr
 import huracanpy
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--docs",
+        action="store_true",
+        default=False,
+        help="Test running documentation ipynb's",
+    )
+
+
 @pytest.fixture()
 def tracks_csv():
     return huracanpy.load(huracanpy.example_csv_file)
