@@ -34,6 +34,7 @@ def _get_distance_haversine(lon1, lat1, lon2, lat2):
     yx2 = np.array([lat2, lon2]).T
     return haversine_vector(yx1, yx2, unit="m")
 
+@preprocess_and_wrap(wrap_like="lon")
 def azimuth(lon, lat, track_id=None, ellps = "WGS84"):
     """Compute azimuth between points using geodesic calculation.
     
