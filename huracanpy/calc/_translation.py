@@ -15,14 +15,14 @@ from ._rates import delta
 from .._metpy import dequantify_results
 
 
-def _get_distance_geod(lon1, lat1, lon2, lat2, ellps="WGS84"):
+def _get_distance_azimuth_geod(lon1, lat1, lon2, lat2, ellps="WGS84"):
     # initialize Geod object
     geodesic = pyproj.Geod(ellps=ellps)
 
     # Compute distance for all data
     fwd_azimuth, back_azimuth, dist = geodesic.inv(lon1, lat1, lon2, lat2)
 
-    return dist
+    return dist, fwd_azimuth
 
 
 def _get_distance_haversine(lon1, lat1, lon2, lat2):
@@ -33,6 +33,42 @@ def _get_distance_haversine(lon1, lat1, lon2, lat2):
     yx1 = np.array([lat1, lon1]).T
     yx2 = np.array([lat2, lon2]).T
     return haversine_vector(yx1, yx2, unit="m")
+
+def azimuth(lon, lat, track_id=None, ellps = "WGS84"):
+    """Compute azimuth between points using geodesic calculation.
+    
+    Parameters
+    ----------
+    lon : xarray.DataArray
+    lat : xarray.DataArray
+    track_id : array_like, optional
+    ellps : str, optional
+        The definition of the globe to use for the geodesic calculation (see
+        `pyproj.Geod`). Default is "WGS84".
+    Returns
+    -------
+    xarray.DataArray
+        Azimuth in degrees. 
+            0° corresponds to northward (or stagnating);
+            90° corresponds to eastward;
+            180° corresponds to southward;
+            -90° corresponds to westwards.
+    """
+
+    # Compute azimuth
+    _, azimuth = _get_distance_azimuth_geod(lon[:-1], lat[:-1], lon[1:], lat[1:], ellps=ellps)
+
+    # Mask track transition points
+    if track_id is not None:
+        azimuth[track_id[1:] != track_id[:-1]] = np.nan * azimuth[0]
+        azimuth = np.concatenate([azimuth, [np.nan * azimuth[0]]])
+    else:
+        warnings.warn(
+            "track_id is not provided, all points are considered to come from the"
+            "same track"
+        )
+
+    return azimuth
 
 
 @dequantify_results
@@ -103,7 +139,7 @@ def distance(lon, lat, *args, track_id=None, method="geod", ellps="WGS84"):
         )
 
     if method == "geod":
-        dist = _get_distance_geod(lon1, lat1, lon2, lat2, ellps=ellps)
+        dist, _ = _get_distance_azimuth_geod(lon1, lat1, lon2, lat2, ellps=ellps)
     elif method == "haversine":
         dist = _get_distance_haversine(lon1, lat1, lon2, lat2)
     else:
