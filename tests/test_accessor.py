@@ -46,6 +46,7 @@ def test_nunique():
             {"slp_name": "slp"},
         ),
         (huracanpy.calc.distance, ["lon", "lat", "track_id"], "distance", {}),
+        (huracanpy.calc.azimuth, ["lon", "lat", "track_id"], "azimuth", {}),
         (
             huracanpy.calc.translation_speed,
             ["lon", "lat", "time", "track_id"],
