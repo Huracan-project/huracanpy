@@ -48,6 +48,8 @@ docs = [
     "sphinx-design",
     "ipykernel",
     "myst-parser",
+    "nbformat",
+    "nbsphinx",
 ]
 
 [build-system]
