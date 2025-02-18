@@ -340,7 +340,7 @@ class HuracanPyDatasetAccessor:
 
     # ---- translation
     def get_azimuth(
-        self, 
+        self,
         lon_name="lon",
         lat_name="lat",
         track_id_name="track_id",
@@ -380,7 +380,7 @@ class HuracanPyDatasetAccessor:
             lon_name, lat_name, track_id_name, ellps
         )
         return self._dataset
-        
+
     def get_distance(
         self,
         lon_name="lon",

@@ -34,10 +34,11 @@ def _get_distance_haversine(lon1, lat1, lon2, lat2):
     yx2 = np.array([lat2, lon2]).T
     return haversine_vector(yx1, yx2, unit="m")
 
+
 @preprocess_and_wrap(wrap_like="lon")
-def azimuth(lon, lat, track_id=None, ellps = "WGS84"):
+def azimuth(lon, lat, track_id=None, ellps="WGS84"):
     """Compute azimuth between points using geodesic calculation.
-    
+
     Parameters
     ----------
     lon : xarray.DataArray
@@ -49,7 +50,7 @@ def azimuth(lon, lat, track_id=None, ellps = "WGS84"):
     Returns
     -------
     xarray.DataArray
-        Azimuth in degrees. 
+        Azimuth in degrees.
             0° corresponds to northward (or stagnating);
             90° corresponds to eastward;
             180° corresponds to southward;
@@ -57,7 +58,9 @@ def azimuth(lon, lat, track_id=None, ellps = "WGS84"):
     """
 
     # Compute azimuth
-    _, azimuth = _get_distance_azimuth_geod(lon[:-1], lat[:-1], lon[1:], lat[1:], ellps=ellps)
+    _, azimuth = _get_distance_azimuth_geod(
+        lon[:-1], lat[:-1], lon[1:], lat[1:], ellps=ellps
+    )
 
     # Mask track transition points
     if track_id is not None:

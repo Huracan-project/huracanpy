@@ -182,7 +182,10 @@ def load(
             data = ibtracs.load(ibtracs_subset, filename, **kwargs)
         elif source == "netcdf":
             data = _netcdf.load(filename, rename, **kwargs)
-        elif source in ["old_hurdat", "ecmwf",]:
+        elif source in [
+            "old_hurdat",
+            "ecmwf",
+        ]:
             data = _old_HURDAT.load(filename)
         else:
             raise ValueError(f"Source {source} unsupported or misspelled")
