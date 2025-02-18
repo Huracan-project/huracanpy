@@ -35,10 +35,12 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-  "pre-commit",
-  "pytest",
-  "ruff",
-  "tox",
+    "pre-commit",
+    "pytest",
+    "ruff",
+    "tox",
+    "nbformat",
+    "nbsphinx",
 ]
 docs = [
     "pydata-sphinx-theme",
@@ -48,8 +50,6 @@ docs = [
     "sphinx-design",
     "ipykernel",
     "myst-parser",
-    "nbformat",
-    "nbsphinx",
 ]
 
 [build-system]
