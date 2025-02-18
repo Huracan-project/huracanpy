@@ -339,6 +339,48 @@ class HuracanPyDatasetAccessor:
         return self._dataset
 
     # ---- translation
+    def get_azimuth(
+        self, 
+        lon_name="lon",
+        lat_name="lat",
+        track_id_name="track_id",
+        ellps="WGS84",
+    ):
+        """
+        Compute the azimuth between points along a track
+        """
+        if track_id_name in list(self._dataset.variables):
+            return calc.azimuth(
+                self._dataset[lon_name],
+                self._dataset[lat_name],
+                track_id=self._dataset[track_id_name],
+                ellps=ellps,
+            )
+        if (track_id_name is None) or (
+            track_id_name not in list(self._dataset.variables)
+        ):
+            return calc.distance(
+                self._dataset[lon_name],
+                self._dataset[lat_name],
+                track_id=None,
+                ellps=ellps,
+            )
+
+    def add_azimuth(
+        self,
+        lon_name="lon",
+        lat_name="lat",
+        track_id_name="track_id",
+        ellps="WGS84",
+    ):
+        """
+        Add the azimuth calculation to the dataset.
+        """
+        self._dataset["azimuth"] = self.get_azimuth(
+            lon_name, lat_name, track_id_name, ellps
+        )
+        return self._dataset
+        
     def get_distance(
         self,
         lon_name="lon",

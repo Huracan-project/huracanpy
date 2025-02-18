@@ -4,6 +4,12 @@ from metpy.units import units
 
 import huracanpy
 
+def test_azimuth():
+    data = huracanpy.load(huracanpy.example_csv_file)
+    az = huracanpy.calc.azimuth(data.lon, data.lat, data.track_id)
+
+    np.testing.assert_approx_equal(az[0], -109.07454278, significant=6)
+    np.testing.assert_approx_equal(az.mean(), 28.99955985, significant=6)
 
 def test_get_distance():
     data = huracanpy.load(huracanpy.example_csv_file)

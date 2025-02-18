@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack
+from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack, _old_HURDAT
 from . import ibtracs
 
 
@@ -56,6 +56,7 @@ def load(
         * **ibtracs**
         * **csv**
         * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided appropriate variable_names)
+        * **old_hurdat**, **ecmwf**
 
     variable_names : list of str, optional
           When loading data from an ASCII file (TRACK or TempestExtremes), specify the
@@ -181,6 +182,8 @@ def load(
             data = ibtracs.load(ibtracs_subset, filename, **kwargs)
         elif source == "netcdf":
             data = _netcdf.load(filename, rename, **kwargs)
+        elif source in ["old_hurdat", "ecmwf",]:
+            data = _old_HURDAT.load(filename)
         else:
             raise ValueError(f"Source {source} unsupported or misspelled")
 
