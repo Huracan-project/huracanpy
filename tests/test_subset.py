@@ -15,6 +15,16 @@ def test_sel_id(tracks_csv):
     assert npoints == len(tracks_csv.record)
 
 
+def test_sel_id_array(tracks_csv):
+    npoints = 0
+    for track_id in [[0, 1], [2]]:
+        tracks_subset = huracanpy.sel_id(tracks_csv, tracks_csv.track_id, track_id)
+        assert np.isin(tracks_subset.track_id, track_id).all()
+        npoints += len(tracks_subset.record)
+
+    assert npoints == len(tracks_csv.record)
+
+
 def test_trackswhere():
     tracks = huracanpy.load(huracanpy.example_csv_file)
 

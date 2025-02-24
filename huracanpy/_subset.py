@@ -5,7 +5,7 @@ __all__ = ["trackswhere", "sel_id"]
 
 
 def sel_id(tracks, track_ids, track_id):
-    """Select an individual track from a set of tracks by ID
+    """Select a track or tracks from a dataset of tracks by ID
 
     Parameters
     ----------
@@ -13,8 +13,7 @@ def sel_id(tracks, track_ids, track_id):
     track_ids : xarray.DataArray
         The track_ids corresponding to the tracks Dataset
     track_id : Any
-        The track ID to match in track_ids. Must be the same type as the track_ids.
-        Usually `int` or `str`
+        The track ID or IDs to match in track_ids.
 
     Returns
     -------
@@ -24,8 +23,11 @@ def sel_id(tracks, track_ids, track_id):
     if track_ids.ndim != 1:
         raise ValueError("track_ids must be 1d")
 
+    if np.isscalar(track_id):
+        track_id = [track_id]
+
     dim = track_ids.dims[0]
-    idx = np.where(track_ids == track_id)[0]
+    idx = np.where(np.isin(track_ids, track_id))[0]
 
     return tracks.isel(**{dim: idx})
 
