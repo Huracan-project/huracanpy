@@ -1,4 +1,18 @@
+import numpy as np
+
 import huracanpy
+
+
+def test_sel_id(tracks_csv):
+    # Check that only the points with the track id are extracted each time and all of
+    # the points are extracted once
+    npoints = 0
+    for track_id in np.unique(tracks_csv.track_id):
+        tracks_subset = huracanpy.sel_id(tracks_csv, tracks_csv.track_id, track_id)
+        np.testing.assert_array_equal(tracks_subset.track_id, track_id)
+        npoints += len(tracks_subset.record)
+
+    assert npoints == len(tracks_csv.record)
 
 
 def test_trackswhere():
