@@ -1,12 +1,12 @@
 [project]
 name = "huracanpy"
-version = "1.1.0"
+version = "1.2.0-beta"
 authors = [
   { name="Leo Saffin", email="l.saffin@reading.ac.uk" },
   { name="Stella Bourdin", email="stella.bourdin@physics.ox.ac.uk" },
 ]
 description = "A python package for working with various forms of feature tracking data"
-requires-python = ">=3.8, <3.13"
+requires-python = ">=3.9, <3.14"
 dependencies = [
     "numpy",
     "xarray",
@@ -16,11 +16,7 @@ dependencies = [
     "pandas",
     # Issue with newer versions of fiona when using old versions of geopandas
     # see https://stackoverflow.com/a/78949565/8270394
-    # Normally just specify the newer geopandas, but it does not exist for python3.8
-    # so pin the version of fiona when using python3.8
-    "geopandas>=0.14.4;python_version>='3.9'",
-    "geopandas;python_version<'3.9'",
-    "fiona<=1.9.6;python_version<'3.9'",
+    "geopandas>=0.14.4",
     "matplotlib",
     "seaborn",
     "netcdf4",
@@ -35,10 +31,12 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-  "pre-commit",
-  "pytest",
-  "ruff",
-  "tox",
+    "pre-commit",
+    "pytest",
+    "ruff>=0.9.0",
+    "tox",
+    "nbformat",
+    "nbsphinx",
 ]
 docs = [
     "pydata-sphinx-theme",
@@ -73,7 +71,7 @@ extend-select = [
 
 [tool.tox]
 requires = ["tox>=4.15.0"]
-env_list = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+env_list = ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
 [tool.tox.env_run_base]
 extras = ["dev"]

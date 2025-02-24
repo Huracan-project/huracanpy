@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack
+from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack, _old_HURDAT
 from . import ibtracs
 
 
@@ -56,6 +56,7 @@ def load(
         * **ibtracs**
         * **csv**
         * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided appropriate variable_names)
+        * **old_hurdat**, **ecmwf**
 
     variable_names : list of str, optional
           When loading data from an ASCII file (TRACK or TempestExtremes), specify the
@@ -116,6 +117,8 @@ def load(
           calendar to the default :class:`datetime.datetime`, then you can pass this
           argument to load the times in as :class:`cftime.datetime` with the given
           calendar instead
+          Can also be set to "timestep" if the TRACK file has timesteps instead of dates.
+          In that case, you need to provide initial_date and timestep arguments.
     **kwargs
         When loading tracks from a standard files these will be passed to the relevant
         load function
@@ -154,7 +157,10 @@ def load(
         source = source.lower()
         if source == "track":
             data = _TRACK.load(
-                filename, calendar=track_calendar, variable_names=variable_names
+                filename,
+                calendar=track_calendar,
+                variable_names=variable_names,
+                **kwargs,
             )
         elif source == "track.tilt":
             data = _TRACK.load_tilts(
@@ -176,6 +182,11 @@ def load(
             data = ibtracs.load(ibtracs_subset, filename, **kwargs)
         elif source == "netcdf":
             data = _netcdf.load(filename, rename, **kwargs)
+        elif source in [
+            "old_hurdat",
+            "ecmwf",
+        ]:
+            data = _old_HURDAT.load(filename)
         else:
             raise ValueError(f"Source {source} unsupported or misspelled")
 
