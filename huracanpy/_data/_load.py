@@ -112,13 +112,22 @@ def load(
         This is an option in the Colin's load function, so I assume this can change
         between files
 
-    track_calendar : str, optional
+    track_calendar : [str, tuple] optional
           When loading data from a TRACK ASCII file, if the data uses a different
           calendar to the default :class:`datetime.datetime`, then you can pass this
           argument to load the times in as :class:`cftime.datetime` with the given
           calendar instead
-          Can also be set to "timestep" if the TRACK file has timesteps instead of dates.
-          In that case, you need to provide initial_date and timestep arguments.
+
+          If the TRACK file has timesteps instead of dates. Then you can pass a tuple
+          with the initial time and timestep e.g. ("1940-01-01", 6)
+
+          * The first argument is the initial time and needs to be something readable by
+            :class:`numpy.datetime64`, or you can explicity pass a
+            :class:`numpy.datetime64` object.
+          * The second argument is the step and is passed to :class:`numpy.timedelta64`
+            and is assumed to be in hours, or you can explicitly pass a
+            :class:`numpy.timedelta64` object and specify the units
+
     **kwargs
         When loading tracks from a standard files these will be passed to the relevant
         load function
@@ -160,7 +169,6 @@ def load(
                 filename,
                 calendar=track_calendar,
                 variable_names=variable_names,
-                **kwargs,
             )
         elif source == "track.tilt":
             data = _TRACK.load_tilts(

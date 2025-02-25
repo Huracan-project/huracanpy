@@ -14,10 +14,20 @@ import huracanpy
         (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86),
         (
             huracanpy.example_TRACK_timestep_file,
+            dict(source="TRACK", track_calendar=("1940-01-01", 6)),
+            38,
+            0,
+            416,
+            19,
+        ),
+        (
+            huracanpy.example_TRACK_timestep_file,
             dict(
                 source="TRACK",
-                track_calendar="timestep",
-                initial_date="1940-01-01",
+                track_calendar=(
+                    np.datetime64("1940-01-01"),
+                    np.timedelta64(6 * 60 * 60, "s"),
+                ),
             ),
             38,
             0,
