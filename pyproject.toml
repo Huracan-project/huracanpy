@@ -1,6 +1,6 @@
 [project]
 name = "huracanpy"
-version = "1.2.0-beta"
+version = "1.2.0"
 authors = [
   { name="Leo Saffin", email="l.saffin@reading.ac.uk" },
   { name="Stella Bourdin", email="stella.bourdin@physics.ox.ac.uk" },
