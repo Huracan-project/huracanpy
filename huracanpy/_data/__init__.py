@@ -16,6 +16,7 @@ __all__ = [
     "example_ERA20C_file",
     "example_WiTRACK_file",
     "example_old_HURDAT_file",
+    "example_STORM_file",
 ]
 
 import pathlib
@@ -55,3 +56,5 @@ example_ERA20C_file = str(testdata_dir / "ERA20C_TRACK_NATL_tcident.nc")
 example_WiTRACK_file = str(testdata_dir / "event_tracks_2017_ERA5.dat")
 
 example_old_HURDAT_file = str(testdata_dir / "00012024050100_050_0005160_atl")
+
+example_STORM_file = str(testdata_dir / "STORM_DATA_NA_10_YEARS_0.txt")

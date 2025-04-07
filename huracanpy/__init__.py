@@ -13,6 +13,7 @@ __all__ = [
     "sel_id",
     "trackswhere",
     "interp_time",
+    "infer_track_id",
     # Parameters
     "basins",
     "example_csv_file",
@@ -28,6 +29,7 @@ __all__ = [
     "example_ERA20C_file",
     "example_WiTRACK_file",
     "example_old_HURDAT_file",
+    "example_STORM_file",
     "_accessor",
 ]
 
@@ -47,10 +49,12 @@ from ._data import (
     example_ERA20C_file,
     example_WiTRACK_file,
     example_old_HURDAT_file,
+    example_STORM_file,
 )
 from ._basins import basins
 from ._interp import interp_time
 from ._subset import sel_id, trackswhere
+from ._utils import infer_track_id
 from . import calc, plot, assess, info, tc
 
 from . import _accessor
