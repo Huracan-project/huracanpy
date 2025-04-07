@@ -1,0 +1,36 @@
+import numpy as np
+
+
+def infer_track_id(*variables):
+    """Create a track_id variable by combining multiple identifying variables
+
+    If, for example, we have a set of tracks with variables `year` and `storm_number`,
+    but `storm_number` is reset to zero for each year, we can still uniquely identify
+    each track using the combination of `year` and `storm_number`. This function
+    does that identification and creates a track_id array, e.g.
+
+    >>> track_id = huracanpy.infer_track_id(tracks.year, tracks.storm_number)
+
+    Parameters
+    ----------
+    *variables
+
+    Returns
+    -------
+    np.ndarray
+        An array of integers ranging from 0 to the total number of tracks. Identifying
+        the track of each record
+
+    """
+    long_id = ""
+    for variable in variables:
+        _, partial_id = np.unique(variable, return_inverse=True)
+
+        # Split up the individual IDs to avoid accidental matches
+        # e.g. (11, 1) and (1, 11) are 11-1 and 1-11 rather than both 111
+        long_id = np.char.add(long_id, "-")
+        long_id = np.char.add(long_id, partial_id.astype(str))
+
+    _, track_id = np.unique(long_id, return_inverse=True)
+
+    return track_id

@@ -3,6 +3,7 @@ import pandas as pd
 
 from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack, _old_HURDAT
 from . import ibtracs
+from .. import _utils
 
 
 rename_defaults = dict(
@@ -26,6 +27,7 @@ def load(
     rename=dict(),
     units=None,
     baselon=None,
+    infer_track_id=None,
     ibtracs_subset="wmo",
     tempest_extremes_unstructured=False,
     tempest_extremes_header_str="start",
@@ -86,6 +88,13 @@ def load(
     baselon : scalar, optional
         Force the loaded longitudes into the range (baselon, baselon + 360). e.g.
         (0, 360) or (-180, 180)
+
+    infer_track_id : list, optional
+        If track_id is not a variable in the file, but the individual tracks can be
+        inferred from the combination of other variables, e.g. the file has year and
+        storm number by year, then pass a list with those variable names, and a new
+        track_id variable will be created
+
     ibtracs_subset : str, default="wmo"
         IBTrACS subset. Two offline versions are available:
 
@@ -210,5 +219,11 @@ def load(
 
     if baselon is not None:
         data["lon"] = ((data.lon - baselon) % 360) + baselon
+
+    if infer_track_id is not None:
+        data["track_id"] = (
+            "record",
+            _utils.infer_track_id(*[data[var] for var in infer_track_id]),
+        )
 
     return data
