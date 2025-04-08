@@ -267,7 +267,7 @@ class HuracanPyDatasetAccessor:
         )
 
     def add_inferred_track_id(self, *variable_names, track_id_name="track_id"):
-        self._dataset[track_id_name] = self.get_inferred_track_id(variable_names)
+        self._dataset[track_id_name] = self.get_inferred_track_id(*variable_names)
         return self._dataset
 
     # --- category

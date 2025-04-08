@@ -17,9 +17,10 @@ def inferred_track_id(*variables):
 
     Returns
     -------
-    np.ndarray
+    array_like
         An array of integers ranging from 0 to the total number of tracks. Identifying
-        the track of each record
+        the track of each record. The return type is the same type as the input or a
+        numpy.ndarray if the input does not have a `copy` method
 
     """
     long_id = ""
@@ -33,4 +34,12 @@ def inferred_track_id(*variables):
 
     _, track_id = np.unique(long_id, return_inverse=True)
 
-    return track_id
+    # Try to return the same type as the input
+    try:
+        track_id_return = variables[0].copy()
+        track_id_return[:] = track_id
+
+        return track_id_return
+
+    except AttributeError:
+        return track_id
