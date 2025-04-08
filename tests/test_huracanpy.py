@@ -41,6 +41,33 @@ import huracanpy
         (None, dict(source="ibtracs", ibtracs_subset="wmo"), 8, 0, 143287, 4540),
         (None, dict(source="ibtracs", ibtracs_subset="usa"), 10, 0, 121806, 4170),
         (huracanpy.example_old_HURDAT_file, dict(source="ecmwf"), 8, 0, 183, 29),
+        (
+            huracanpy.example_STORM_file,
+            dict(
+                source="csv",
+                names=[
+                    "year",
+                    "month",
+                    "time",
+                    "TC_num",
+                    "timeStep",
+                    "basinID",
+                    "lat",
+                    "lon",
+                    "minP",
+                    "Vmax",
+                    "Rmax",
+                    "cat",
+                    "landfall",
+                    "dist_land",
+                ],
+                infer_track_id=["year", "tc_num"],
+            ),
+            15,
+            0,
+            3909,
+            134,
+        ),
     ],
 )
 def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):

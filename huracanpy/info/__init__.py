@@ -10,6 +10,7 @@ __all__ = [
     "category",
     "time_components",
     "season",
+    "inferred_track_id",
 ]
 
 from ._geography import (
@@ -22,3 +23,4 @@ from ._geography import (
 )
 from ._category import category
 from ._time import time_components, season
+from ._utils import inferred_track_id

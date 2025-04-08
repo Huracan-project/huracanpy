@@ -28,6 +28,7 @@ __all__ = [
     "example_ERA20C_file",
     "example_WiTRACK_file",
     "example_old_HURDAT_file",
+    "example_STORM_file",
     "_accessor",
 ]
 
@@ -47,6 +48,7 @@ from ._data import (
     example_ERA20C_file,
     example_WiTRACK_file,
     example_old_HURDAT_file,
+    example_STORM_file,
 )
 from ._basins import basins
 from ._interp import interp_time
