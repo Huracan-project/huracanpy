@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def infer_track_id(*variables):
+def inferred_track_id(*variables):
     """Create a track_id variable by combining multiple identifying variables
 
     If, for example, we have a set of tracks with variables `year` and `storm_number`,
@@ -9,7 +9,7 @@ def infer_track_id(*variables):
     each track using the combination of `year` and `storm_number`. This function
     does that identification and creates a track_id array, e.g.
 
-    >>> track_id = huracanpy.infer_track_id(tracks.year, tracks.storm_number)
+    >>> track_id = huracanpy.inferred_track_id(tracks.year,tracks.storm_number)
 
     Parameters
     ----------

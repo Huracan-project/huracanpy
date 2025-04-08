@@ -13,7 +13,6 @@ __all__ = [
     "sel_id",
     "trackswhere",
     "interp_time",
-    "infer_track_id",
     # Parameters
     "basins",
     "example_csv_file",
@@ -54,7 +53,6 @@ from ._data import (
 from ._basins import basins
 from ._interp import interp_time
 from ._subset import sel_id, trackswhere
-from ._utils import infer_track_id
 from . import calc, plot, assess, info, tc
 
 from . import _accessor
