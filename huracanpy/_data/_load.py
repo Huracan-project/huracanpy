@@ -3,7 +3,6 @@ import pandas as pd
 
 from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack, _old_HURDAT
 from . import ibtracs
-from .. import info
 
 
 rename_defaults = dict(
@@ -221,9 +220,6 @@ def load(
         data["lon"] = ((data.lon - baselon) % 360) + baselon
 
     if infer_track_id is not None:
-        data["track_id"] = (
-            "record",
-            info.inferred_track_id(*[data[var] for var in infer_track_id]),
-        )
+        data = data.hrcn.add_inferred_track_id(*infer_track_id)
 
     return data
