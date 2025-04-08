@@ -204,6 +204,10 @@ def test_get_methods(tracks_csv):
     )
     xr.testing.assert_equal(apex_vals_acc, apex_vals_fct)
 
+    ## Inferred track_id
+    track_id = data.hrcn.get_inferred_track_id("track_id")
+    xr.testing.assert_equal(track_id, data.track_id)
+
 
 def test_interp_methods():
     data = huracanpy.load(huracanpy.example_csv_file)
