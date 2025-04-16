@@ -22,6 +22,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_design",
     "myst_parser",
+    "sphinx_autosummary_accessors",
 ]
 
 templates_path = ["_templates"]
