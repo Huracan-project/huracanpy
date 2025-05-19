@@ -2,9 +2,12 @@
 Utils related to time
 """
 
-import pandas as pd
-import numpy as np
+import warnings
+
 from metpy.xarray import preprocess_and_wrap
+import numpy as np
+from pint.errors import UnitStrippedWarning
+import pandas as pd
 
 from ._geography import hemisphere
 
@@ -61,7 +64,13 @@ def season(track_id, lat, time, convention="tc-short"):
     hemi = hemisphere(lat)
 
     try:
-        time = pd.to_datetime(time)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                category=UnitStrippedWarning,
+                message="The unit of the quantity is stripped when downcasting to ndarray.",
+            )
+            time = pd.to_datetime(time)
         year = time.year
         month = time.month
     except TypeError:
@@ -70,9 +79,15 @@ def season(track_id, lat, time, convention="tc-short"):
         month = np.array([t.month for t in time])
 
     # Store in a dataframe
-    df = pd.DataFrame(
-        {"hemi": hemi, "year": year, "month": month, "track_id": track_id}
-    )
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            category=UnitStrippedWarning,
+            message="The unit of the quantity is stripped when downcasting to ndarray.",
+        )
+        df = pd.DataFrame(
+            {"hemi": hemi, "year": year, "month": month, "track_id": track_id}
+        )
     # Most frequent year, month and hemisphere for each track
     # Grouping is done to avoid labelling differently points in a track that might cross hemisphere or seasons.
     group = df.groupby("track_id")[["year", "month", "hemi"]].agg(

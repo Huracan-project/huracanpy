@@ -65,12 +65,19 @@ def test_pressure_cat_units(units, expected, convention, pass_as_numpy):
     data = huracanpy.load(huracanpy.example_csv_file, source="csv")
 
     if isinstance(expected, str) and expected == "default":
-        expected = huracanpy.tc.pressure_category(data.slp, convention=convention)
+        with pytest.warns(UserWarning, match="Caution, pressure are likely in Pa"):
+            expected = huracanpy.tc.pressure_category(data.slp, convention=convention)
 
     if pass_as_numpy:
-        result = huracanpy.tc.pressure_category(
-            data.slp.data, convention=convention, slp_units=units
-        )
+        if units != "Pa":
+            with pytest.warns(UserWarning, match="Caution, pressure are likely in Pa"):
+                result = huracanpy.tc.pressure_category(
+                    data.slp.data, convention=convention, slp_units=units
+                )
+        else:
+            result = huracanpy.tc.pressure_category(
+                data.slp.data, convention=convention, slp_units=units
+            )
     else:
         data.slp.attrs["units"] = units
         result = huracanpy.tc.pressure_category(data.slp, convention=convention)

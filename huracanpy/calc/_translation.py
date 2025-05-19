@@ -4,12 +4,13 @@ Utils related to translation distance and time
 
 import warnings
 
-import numpy as np
+from haversine import haversine_vector
 from metpy.units import units
 from metpy.xarray import preprocess_and_wrap
-
+import numpy as np
+from pint.errors import UnitStrippedWarning
 import pyproj
-from haversine import haversine_vector
+
 
 from ._rates import delta
 from .._metpy import dequantify_results
@@ -20,7 +21,13 @@ def _get_distance_azimuth_geod(lon1, lat1, lon2, lat2, ellps="WGS84"):
     geodesic = pyproj.Geod(ellps=ellps)
 
     # Compute distance for all data
-    fwd_azimuth, back_azimuth, dist = geodesic.inv(lon1, lat1, lon2, lat2)
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            category=UnitStrippedWarning,
+            message="The unit of the quantity is stripped when downcasting to ndarray.",
+        )
+        fwd_azimuth, back_azimuth, dist = geodesic.inv(lon1, lat1, lon2, lat2)
 
     return dist, fwd_azimuth
 
@@ -30,8 +37,15 @@ def _get_distance_haversine(lon1, lat1, lon2, lat2):
     lon1 = ((lon1 + 180) % 360) - 180
     lon2 = ((lon2 + 180) % 360) - 180
 
-    yx1 = np.array([lat1, lon1]).T
-    yx2 = np.array([lat2, lon2]).T
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            category=UnitStrippedWarning,
+            message="The unit of the quantity is stripped when downcasting to ndarray.",
+        )
+        yx1 = np.array([lat1, lon1]).T
+        yx2 = np.array([lat2, lon2]).T
+
     return haversine_vector(yx1, yx2, unit="m")
 
 
