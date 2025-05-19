@@ -33,7 +33,7 @@ def time_from_genesis(time, track_ids):
     return (
         time_from_start.to_xarray()
         .rename({"index": track_ids.dims[0]})
-        .drop(track_ids.dims[0])
+        .drop_vars(track_ids.dims[0])
         .rename("time_from_genesis")
     )
 
@@ -73,6 +73,6 @@ def time_from_apex(time, track_ids, intensity_var, stat="max"):
     return (
         time_from_extr.to_xarray()
         .rename({"index": track_ids.dims[0]})
-        .drop(track_ids.dims[0])
+        .drop_vars(track_ids.dims[0])
         .rename("time_from_extremum")
     )
