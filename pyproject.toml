@@ -75,6 +75,7 @@ filterwarnings = [
     "error",
     "default::DeprecationWarning",
     'ignore:numpy.ndarray size changed:RuntimeWarning',
+    "ignore::cartopy.io.DownloadWarning"
 ]
 
 [tool.tox]
