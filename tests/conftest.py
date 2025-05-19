@@ -7,7 +7,8 @@ import cftime
 import numpy as np
 import xarray as xr
 
-import huracanpy
+with pytest.warns(PendingDeprecationWarning, match="Overriding `Axes.cla` in GeoAxes"):
+    import huracanpy
 
 
 def pytest_addoption(parser):

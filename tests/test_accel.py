@@ -87,7 +87,7 @@ def test_accel_get_time_from_apex(tracks, request):
     track_groups = tracks.groupby("track_id")
     expected = []
     for track_id, track in track_groups:
-        idx = track.wind10.argmax()
+        idx = np.argmax(track.wind10.values)
         expected.append(track.time - track.time[idx])
 
     expected = xr.concat(expected, dim="record")

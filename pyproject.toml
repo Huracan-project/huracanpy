@@ -73,8 +73,6 @@ extend-select = [
 minversion = "6.0"
 filterwarnings = [
     "error",
-    "ignore::DeprecationWarning",
-    "ignore::PendingDeprecationWarning",
     'ignore:numpy.ndarray size changed:RuntimeWarning',
 ]
 
