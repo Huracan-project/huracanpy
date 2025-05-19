@@ -23,9 +23,13 @@ conda install -c conda-forge huracanpy
 ```
 or pip
 ```bash
-pip install huracanpy
+python -m pip install huracanpy
 ```
-For older python versions, the pip installation may fail due to issues with installing cartopy through pip. If this happens, use conda to install cartopy first (e.g. ``conda install -c conda-forge cartopy``), then install huracanpy.
+
+To install the most up-to-date version of huracanpy, you can install directly from the repository with
+```bash
+python -m pip install huracanpy @ git+https://github.com/Huracan-project/huracanpy
+```
 
 ## Basic usage
 HuracanPy provides a standard way for working with cyclone track data from different sources.
