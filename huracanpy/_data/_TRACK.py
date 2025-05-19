@@ -176,7 +176,13 @@ def load(filename, calendar=None, variable_names=None):
     data_vars["track_id"] = ("record", track_id)
     data_vars["time"] = ("record", times)
 
-    ds = xr.Dataset(data_vars=data_vars)
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            category=UserWarning,
+            message="Converting non-nanosecond precision datetime values to nanosecond",
+        )
+        ds = xr.Dataset(data_vars=data_vars)
     ds.track_id.attrs["cf_role"] = "trajectory_id"
 
     return ds

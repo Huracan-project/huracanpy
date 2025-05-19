@@ -37,7 +37,8 @@ def test_accel_get_gen_vals(tracks, request):
     tracks = request.getfixturevalue(tracks)
     result = huracanpy.calc.gen_vals(tracks, tracks.time, tracks.track_id)
 
-    expected = tracks.groupby("track_id").first()
+    with pytest.warns(UserWarning, match="No index created for dimension track_id"):
+        expected = tracks.groupby("track_id").first()
 
     xr.testing.assert_identical(result, expected)
 
@@ -50,7 +51,8 @@ def test_accel_get_apex_vals(tracks, request):
     tracks = request.getfixturevalue(tracks)
     result = huracanpy.calc.apex_vals(tracks, tracks.wind10, tracks.track_id)
 
-    expected = tracks.sortby("wind10", ascending=False).groupby("track_id").first()
+    with pytest.warns(UserWarning, match="No index created for dimension track_id"):
+        expected = tracks.sortby("wind10", ascending=False).groupby("track_id").first()
 
     xr.testing.assert_identical(result, expected)
 

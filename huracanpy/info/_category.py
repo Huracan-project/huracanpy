@@ -6,6 +6,7 @@ import warnings
 
 import numpy as np
 import pint
+from pint.errors import UnitStrippedWarning
 import pandas as pd
 
 from metpy.xarray import preprocess_and_wrap
@@ -55,4 +56,13 @@ def category(variable, bins, labels=None, variable_units=None):
 
     bins = bins.to(variable.units)
 
-    return np.array(pd.cut(variable, bins, labels=labels))
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            category=UnitStrippedWarning,
+            message="The unit of the quantity is stripped when downcasting to ndarray.",
+        )
+
+        result = np.array(pd.cut(variable, bins, labels=labels))
+
+    return result
