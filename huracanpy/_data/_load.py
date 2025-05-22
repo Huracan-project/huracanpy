@@ -28,8 +28,6 @@ rename_defaults = dict(
     isotime="time",
 )
 
-xarray_datetime_precisions = ["ns", "us", "ms", "s"]
-
 pandas_valid_time_labels = [
     "year",
     "years",
@@ -264,20 +262,12 @@ def load(
             # This may still break at this point with older versions of xarray
             # attempting to convert back to "ns" precision
             try:
-                time = tracks.time.astype("datetime64[ns]")
+                time = tracks.time.astype("datetime64")
 
-                # Check that the times haven't gone wrong due to being out of range of the
-                # default time precision
-                years = tracks.time.astype("datetime64[Y]").dt.year
-                n = 1
-                # Successively reduce the time precision until it is not out of bounds
-                while (time.dt.year != years).any() and n < len(
-                    xarray_datetime_precisions
-                ):
-                    time = tracks.time.astype(
-                        f"datetime64[{xarray_datetime_precisions[n]}]"
-                    )
-                    n += 1
+                if (
+                    tracks["time"].astype("datetime64[Y]").dt.year != time.dt.year
+                ).any():
+                    raise OutOfBoundsDatetime
 
                 tracks["time"] = time
             except OutOfBoundsDatetime:
