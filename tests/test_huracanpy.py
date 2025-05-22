@@ -68,6 +68,7 @@ import huracanpy
             3909,
             134,
         ),
+        (huracanpy.example_IRIS_file, dict(source="iris"), 10, 0, 40, 2),
     ],
 )
 def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
