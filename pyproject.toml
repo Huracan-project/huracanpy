@@ -70,6 +70,15 @@ extend-select = [
 # Only check for use of assert/print in main module
 "!huracanpy/**" = ["S101", "T20"]
 
+[tool.pytest.ini_options]
+minversion = "6.0"
+filterwarnings = [
+    "error",
+    "default::DeprecationWarning",
+    'ignore:numpy.ndarray size changed:RuntimeWarning',
+    "ignore::cartopy.io.DownloadWarning"
+]
+
 [tool.tox]
 requires = ["tox>=4.15.0"]
 env_list = ["3.9", "3.10", "3.11", "3.12", "3.13"]

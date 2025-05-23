@@ -1,10 +1,17 @@
 import numpy as np
+import pytest
 
 import huracanpy
 
 
 def test_match():
-    ib = huracanpy.load(source="ibtracs", ibtracs_subset="wmo")
+    with (
+        pytest.warns(
+            UserWarning, match="This offline function loads a light version of IBTrACS"
+        ),
+        pytest.warns(UserWarning, match="You are loading the IBTrACS-WMO subset"),
+    ):
+        ib = huracanpy.load(source="ibtracs", ibtracs_subset="wmo")
     ref_1996 = ib.where(ib.time.dt.year == 1996, drop=True)
     UZ = huracanpy.load(huracanpy.example_year_file)
     UZ1 = UZ.where(UZ.track_id.isin([1207, 1208, 1210, 1212, 1220, 1238]), drop=True)
@@ -27,7 +34,13 @@ def test_match():
 
 
 def test_scores():
-    ib = huracanpy.load(source="ibtracs", ibtracs_subset="wmo")
+    with (
+        pytest.warns(
+            UserWarning, match="This offline function loads a light version of IBTrACS"
+        ),
+        pytest.warns(UserWarning, match="You are loading the IBTrACS-WMO subset"),
+    ):
+        ib = huracanpy.load(source="ibtracs", ibtracs_subset="wmo")
     ref_1996 = ib.where(ib.time.dt.year == 1996, drop=True)
     UZ = huracanpy.load(huracanpy.example_year_file)
     M = huracanpy.assess.match([UZ, ref_1996], ["UZ", "ib"])
