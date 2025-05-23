@@ -1,6 +1,8 @@
 import gzip
 
 import datetime
+import warnings
+
 import cftime
 import numpy as np
 import xarray as xr
@@ -32,7 +34,14 @@ def _parse(fmt, string, **kwargs):
 
 
 def parse_date(date, calendar=None):
-    if len(date) == 10:  # i.e., YYYYMMDDHH
+    if isinstance(calendar, (tuple, list)):
+        initial_date = np.datetime64(calendar[0])
+        timestep = calendar[1]
+        if not isinstance(timestep, np.timedelta64):
+            timestep = np.timedelta64(timestep, "h")
+        return initial_date + (int(date) - 1) * timestep
+
+    elif len(date) == 10:  # i.e., YYYYMMDDHH
         if calendar is not None:
             yr = int(date[0:4])
             mn = int(date[4:6])
@@ -41,6 +50,7 @@ def parse_date(date, calendar=None):
             return cftime.datetime(yr, mn, dy, hr, calendar=calendar)
         else:
             return datetime.datetime.strptime(date.strip(), "%Y%m%d%H")
+
     else:
         return int(date)
 
@@ -123,28 +133,40 @@ def load(filename, calendar=None, variable_names=None):
         for n in range(ntracks):
             # Read individual track header (two lines)
             line = f.readline().strip()
-            try:
-                track_info = _parse(track_header_fmt, line).named
-            except ValueError:
-                track_info = _parse(track_header_fmt_new, line).named
+            if not line.replace(" ", "") == "":  # If line is empty
+                try:
+                    track_info = _parse(track_header_fmt, line).named
+                except ValueError:
+                    track_info = _parse(track_header_fmt_new, line).named
 
-            line = f.readline().strip()
-            npoints = _parse(track_info_fmt, line)["npoints"]
-
-            # Generate arrays for time coordinate and variables
-            # Time is a list because it will hold datetime or cftime objects
-            # Other variables are a dictionary mapping variable name to a tuple of
-            # (time, data_array) as this is what is passed to xarray.Dataset
-
-            # Add track ID as a variable along the record dimension so that it can be used
-            # for groupby
-            track_id.extend([track_info["track_id"]] * npoints)
-
-            # Populate time and data line by line
-            for m in range(npoints):
                 line = f.readline().strip()
-                times.append(parse_date(line.split(" ")[0], calendar=calendar))
-                output.append(line.replace("&", " "))
+                npoints = _parse(track_info_fmt, line)["npoints"]
+
+                # Generate arrays for time coordinate and variables
+                # Time is a list because it will hold datetime or cftime objects
+                # Other variables are a dictionary mapping variable name to a tuple of
+                # (time, data_array) as this is what is passed to xarray.Dataset
+
+                # Add track ID as a variable along the record dimension so that it can be used
+                # for groupby
+                track_id.extend([track_info["track_id"]] * npoints)
+
+                # Populate time and data line by line
+                for m in range(npoints):
+                    line = f.readline().strip()
+                    times.append(
+                        parse_date(
+                            line.split(" ")[0],
+                            calendar=calendar,
+                        )
+                    )
+                    output.append(line.replace("&", " "))
+            else:
+                warnings.warn(
+                    "Parsed line is empty. It is possible this problem arrises because"
+                    "the number of tracks expected from the header was not found in the"
+                    "file."
+                )
 
     output = np.genfromtxt(output)
     data_vars = {
@@ -154,7 +176,13 @@ def load(filename, calendar=None, variable_names=None):
     data_vars["track_id"] = ("record", track_id)
     data_vars["time"] = ("record", times)
 
-    ds = xr.Dataset(data_vars=data_vars)
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            category=UserWarning,
+            message="Converting non-nanosecond precision datetime values to nanosecond",
+        )
+        ds = xr.Dataset(data_vars=data_vars)
     ds.track_id.attrs["cf_role"] = "trajectory_id"
 
     return ds

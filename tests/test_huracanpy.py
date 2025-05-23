@@ -12,16 +12,39 @@ import huracanpy
         (huracanpy.example_csv_file, dict(), 9, 0, 99, 3),
         (huracanpy.example_parquet_file, dict(), 9, 0, 99, 3),
         (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86),
+        (
+            huracanpy.example_TRACK_timestep_file,
+            dict(source="TRACK", track_calendar=("1940-01-01", 6)),
+            38,
+            0,
+            416,
+            19,
+        ),
+        (
+            huracanpy.example_TRACK_timestep_file,
+            dict(
+                source="TRACK",
+                track_calendar=(
+                    np.datetime64("1940-01-01"),
+                    np.timedelta64(6 * 60 * 60, "s"),
+                ),
+            ),
+            38,
+            0,
+            416,
+            19,
+        ),
         (huracanpy.example_TE_file, dict(source="tempestextremes"), 8, 0, 210, 8),
         (huracanpy.example_CHAZ_file, dict(), 11, 0, 1078, 20),
         (huracanpy.example_MIT_file, dict(), 10, 1, 2138, 11),
         (huracanpy.example_WiTRACK_file, dict(source="witrack"), 14, 0, 3194, 268),
         (None, dict(source="ibtracs", ibtracs_subset="wmo"), 8, 0, 143287, 4540),
         (None, dict(source="ibtracs", ibtracs_subset="usa"), 10, 0, 121806, 4170),
+        (huracanpy.example_old_HURDAT_file, dict(source="ecmwf"), 8, 0, 183, 29),
     ],
 )
 def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
-    data = huracanpy.load(filename, **kwargs)
+    data = _load_with_checked_warnings(filename, **kwargs)
 
     assert len(data) == nvars
     assert len(data.coords) == ncoords
@@ -61,7 +84,7 @@ def test_save(filename, source, extension, muddle, tmp_path):
             " dataframe leads to having rows equal to the product of the dimensions"
             " even though the dimensions cover different variables"
         )
-    data = huracanpy.load(filename, source=source)
+    data = _load_with_checked_warnings(filename, source=source)
 
     # Check that save/load gives the same result when the track_id is not monotonic
     # Caused an issue because they got sorted before
@@ -81,6 +104,31 @@ def test_save(filename, source, extension, muddle, tmp_path):
         data = data.sortby("track_id")
     data_reload = huracanpy.load(str(tmp_path / f"tmp_file.{extension}"))
     _assert_dataset_identical(data, data_reload)
+
+
+def _load_with_checked_warnings(filename, **kwargs):
+    if filename is None:
+        if "ibtracs_subset" not in kwargs or kwargs["ibtracs_subset"] == "wmo":
+            with (
+                pytest.warns(
+                    UserWarning,
+                    match="This offline function loads a light version of IBTrACS",
+                ),
+                pytest.warns(
+                    UserWarning, match="You are loading the IBTrACS-WMO subset"
+                ),
+            ):
+                data = huracanpy.load(filename, **kwargs)
+        else:
+            with pytest.warns(
+                UserWarning,
+                match="This offline function loads a light version of IBTrACS",
+            ):
+                data = huracanpy.load(filename, **kwargs)
+    else:
+        data = huracanpy.load(filename, **kwargs)
+
+    return data
 
 
 def _assert_dataset_identical(ds1, ds2):

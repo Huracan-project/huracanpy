@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack
+from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack, _old_HURDAT
 from . import ibtracs
 
 
@@ -56,6 +56,7 @@ def load(
         * **ibtracs**
         * **csv**
         * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided appropriate variable_names)
+        * **old_hurdat**, **ecmwf**
 
     variable_names : list of str, optional
           When loading data from an ASCII file (TRACK or TempestExtremes), specify the
@@ -111,11 +112,22 @@ def load(
         This is an option in the Colin's load function, so I assume this can change
         between files
 
-    track_calendar : str, optional
+    track_calendar : [str, tuple] optional
           When loading data from a TRACK ASCII file, if the data uses a different
           calendar to the default :class:`datetime.datetime`, then you can pass this
           argument to load the times in as :class:`cftime.datetime` with the given
           calendar instead
+
+          If the TRACK file has timesteps instead of dates. Then you can pass a tuple
+          with the initial time and timestep e.g. ("1940-01-01", 6)
+
+          * The first argument is the initial time and needs to be something readable by
+            :class:`numpy.datetime64`, or you can explicity pass a
+            :class:`numpy.datetime64` object.
+          * The second argument is the step and is passed to :class:`numpy.timedelta64`
+            and is assumed to be in hours, or you can explicitly pass a
+            :class:`numpy.timedelta64` object and specify the units
+
     **kwargs
         When loading tracks from a standard files these will be passed to the relevant
         load function
@@ -154,7 +166,9 @@ def load(
         source = source.lower()
         if source == "track":
             data = _TRACK.load(
-                filename, calendar=track_calendar, variable_names=variable_names
+                filename,
+                calendar=track_calendar,
+                variable_names=variable_names,
             )
         elif source == "track.tilt":
             data = _TRACK.load_tilts(
@@ -176,6 +190,11 @@ def load(
             data = ibtracs.load(ibtracs_subset, filename, **kwargs)
         elif source == "netcdf":
             data = _netcdf.load(filename, rename, **kwargs)
+        elif source in [
+            "old_hurdat",
+            "ecmwf",
+        ]:
+            data = _old_HURDAT.load(filename)
         else:
             raise ValueError(f"Source {source} unsupported or misspelled")
 

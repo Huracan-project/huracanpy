@@ -43,9 +43,10 @@ def test_nunique():
             huracanpy.tc.pressure_category,
             ["slp"],
             "pressure_category",
-            {"slp_name": "slp"},
+            {"slp_name": "slp", "slp_units": "Pa"},
         ),
         (huracanpy.calc.distance, ["lon", "lat", "track_id"], "distance", {}),
+        (huracanpy.calc.azimuth, ["lon", "lat", "track_id"], "azimuth", {}),
         (
             huracanpy.calc.translation_speed,
             ["lon", "lat", "time", "track_id"],
@@ -119,7 +120,11 @@ def test_accessor_methods_match_functions(
     function_args = [
         tracks_csv[var] if not var == "all" else tracks_csv for var in function_args
     ]
-    result = function(*function_args)
+    if function == huracanpy.tc.pressure_category:
+        with pytest.warns(UserWarning, match="Caution, pressure are likely in Pa"):
+            result = function(*function_args)
+    else:
+        result = function(*function_args)
 
     # Call the accessor method
     result_accessor = getattr(tracks_csv.hrcn, f"{call_type}_{accessor_name}")(
@@ -137,9 +142,9 @@ def test_accessor_methods_match_functions(
         result_accessor = result_accessor[varname]
 
     # Check that the function and method return identical results
-    assert type(result) is type(
-        result_accessor
-    ), "accessor return type differs from function"
+    assert type(result) is type(result_accessor), (
+        "accessor return type differs from function"
+    )
     np.testing.assert_equal(
         np.array(result),
         np.array(result_accessor),

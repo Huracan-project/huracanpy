@@ -5,6 +5,14 @@ from metpy.units import units
 import huracanpy
 
 
+def test_azimuth():
+    data = huracanpy.load(huracanpy.example_csv_file)
+    az = huracanpy.calc.azimuth(data.lon, data.lat, data.track_id)
+
+    np.testing.assert_approx_equal(az[0], -109.07454278, significant=6)
+    np.testing.assert_approx_equal(az.mean(), 28.99955985, significant=6)
+
+
 def test_get_distance():
     data = huracanpy.load(huracanpy.example_csv_file)
 
@@ -20,6 +28,16 @@ def test_get_distance():
     for dist in dist_haversine, dist_geod:
         assert not isinstance(dist.data, pint.Quantity)
         assert dist.metpy.units == units("m")
+
+
+def test_radius_of_maximum_wind():
+    data = huracanpy.load(huracanpy.example_TRACK_file, source="TRACK")
+    rmw = huracanpy.calc.distance(
+        data.lon, data.lat, data.feature_9_lon, data.feature_9_lat, method="haversine"
+    )
+    np.testing.assert_allclose(rmw.max(), 666749.2768932)
+    np.testing.assert_allclose(rmw.min(), 25218.89771)
+    np.testing.assert_allclose(rmw.mean(), 356360.39091)
 
 
 def test_get_translation_speed():

@@ -21,11 +21,13 @@ __all__ = [
     "example_TRACK_file",
     "example_TRACK_tilt_file",
     "example_TRACK_netcdf_file",
+    "example_TRACK_timestep_file",
     "example_TE_file",
     "example_CHAZ_file",
     "example_MIT_file",
     "example_ERA20C_file",
     "example_WiTRACK_file",
+    "example_old_HURDAT_file",
     "_accessor",
 ]
 
@@ -38,11 +40,13 @@ from ._data import (
     example_TRACK_file,
     example_TRACK_tilt_file,
     example_TRACK_netcdf_file,
+    example_TRACK_timestep_file,
     example_TE_file,
     example_CHAZ_file,
     example_MIT_file,
     example_ERA20C_file,
     example_WiTRACK_file,
+    example_old_HURDAT_file,
 )
 from ._basins import basins
 from ._interp import interp_time

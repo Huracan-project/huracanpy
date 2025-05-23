@@ -29,10 +29,12 @@ def test_get_delta(tracks_csv, var, track_id, expected, unit, centering):
     if unit is not None:
         var.attrs["units"] = unit
 
-    if track_id is not None:
+    if track_id is None:
+        with pytest.warns(UserWarning, match="track_id is not provided"):
+            delta = huracanpy.calc.delta(var, track_id, centering=centering)
+    else:
         track_id = tracks_csv[track_id]
-
-    delta = huracanpy.calc.delta(var, track_id, centering=centering)
+        delta = huracanpy.calc.delta(var, track_id, centering=centering)
 
     assert len(delta) == len(var)
     np.testing.assert_approx_equal(delta.mean(), expected, significant=6)
