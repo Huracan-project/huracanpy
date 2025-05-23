@@ -63,9 +63,15 @@ This allows us to draw from xarray's performance and existing methods, and also 
 ## Loading data
 
 HuracanPy currently supports loading tracks from:
+
 * CSV (comma-separated variable) files where each row correspond to a cyclone point and each column to a feature.
-* NetCDF (Network Common Data Form) files following CF (Climate and Forecast) conventions [@cfconventions], specifically the formats for trajectory data described in H.4 [@cfconventionswebpage]. NetCDF files similar to the CF conventions can also be loaded provided they use specific naming for the track ID.
+  
+* NetCDF (Network Common Data Form) files following CF (Climate and Forecast) conventions [@cfconventions], specifically the formats for trajectory data described in H.4 [@cfconventionswebpage].
+
+* NetCDF files similar to the CF conventions can also be loaded provided they use specific naming for the track ID.
+
 * Text files from TempestExtreme's StitchNodes (GFDL format, see [@ullrich2021tempestextremes])
+
 * Text files from TRACK [@TRACKa, @TRACKb]
 
 HuracanPy can also load IBTrACS [@gahtan2024international] from the online source, or from an embedded file. 
