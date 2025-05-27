@@ -30,7 +30,7 @@ source .venv/bin/activate
 
 Install your copy locally
 ```shell
-python -m pip install -e .[dev,docs]
+python -m pip install -e ".[dev,docs]"
 ```
 
 The "[dev]" argument installs the following optional packages that are useful for
