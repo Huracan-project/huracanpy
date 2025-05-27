@@ -138,9 +138,15 @@ def distance(lon, lat, *args, track_id=None, method="geod", ellps="WGS84"):
         lat2 = lat[1:]
 
         if len(args) == 1:
-            track_id = args[0]
+            if track_id is None:
+                track_id = args[0]
+            else:
+                raise ValueError(
+                    "Distance either takes 2 arrays (lon/lat) or 4 arrays 2x(lon/lat)"
+                )
 
         if track_id is None:
+            track_id = np.zeros(lon.shape)
             warnings.warn(
                 "track_id is not provided, all points are considered to come from the"
                 "same track"
@@ -203,14 +209,14 @@ def translation_speed(lon, lat, time, track_id=None, method="geod", ellps="WGS84
     # Curate input
     # If track_id is not provided, all points are considered to belong to the same track
     if track_id is None:
-        np.zeros_like(lon)
+        track_id = np.zeros(lon.shape)
         warnings.warn(
             "track_id is not provided, all points are considered to come from the same"
             "track"
         )
 
     # Distance between each points
-    dx = distance(lon, lat, track_id, method=method, ellps=ellps)
+    dx = distance(lon, lat, track_id=track_id, method=method, ellps=ellps)
 
     # time between each points
     dt = delta(time, track_id)

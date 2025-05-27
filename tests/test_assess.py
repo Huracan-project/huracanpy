@@ -33,6 +33,15 @@ def test_match():
     assert (M_not1, M_not2, M_not3, M_all) == (1, 1, 1, 3)
 
 
+@pytest.mark.parametrize(
+    "tracksets, message",
+    [([], "You must provide at least two"), ([1, 2, 3], "Number of names provided")],
+)
+def test_match_fails(tracksets, message):
+    with pytest.raises(ValueError, match=message):
+        huracanpy.assess.match(tracksets)
+
+
 def test_scores():
     with (
         pytest.warns(

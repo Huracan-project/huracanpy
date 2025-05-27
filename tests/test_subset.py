@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 import huracanpy
 
@@ -13,6 +14,15 @@ def test_sel_id(tracks_csv):
         npoints += len(tracks_subset.record)
 
     assert npoints == len(tracks_csv.record)
+
+
+def test_sel_id_fails(tracks_csv):
+    with pytest.raises(ValueError, match="track_ids must be 1d"):
+        huracanpy.sel_id(
+            tracks_csv,
+            np.array([tracks_csv.track_id.values, tracks_csv.track_id.values]),
+            0,
+        )
 
 
 def test_sel_id_array(tracks_csv):
@@ -35,3 +45,12 @@ def test_trackswhere():
     )
 
     assert set(tracks_subset.track_id.data) == {0, 2}
+
+
+def test_trackswhere_fails(tracks_csv):
+    with pytest.raises(ValueError, match="track_ids must be 1d"):
+        huracanpy.trackswhere(
+            tracks_csv,
+            np.array([tracks_csv.track_id.values, tracks_csv.track_id.values]),
+            lambda track: (track.track_id == 0).all(),
+        )

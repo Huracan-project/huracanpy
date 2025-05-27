@@ -5,7 +5,6 @@ Module containing functions to compute rates.
 import warnings
 
 import numpy as np
-import xarray as xr
 from metpy.units import units
 from metpy.xarray import preprocess_and_wrap
 
@@ -87,7 +86,7 @@ def rate(var, time, track_ids=None, centering="forward"):
     # Curate input
     # If track_id is not provided, all points are considered to belong to the same track
     if track_ids is None:
-        track_ids = xr.DataArray([0] * len(time), dims=time.dims)
+        track_ids = np.zeros(var.shape)
         warnings.warn(
             "track_id is not provided, all points are considered to come from the same"
             "track"

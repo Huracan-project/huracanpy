@@ -12,6 +12,7 @@ import huracanpy
         (huracanpy.example_csv_file, dict(), 9, 0, 99, 3),
         (huracanpy.example_parquet_file, dict(), 9, 0, 99, 3),
         (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86),
+        (huracanpy.example_TRACK_netcdf_file, dict(source="netcdf"), 20, 17, 4580, 86),
         (
             huracanpy.example_TRACK_timestep_file,
             dict(source="TRACK", track_calendar=("1940-01-01", 6)),
@@ -55,6 +56,46 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
     if filename != huracanpy.example_TRACK_tilt_file:
         for name in ["track_id", "time", "lon", "lat"]:
             assert name in data
+
+
+@pytest.mark.parametrize(
+    "filename, kwargs, error, message",
+    [
+        ("", dict(source="nonsense"), ValueError, "Source nonsense unsupported"),
+        ("", dict(), ValueError, "Source is set to None"),
+    ],
+)
+def test_load_fails(filename, kwargs, error, message):
+    with pytest.raises(error, match=message):
+        huracanpy.load(filename, **kwargs)
+
+
+def test_load_rename():
+    tracks = huracanpy.load(
+        huracanpy.example_csv_file,
+        rename=dict(slp="pressure", not_a_variable="should_be_ignored"),
+    )
+
+    assert "pressure" in tracks
+    assert "slp" not in tracks
+    assert "should_be_ignored" not in tracks
+
+
+def test_load_units():
+    tracks = huracanpy.load(huracanpy.example_csv_file, units=dict(slp="Pa"))
+
+    assert tracks.slp.attrs["units"] == "Pa"
+
+    slp_hpa = tracks.slp.metpy.convert_units("hPa")
+
+    np.testing.assert_allclose(tracks.slp.values, slp_hpa.data.magnitude * 100)
+
+
+def test_load_baselon():
+    tracks = huracanpy.load(huracanpy.example_csv_file, baselon=1000)
+
+    assert tracks.lon.max() <= 1360
+    assert tracks.lon.min() >= 1000
 
 
 @pytest.mark.parametrize(
@@ -104,6 +145,11 @@ def test_save(filename, source, extension, muddle, tmp_path):
         data = data.sortby("track_id")
     data_reload = huracanpy.load(str(tmp_path / f"tmp_file.{extension}"))
     _assert_dataset_identical(data, data_reload)
+
+
+def test_save_fails(tracks_csv):
+    with pytest.raises(NotImplementedError, match="File format not recognized"):
+        huracanpy.save(tracks_csv, "filename.unsupported_extension")
 
 
 def _load_with_checked_warnings(filename, **kwargs):

@@ -46,14 +46,21 @@ def category(variable, bins, labels=None, variable_units=None):
         )
         labels = [str(i) for i in range(len(bins) - 1)]
 
+    # Account for one, both, or neither of the variable and bins having their units
+    # specified
     if not isinstance(variable, pint.Quantity) or variable.unitless:
+        # If variable has no units, but bins do, copy the units from the bins to the
+        # variable. But if neither have units specified use the "variable_units" kwarg
         if variable_units is None and isinstance(bins, pint.Quantity):
             variable_units = str(bins.units)
         variable = variable * units(variable_units)
 
+    # If bins has no units, copy the units to from the variable. Which may have already
+    # been set by the "variable_units" kwarg
     if not isinstance(bins, pint.Quantity) or bins.unitless:
-        bins = bins * units(variable_units)
+        bins = bins * variable.units
 
+    # Make sure the units match, however they have been set
     bins = bins.to(variable.units)
 
     with warnings.catch_warnings():

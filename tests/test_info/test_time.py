@@ -51,3 +51,27 @@ def test_seasons(tracks, request):
     assert season.astype(int).min() == 1996
     assert season.astype(int).max() == 1997
     np.testing.assert_approx_equal(season.astype(int).mean(), 1996.09894459, 1e-6)
+
+
+def test_season_long(tracks_year):
+    season = huracanpy.info.season(
+        tracks_year.track_id, tracks_year.lat, tracks_year.time, convention="tc-long"
+    )
+
+    season_nh = season[tracks_year.lat >= 0].astype(int)
+    assert (season_nh.astype(int) == 1996).all()
+
+    season_sh = season[tracks_year.lat < 0].astype(int)
+    assert season_sh.min() == 19951996
+    assert season_sh.max() == 19961997
+    np.testing.assert_approx_equal(season_sh.mean(), 19954801.76)
+
+
+def test_season_fails(tracks_year):
+    with pytest.raises(NotImplementedError, match="Convention not recognized"):
+        huracanpy.info.season(
+            tracks_year.track_id,
+            tracks_year.lat,
+            tracks_year.time,
+            convention="nonsense",
+        )

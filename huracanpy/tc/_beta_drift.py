@@ -52,14 +52,14 @@ def beta_drift(
     if not isinstance(wind_max, pint.Quantity) or wind_max.unitless:
         wind_max = wind_max * units("m / s")
 
-    ## Convert rmw to m
+    # Convert rmw to m
     if not isinstance(radius_wind_max, pint.Quantity) or radius_wind_max.unitless:
-        if (
-            radius_wind_max.max() < 10000
-        ):  # We assume rmw are in km if they are below 10,000
-            radius_wind_max = radius_wind_max * 1000
-
-        radius_wind_max = radius_wind_max * units("m")
+        if radius_wind_max.max() < 10000:
+            # We assume rmw are in km if they are below 10,000
+            radius_wind_max = radius_wind_max * units("km")
+        else:
+            radius_wind_max = radius_wind_max * units("m")
+    radius_wind_max = radius_wind_max.to("m")
 
     # Coriolis parameter
     beta = 2 * omega * np.cos(lat) / Re  # s-1 m-1
