@@ -12,7 +12,7 @@ from pint.errors import UnitStrippedWarning
 import pyproj
 
 
-from ._rates import delta
+from ._rates import delta, _dummy_track_id
 from .._metpy import dequantify_results
 
 
@@ -70,6 +70,8 @@ def azimuth(lon, lat, track_id=None, ellps="WGS84"):
             180° corresponds to southward;
             -90° corresponds to westwards.
     """
+    if track_id is None:
+        track_id = _dummy_track_id(lon)
 
     # Compute azimuth
     _, azimuth = _get_distance_azimuth_geod(
@@ -77,14 +79,8 @@ def azimuth(lon, lat, track_id=None, ellps="WGS84"):
     )
 
     # Mask track transition points
-    if track_id is not None:
-        azimuth[track_id[1:] != track_id[:-1]] = np.nan * azimuth[0]
-        azimuth = np.concatenate([azimuth, [np.nan * azimuth[0]]])
-    else:
-        warnings.warn(
-            "track_id is not provided, all points are considered to come from the"
-            "same track"
-        )
+    azimuth[track_id[1:] != track_id[:-1]] = np.nan * azimuth[0]
+    azimuth = np.concatenate([azimuth, [np.nan * azimuth[0]]])
 
     return azimuth
 
@@ -146,11 +142,7 @@ def distance(lon, lat, *args, track_id=None, method="geod", ellps="WGS84"):
                 )
 
         if track_id is None:
-            track_id = np.zeros(lon.shape)
-            warnings.warn(
-                "track_id is not provided, all points are considered to come from the"
-                "same track"
-            )
+            track_id = _dummy_track_id(lon)
 
     elif len(args) == 2:
         lon1 = lon
@@ -209,11 +201,7 @@ def translation_speed(lon, lat, time, track_id=None, method="geod", ellps="WGS84
     # Curate input
     # If track_id is not provided, all points are considered to belong to the same track
     if track_id is None:
-        track_id = np.zeros(lon.shape)
-        warnings.warn(
-            "track_id is not provided, all points are considered to come from the same"
-            "track"
-        )
+        track_id = _dummy_track_id(lon)
 
     # Distance between each points
     dx = distance(lon, lat, track_id=track_id, method=method, ellps=ellps)

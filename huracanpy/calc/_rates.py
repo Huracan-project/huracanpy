@@ -11,6 +11,13 @@ from metpy.xarray import preprocess_and_wrap
 from .._metpy import dequantify_results
 
 
+def _dummy_track_id(var):
+    warnings.warn(
+        "track_id is not provided, all points are considered to come from the sametrack"
+    )
+    return np.zeros(var.shape)
+
+
 @dequantify_results
 @preprocess_and_wrap(wrap_like="var")
 def delta(var, track_ids=None, centering="forward"):
@@ -33,11 +40,7 @@ def delta(var, track_ids=None, centering="forward"):
     # Curate input
     # If track_id is not provided, all points are considered to belong to the same track
     if track_ids is None:
-        track_ids = np.zeros(var.shape)
-        warnings.warn(
-            "track_id is not provided, all points are considered to come from the same"
-            "track"
-        )
+        track_ids = _dummy_track_id(var)
 
     # Check that centering is supported
     if centering not in ["forward", "backward"]:
@@ -86,11 +89,8 @@ def rate(var, time, track_ids=None, centering="forward"):
     # Curate input
     # If track_id is not provided, all points are considered to belong to the same track
     if track_ids is None:
-        track_ids = np.zeros(var.shape)
-        warnings.warn(
-            "track_id is not provided, all points are considered to come from the same"
-            "track"
-        )
+        track_ids = _dummy_track_id(var)
+
     ## Sort data by track_id and time
     # rate_var, track_ids, time = [a.sortby(time) for a in [rate_var, track_ids, time]]
     # rate_var, time, track_ids = [a.sortby(track_ids) for a in [rate_var, time, track_ids]]

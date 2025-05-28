@@ -196,7 +196,7 @@ class HuracanPyDatasetAccessor:
         """
         Add PACE calculation to the dataset.
         """
-        pace_values = self.get_pace(
+        pace_values, model = self.get_pace(
             pressure_name=pressure_name,
             wind_name=wind_name,
             model=model,
@@ -207,7 +207,7 @@ class HuracanPyDatasetAccessor:
             **kwargs,
         )
         self._dataset["pace"] = pace_values
-        return self._dataset
+        return self._dataset, model
 
     # ---- time
     def get_time_components(self, time_name="time"):
@@ -220,12 +220,9 @@ class HuracanPyDatasetAccessor:
         """
         Add year, month, day, and hour as new variables to the dataset.
         """
-        year, month, day, hour = self.get_time_components(time_name)
-        self._dataset["year"] = year
-        self._dataset["month"] = month
-        self._dataset["day"] = day
-        self._dataset["hour"] = hour
-        return self._dataset
+        components = self.get_time_components(time_name)
+
+        return xr.merge([self._dataset, *components])
 
     def get_season(
         self,
@@ -262,7 +259,7 @@ class HuracanPyDatasetAccessor:
     # --- category
     def get_category(
         self,
-        variable_name,
+        var_name,
         bins=None,
         labels=None,
         variable_units=None,
@@ -271,7 +268,7 @@ class HuracanPyDatasetAccessor:
         Calculate a generic category from a variable and a set of thresholds.
         """
         return info.category(
-            self._dataset[variable_name],
+            self._dataset[var_name],
             bins=bins,
             labels=labels,
             variable_units=variable_units,
@@ -279,8 +276,8 @@ class HuracanPyDatasetAccessor:
 
     def add_category(
         self,
-        variable_name,
-        new_var_name,
+        var_name,
+        new_var_name=None,
         bins=None,
         labels=None,
         variable_units=None,
@@ -288,8 +285,10 @@ class HuracanPyDatasetAccessor:
         """
         Add a generic category to the dataset as a new variable.
         """
+        if new_var_name is None:
+            new_var_name = f"category_{var_name}"
         self._dataset[new_var_name] = self.get_category(
-            variable_name,
+            var_name,
             bins=bins,
             labels=labels,
             variable_units=variable_units,
@@ -344,7 +343,11 @@ class HuracanPyDatasetAccessor:
         )
 
     def add_beta_drift(self, lat_name="lat", wind_name="wind", rmw_name="rmw"):
-        self._dataset["beta_drift"] = self.get_beta_drift(lat_name, wind_name, rmw_name)
+        v_drift, theta_drift = self.get_beta_drift(lat_name, wind_name, rmw_name)
+
+        self._dataset["v_drift"] = v_drift
+        self._dataset["theta_drift"] = theta_drift
+        return self._dataset
 
     # ---- translation
     def get_azimuth(
@@ -367,7 +370,7 @@ class HuracanPyDatasetAccessor:
         if (track_id_name is None) or (
             track_id_name not in list(self._dataset.variables)
         ):
-            return calc.distance(
+            return calc.azimuth(
                 self._dataset[lon_name],
                 self._dataset[lat_name],
                 track_id=None,
@@ -651,10 +654,10 @@ class HuracanPyDatasetAccessor:
             self._dataset, self._dataset[time_name], self._dataset[track_id_name]
         )
 
-    def get_apex_vals(self, varname, track_id_name="track_id", stat="max"):
+    def get_apex_vals(self, var_name, track_id_name="track_id", stat="max"):
         return calc.apex_vals(
             self._dataset,
-            variable=self._dataset[varname],
+            variable=self._dataset[var_name],
             track_id=self._dataset[track_id_name],
             stat=stat,
         )

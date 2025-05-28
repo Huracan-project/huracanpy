@@ -114,8 +114,10 @@ def test_load_baselon():
     ],
 )
 @pytest.mark.parametrize("extension", ["csv", "nc"])
-@pytest.mark.parametrize("muddle", [False, True])
-def test_save(filename, source, extension, muddle, tmp_path):
+@pytest.mark.parametrize(
+    "muddle, use_accessor", [(False, False), (True, False), (False, True)]
+)
+def test_save(filename, source, extension, muddle, use_accessor, tmp_path):
     if extension == "csv" and (
         filename == huracanpy.example_TRACK_tilt_file
         or (filename is not None and filename.split(".")[-1] == "nc")
@@ -134,7 +136,12 @@ def test_save(filename, source, extension, muddle, tmp_path):
 
     # Copy the data because save modifies the dataset at the moment
     data_orig = data.copy()
-    huracanpy.save(data, str(tmp_path / f"tmp_file.{extension}"))
+
+    filename = str(tmp_path / f"tmp_file.{extension}")
+    if use_accessor:
+        data.hrcn.save(filename)
+    else:
+        huracanpy.save(data, filename)
 
     # Check that the original data is not modified by the save function
     _assert_dataset_identical(data_orig, data)
@@ -143,7 +150,7 @@ def test_save(filename, source, extension, muddle, tmp_path):
     # Saving as netcdf does force sorting by track_id so apply this
     if extension == "nc":
         data = data.sortby("track_id")
-    data_reload = huracanpy.load(str(tmp_path / f"tmp_file.{extension}"))
+    data_reload = huracanpy.load(filename)
     _assert_dataset_identical(data, data_reload)
 
 
