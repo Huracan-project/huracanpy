@@ -1,5 +1,7 @@
 from inspect import getmembers, isfunction
 
+import matplotlib.pyplot as plt
+from matplotlib.testing.decorators import check_figures_equal
 import numpy as np
 import pytest
 import xarray as xr
@@ -19,6 +21,15 @@ _intentionally_missing = [
     "plot_doughnut",
     "plot_venn",
 ]
+
+
+def _get_function_args(tracks, function_args):
+    # Get the function arguments as arrays. Use "all" as a wildcard for the full dataset
+    # Keep other types of arguments as is
+    return [
+        var if not isinstance(var, str) else tracks if var == "all" else tracks[var]
+        for var in function_args
+    ]
 
 
 # %% DataArrayAccessor
@@ -123,16 +134,7 @@ def test_accessor_methods_match_functions(
         pytest.skip(f"sum_by not a valid argument for {accessor_name}")
 
     # Call the huracanpy function
-    # Get the function arguments as arrays. Use "all" as a wildcard for the full dataset
-    # Keep other types of arguments as is
-    function_args = [
-        var
-        if not isinstance(var, str)
-        else tracks_csv
-        if var == "all"
-        else tracks_csv[var]
-        for var in function_args
-    ]
+    function_args = _get_function_args(tracks_csv, function_args)
     if function == huracanpy.tc.pressure_category:
         with pytest.warns(UserWarning, match="Caution, pressure are likely in Pa"):
             result = function(*function_args)
@@ -196,6 +198,66 @@ def test_accessor_methods_match_functions(
             np.array(result_accessor),
             err_msg="accessor output differs from function output",
         )
+
+
+@check_figures_equal()
+@pytest.mark.parametrize(
+    "function, function_args, accessor_function_kwargs",
+    [
+        (huracanpy.plot.density, [], {}),
+        (huracanpy.plot.fancyline, ["lon", "lat", "wind10"], {"colors": "wind10"}),
+        (
+            huracanpy.plot.tracks,
+            ["lon", "lat", "wind10"],
+            {"intensity_var_name": "wind10"},
+        ),
+        (huracanpy.plot.tracks, ["lon", "lat"], {}),
+    ],
+)
+def test_accessor_plot_methods_match_functions(
+    fig_test, fig_ref, tracks_csv, function, function_args, accessor_function_kwargs
+):
+    accessor_name = f"plot_{function.__name__}"
+
+    if function is huracanpy.plot.density:
+        function_args = [huracanpy.calc.density(tracks_csv.lon, tracks_csv.lat)]
+    elif function is huracanpy.plot.fancyline:
+        function_args = [
+            _get_function_args(track, function_args)
+            for track_id, track in tracks_csv.groupby("track_id")
+        ]
+    else:
+        function_args = _get_function_args(tracks_csv, function_args)
+
+    plt.figure(fig_ref)
+    ax = plt.gca()
+
+    if function is huracanpy.plot.fancyline:
+        [function(*args, ax=ax) for args in function_args]
+    elif (
+        function is huracanpy.plot.tracks
+        and "intensity_var_name" not in accessor_function_kwargs
+    ):
+        with pytest.warns(
+            UserWarning, match="Ignoring `palette` because no `hue` variable"
+        ):
+            function(*function_args, ax=ax)
+    else:
+        function(*function_args, ax=ax)
+
+    plt.figure(fig_test)
+    ax = plt.gca()
+
+    if (
+        function is huracanpy.plot.tracks
+        and "intensity_var_name" not in accessor_function_kwargs
+    ):
+        with pytest.warns(
+            UserWarning, match="Ignoring `palette` because no `hue` variable"
+        ):
+            getattr(tracks_csv.hrcn, accessor_name)(**accessor_function_kwargs, ax=ax)
+    else:
+        getattr(tracks_csv.hrcn, accessor_name)(**accessor_function_kwargs, ax=ax)
 
 
 def test_interp_methods():

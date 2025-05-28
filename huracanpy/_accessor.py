@@ -624,7 +624,7 @@ class HuracanPyDatasetAccessor:
             # strings
             # e.g. colors can be a variable on the track or could just be "red"
             extra_variables = {
-                key: (track[name] if key in track else name)
+                key: (track[name] if name in track else name)
                 for key, name in extra_names.items()
             }
 
