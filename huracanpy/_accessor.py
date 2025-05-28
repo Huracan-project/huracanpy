@@ -338,6 +338,14 @@ class HuracanPyDatasetAccessor:
         )
         return self._dataset
 
+    def get_beta_drift(self, lat_name="lat", wind_name="wind", rmw_name="rmw"):
+        return tc.beta_drift(
+            self._dataset[lat_name], self._dataset[wind_name], self._dataset[rmw_name]
+        )
+
+    def add_beta_drift(self, lat_name="lat", wind_name="wind", rmw_name="rmw"):
+        self._dataset["beta_drift"] = self.get_beta_drift(lat_name, wind_name, rmw_name)
+
     # ---- translation
     def get_azimuth(
         self,
@@ -592,6 +600,38 @@ class HuracanPyDatasetAccessor:
     ):
         d = self.get_density(lon_name=lon_name, lat_name=lat_name, **density_kws)
         return plot.density(d, **kwargs)
+
+    def plot_fancyline(
+        self,
+        lon_name="lon",
+        lat_name="lat",
+        track_id_name="track_id",
+        colors=None,
+        linewidths=None,
+        alphas=None,
+        linestyles=None,
+        **kwargs,
+    ):
+        extra_names = dict(
+            colors=colors, linewidths=linewidths, alphas=alphas, linestyles=linestyles
+        )
+        output = []
+        for track_id, track in self._dataset.groupby(track_id_name):
+            # Allow the other variables to be passed as variable names or constant
+            # strings
+            # e.g. colors can be a variable on the track or could just be "red"
+            extra_variables = {
+                key: (track[name] if key in track else name)
+                for key, name in extra_names.items()
+            }
+
+            output.append(
+                plot.fancyline(
+                    track[lon_name], track[lat_name], **extra_variables, **kwargs
+                )
+            )
+
+        return output
 
     # %% diags
     # ---- density

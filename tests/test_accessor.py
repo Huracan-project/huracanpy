@@ -1,6 +1,7 @@
-import pytest
+from inspect import getmembers, isfunction
 
 import numpy as np
+import pytest
 import xarray as xr
 
 import huracanpy
@@ -236,3 +237,62 @@ def test_accessor_trackswhere(tracks_csv):
     )
 
     xr.testing.assert_identical(result, expected)
+
+
+# Functions not in the accessor
+_intentionally_missing = [
+    "load",
+    # add_ functions that would have output with a different shape
+    "add_apex_vals",
+    "add_gen_vals",
+    "add_density",
+    "add_track_duration",
+    # plot_ functions that are for multiple datasets
+    "plot_doughnut",
+    "plot_venn",
+]
+
+
+def test_accessor_namespace_matches():
+    # Functions at the top level have the same name as in the module
+    expected_functions = [m[0] for m in getmembers(huracanpy) if isfunction(m[1])]
+
+    # Functions in calc, info, and tc should have get_ and add_ equivalents in the
+    # accessor
+    expected_functions += [
+        f"{prefix}_{m[0]}"
+        for prefix in ["get", "add"]
+        for module in [huracanpy.calc, huracanpy.info, huracanpy.tc]
+        for m in getmembers(module)
+        if isfunction(m[1])
+    ]
+
+    # Function in plot should be named plot_ in the accessor
+    expected_functions += [
+        f"plot_{m[0]}" for m in getmembers(huracanpy.plot) if isfunction(m[1])
+    ]
+
+    # Remove functions that do not go in the accessor
+    for func in _intentionally_missing:
+        expected_functions.remove(func)
+
+    # The names of functions actually available on the accessor
+    accessor_functions = [
+        m[0]
+        for m in getmembers(huracanpy._accessor.HuracanPyDatasetAccessor)
+        if isfunction(m[1]) and m[0][0] != "_"
+    ]
+
+    if sorted(expected_functions) != sorted(accessor_functions):
+        missing = [
+            func for func in expected_functions if func not in accessor_functions
+        ]
+        extras = [func for func in accessor_functions if func not in expected_functions]
+
+        raise ValueError(
+            "Module and accessor functions do not match\n"
+            + "Functions missing from accessor\n    - "
+            + "\n    - ".join(missing)
+            + "\nExtra functions in the accessor\n    - "
+            + "\n    - ".join(extras)
+        )
