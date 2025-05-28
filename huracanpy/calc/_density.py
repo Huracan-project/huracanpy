@@ -81,4 +81,5 @@ def _kde(lon, lat, x_mid, y_mid, function_kws):
     # Compute kernel density estimate
     kernel = gaussian_kde([lon, lat], **function_kws)
     # Evaluation kernel along positions
-    return np.reshape(kernel(positions), (len(y_mid), len(x_mid)))
+    H = np.reshape(kernel(positions), (len(y_mid), len(x_mid)))
+    return H * len(lon) / H.sum()
