@@ -17,7 +17,7 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
     lat : array_like
         latitude series
     method : str, default="histogram"
-        The method used to calculate the density, currently only "histogram", which
+        The method used to calculate the density, currently "histogram" or "kde", which
         gives a 2d histogram using `np.histogram2d`
     bin_size : int or float, default=5
         When using histogram, defines the size (in degrees) of the bins.
@@ -28,7 +28,7 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
     Raises
     ------
     NotImplementedError
-        If method given is not 'histogram'
+        If method given is not 'histogram' or 'kde'
 
     Returns
     -------
