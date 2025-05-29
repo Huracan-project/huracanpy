@@ -17,7 +17,7 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
     lat : array_like
         latitude series
     method : str, default="histogram"
-        The method used to calculate the density, currently only "histogram", which
+        The method used to calculate the density, currently "histogram" or "kde", which
         gives a 2d histogram using `np.histogram2d`
     bin_size : int or float, default=5
         When using histogram, defines the size (in degrees) of the bins.
@@ -28,7 +28,7 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
     Raises
     ------
     NotImplementedError
-        If method given is not 'histogram'
+        If method given is not 'histogram' or 'kde'
 
     Returns
     -------
@@ -52,7 +52,7 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
         H = _kde(lon, lat, x_mid, y_mid, function_kws)
     else:
         raise NotImplementedError(
-            f"Method {method} not implemented yet. Use one 'histogram'"
+            f"Method {method} not implemented yet. Use one 'histogram', 'kde'"
         )
 
     # Turn into xarray
@@ -81,4 +81,8 @@ def _kde(lon, lat, x_mid, y_mid, function_kws):
     # Compute kernel density estimate
     kernel = gaussian_kde([lon, lat], **function_kws)
     # Evaluation kernel along positions
-    return np.reshape(kernel(positions), (len(y_mid), len(x_mid)))
+    H = np.reshape(kernel(positions), (len(y_mid), len(x_mid)))
+    # Account for cell area differences
+    H = H / np.transpose([np.cos(y_mid * np.pi / 180)])
+    # Normalize so that H integrates to the total number of points
+    return H * len(lon) / H.sum()
