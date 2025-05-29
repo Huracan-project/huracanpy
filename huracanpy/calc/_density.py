@@ -67,10 +67,7 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
         return da.where(~np.isnan(da), drop=True).fillna(0)
     else:
         return da
-
-def _compute_cell_area(x_edge, y_edge):
-    
-    
+ 
 def _histogram(lon, lat, x_edge, y_edge, function_kws):
     # Compute 2D histogram with numpy
     H, _x, _y = np.histogram2d(lon, lat, bins=[x_edge, y_edge], **function_kws)
