@@ -20,13 +20,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: mamba-org/setup-micromamba@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        create-args: >-
+          python=${{matrix.python-version}}
     - name: Install dependencies
       run: |
-        python -m conda install -c conda-forge cartopy
-        python -m pip install --upgrade pip
         python -m pip install .[dev]
     - uses: chartboost/ruff-action@v1
     - uses: chartboost/ruff-action@v1
