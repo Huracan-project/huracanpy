@@ -25,17 +25,15 @@ jobs:
         environment-name: test-huracanpy
         create-args: >-
           python=${{matrix.python-version}}
-    - name: Install dependencies
+    - name: Install dependencies and test
       run: |
         python -c "import sys; print(sys.version)"
         eval "$(micromamba shell hook --shell bash)"
         micromamba activate test-huracanpy
         python -c "import sys; print(sys.version)"
         python -m pip install .[dev]
+        python -m pytest
     - uses: chartboost/ruff-action@v1
     - uses: chartboost/ruff-action@v1
       with:
         args: 'format --check'
-    - name: Test with pytest
-      run: |
-        python -m pytest
