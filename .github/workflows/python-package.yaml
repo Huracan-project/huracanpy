@@ -28,6 +28,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -c "import sys; print(sys.version)"
+        eval "$(micromamba shell hook --shell bash)"
         micromamba activate test-huracanpy
         python -c "import sys; print(sys.version)"
         python -m pip install .[dev]
