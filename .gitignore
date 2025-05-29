@@ -27,6 +27,7 @@ htmlcov
 .coverage
 .tox
 nosetests.xml
+result_images/
 
 # Translations
 *.mo
