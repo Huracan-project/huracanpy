@@ -52,7 +52,7 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
         H = _kde(lon, lat, x_mid, y_mid, function_kws)
     else:
         raise NotImplementedError(
-            f"Method {method} not implemented yet. Use one 'histogram'"
+            f"Method {method} not implemented yet. Use one 'histogram', 'kde'"
         )
 
     # Turn into xarray
@@ -68,7 +68,9 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
     else:
         return da
 
-
+def _compute_cell_area(x_edge, y_edge):
+    
+    
 def _histogram(lon, lat, x_edge, y_edge, function_kws):
     # Compute 2D histogram with numpy
     H, _x, _y = np.histogram2d(lon, lat, bins=[x_edge, y_edge], **function_kws)
@@ -82,4 +84,7 @@ def _kde(lon, lat, x_mid, y_mid, function_kws):
     kernel = gaussian_kde([lon, lat], **function_kws)
     # Evaluation kernel along positions
     H = np.reshape(kernel(positions), (len(y_mid), len(x_mid)))
+    # Account for cell area differences
+    H = H / np.transpose([np.cos(y_mid * np.pi / 180)])
+    # Normalize so that H integrates to the total number of points
     return H * len(lon) / H.sum()
