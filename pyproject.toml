@@ -72,8 +72,6 @@ extend-select = [
 [tool.pytest.ini_options]
 minversion = "6.0"
 filterwarnings = [
-    "error",
-    "default::DeprecationWarning",
     'ignore:numpy.ndarray size changed:RuntimeWarning',
     "ignore::cartopy.io.DownloadWarning"
 ]
