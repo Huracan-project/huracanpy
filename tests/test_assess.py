@@ -4,7 +4,10 @@ import pytest
 import huracanpy
 
 
-def test_match():
+# TODO properly test tracks1_is_ref with a set of tracks that will give a different
+#  answer
+@pytest.mark.parametrize("tracks1_is_ref", [True, False])
+def test_match(tracks1_is_ref):
     with (
         pytest.warns(
             UserWarning, match="This offline function loads a light version of IBTrACS"
@@ -16,7 +19,9 @@ def test_match():
     UZ = huracanpy.load(huracanpy.example_year_file)
     UZ1 = UZ.where(UZ.track_id.isin([1207, 1208, 1210, 1212, 1220, 1238]), drop=True)
     UZ2 = UZ.where(UZ.track_id.isin([1207, 1208, 1209, 1211, 1220, 1238]), drop=True)
-    M = huracanpy.assess.match([UZ1, UZ2, ref_1996], ["UZ1", "UZ2", "ib"])
+    M = huracanpy.assess.match(
+        [UZ1, UZ2, ref_1996], ["UZ1", "UZ2", "ib"], tracks1_is_ref=tracks1_is_ref
+    )
 
     data1, data2, data3 = UZ1, UZ2, ref_1996
     N1 = len(np.unique(data1.track_id.values))  # Number of tracks in dataset 1
@@ -31,6 +36,27 @@ def test_match():
     assert len(M) == 6
     assert (N1, N2, N3) == (6, 6, 118)
     assert (M_not1, M_not2, M_not3, M_all) == (1, 1, 1, 3)
+
+
+def test_match_pair_empty(tracks_csv, tracks_year):
+    matches = huracanpy.assess.match([tracks_csv, tracks_year], ["a", "b"])
+    assert matches.size == 0
+
+
+def test_match_multiple_empty(tracks_year):
+    tracks = [
+        tracks_year.hrcn.sel_id(track_ids)
+        for track_ids in [
+            list(range(1207, 1217)),
+            list(range(1217, 1227)),
+            list(range(1227, 1237)),
+        ]
+    ]
+    with pytest.raises(
+        NotImplementedError,
+        match="For the moment, the case where two datasets have no match is not",
+    ):
+        huracanpy.assess.match(tracks, ["a", "b", "c"])
 
 
 @pytest.mark.parametrize(
