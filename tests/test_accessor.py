@@ -194,8 +194,8 @@ def test_accessor_methods_match_functions(
         xr.testing.assert_identical(result, result_accessor)
     else:
         np.testing.assert_equal(
-            np.array(result),
-            np.array(result_accessor),
+            np.asarray(result),
+            np.asarray(result_accessor),
             err_msg="accessor output differs from function output",
         )
 

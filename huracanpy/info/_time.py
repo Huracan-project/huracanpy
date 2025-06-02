@@ -78,8 +78,8 @@ def season(track_id, lat, time, convention="tc-short"):
         month = time.month
     except TypeError:
         # Fix for cftime
-        year = np.array([t.year for t in time])
-        month = np.array([t.month for t in time])
+        year = np.asarray([t.year for t in time])
+        month = np.asarray([t.month for t in time])
 
     # Store in a dataframe
     with warnings.catch_warnings():

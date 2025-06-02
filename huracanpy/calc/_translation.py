@@ -43,8 +43,8 @@ def _get_distance_haversine(lon1, lat1, lon2, lat2):
             category=UnitStrippedWarning,
             message="The unit of the quantity is stripped when downcasting to ndarray.",
         )
-        yx1 = np.array([lat1, lon1]).T
-        yx2 = np.array([lat2, lon2]).T
+        yx1 = np.asarray([lat1, lon1]).T
+        yx2 = np.asarray([lat2, lon2]).T
 
     return haversine_vector(yx1, yx2, unit="m")
 
