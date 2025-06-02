@@ -199,7 +199,7 @@ def load_tilts(filename, calendar=None, nans=1e25):
         nfields = header["nfields"]
 
         line_fmt = "LEVELS " + " ".join(["{:f}"] * nfields)
-        levels = np.array(_parse(line_fmt, f.readline().strip()).fixed)
+        levels = np.asarray(_parse(line_fmt, f.readline().strip()).fixed)
 
         # Read in each track as an xarray dataset with time as the coordinate
         for n in range(ntracks):

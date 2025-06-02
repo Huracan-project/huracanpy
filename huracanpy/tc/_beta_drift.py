@@ -2,9 +2,8 @@ import numpy as np
 from metpy.constants import Re, omega
 from metpy.units import units
 from metpy.xarray import preprocess_and_wrap
-import pint
 
-from .._metpy import dequantify_results
+from .._metpy import dequantify_results, validate_units
 
 
 omega = omega / units("radian")
@@ -39,27 +38,24 @@ def beta_drift(
     """
 
     # Treat input
-    ## Convert lat to rad
-    if not isinstance(lat, pint.Quantity) or lat.unitless:
-        if np.abs(lat).max() > np.pi:  # We assume lats are in degrees if they exceed pi
-            lat = lat * units("degrees")
-        else:
-            lat = lat * units("radians")
-
+    # Convert lat to rad
+    lat = validate_units(
+        lat,
+        # We assume lats are in degrees if they exceed pi
+        expected_units=lambda x: "degrees" if np.abs(x).max() > np.pi else "radians",
+    )
     lat = lat.to("radians")
 
     # Assume max wind is in m/s if not given
-    if not isinstance(wind_max, pint.Quantity) or wind_max.unitless:
-        wind_max = wind_max * units("m / s")
+    wind_max = validate_units(wind_max, expected_units="m s-1")
 
-    ## Convert rmw to m
-    if not isinstance(radius_wind_max, pint.Quantity) or radius_wind_max.unitless:
-        if (
-            radius_wind_max.max() < 10000
-        ):  # We assume rmw are in km if they are below 10,000
-            radius_wind_max = radius_wind_max * 1000
-
-        radius_wind_max = radius_wind_max * units("m")
+    # Convert rmw to m
+    radius_wind_max = validate_units(
+        radius_wind_max,
+        # We assume rmw are in km if they are below 10,000
+        expected_units=lambda x: "km" if x.max() < 10000 else "m",
+    )
+    radius_wind_max = radius_wind_max.to("m")
 
     # Coriolis parameter
     beta = 2 * omega * np.cos(lat) / Re  # s-1 m-1

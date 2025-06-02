@@ -51,11 +51,11 @@ def gen_vals(tracks, time, track_id):
     df = pd.DataFrame(
         data=dict(
             idx=np.arange(len(track_id)),
-            time=np.array(time),
-            track_id=np.array(track_id),
+            time=np.asarray(time),
+            track_id=np.asarray(track_id),
         )
     )
-    idx = np.array(df.sort_values("time").groupby("track_id").first().idx)
+    idx = np.asarray(df.sort_values("time").groupby("track_id").first().idx)
 
     # Could check that track_id is 1d, but the function would already have failed by now
     # if not
@@ -107,11 +107,13 @@ def apex_vals(tracks, variable, track_id, stat="max"):
     df = pd.DataFrame(
         data=dict(
             idx=np.arange(len(variable)),
-            var=np.array(variable),
-            track_id=np.array(track_id),
+            var=np.asarray(variable),
+            track_id=np.asarray(track_id),
         )
     )
-    idx = np.array(df.sort_values("var", ascending=asc).groupby("track_id").first().idx)
+    idx = np.asarray(
+        df.sort_values("var", ascending=asc).groupby("track_id").first().idx
+    )
 
     dim = track_id.dims[0]
     tracks = tracks.isel(**{dim: idx})
