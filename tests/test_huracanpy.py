@@ -13,6 +13,7 @@ import huracanpy
         (huracanpy.example_parquet_file, dict(), 9, 0, 99, 3),
         (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86),
         (huracanpy.example_TRACK_netcdf_file, dict(source="netcdf"), 20, 17, 4580, 86),
+        (huracanpy.example_TRACK_timestep_file, dict(source="TRACK"), 38, 0, 416, 19),
         (
             huracanpy.example_TRACK_timestep_file,
             dict(source="TRACK", track_calendar=("1940-01-01", 6)),
@@ -36,6 +37,14 @@ import huracanpy
             19,
         ),
         (huracanpy.example_TE_file, dict(source="tempestextremes"), 8, 0, 210, 8),
+        (
+            huracanpy.example_TE_file,
+            dict(source="tempestextremes", variable_names=["slp", "wind"]),
+            8,
+            0,
+            210,
+            8,
+        ),
         (huracanpy.example_CHAZ_file, dict(), 11, 0, 1078, 20),
         (huracanpy.example_MIT_file, dict(), 10, 1, 2138, 11),
         (huracanpy.example_WiTRACK_file, dict(source="witrack"), 14, 0, 3194, 268),
@@ -56,6 +65,29 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
     if filename != huracanpy.example_TRACK_tilt_file:
         for name in ["track_id", "time", "lon", "lat"]:
             assert name in data
+
+
+def _fake_ibtracs_data(url, filename):  # noqa ARG001
+    return huracanpy.example_csv_file, None
+
+
+def test_load_ibtracs_online(monkeypatch):
+    with monkeypatch.context() as m:
+        from huracanpy._data import ibtracs
+
+        m.setattr(ibtracs, "urlretrieve", _fake_ibtracs_data)
+        tracks = huracanpy.load(source="ibtracs", ibtracs_subset="last3years")
+
+    assert len(tracks) == 9
+    assert len(tracks.coords) == 0
+    # IBTrACS online load skips the second line (first line after header) so this is one
+    # less than expected
+    assert len(tracks.time) == 98
+    assert len(tracks.groupby("track_id")) == 3
+    assert "record" not in tracks.coords
+
+    for name in ["track_id", "time", "lon", "lat"]:
+        assert name in tracks
 
 
 @pytest.mark.parametrize(
