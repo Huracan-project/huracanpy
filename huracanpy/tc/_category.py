@@ -4,11 +4,11 @@ Module with function to compute TC-specific categories
 
 import warnings
 
-import pint
+from metpy.units import units
 from metpy.xarray import preprocess_and_wrap
 
 from ..info import category
-from .._metpy import dequantify_results
+from .._metpy import dequantify_results, validate_units
 from ._conventions import _thresholds
 
 
@@ -42,7 +42,7 @@ def saffir_simpson_category(wind, convention="Saffir-Simpson", wind_units="m s-1
 
 @dequantify_results
 @preprocess_and_wrap(wrap_like="slp")
-def pressure_category(slp, convention="Klotzbach", slp_units="hPa"):
+def pressure_category(slp, convention="Klotzbach", slp_units=None):
     """
     Determine the pressure category according to selected convention.
 
@@ -64,15 +64,21 @@ def pressure_category(slp, convention="Klotzbach", slp_units="hPa"):
         You can append it to your tracks by running tracks["cat"] = get_pressure_cat(tracks.slp)
 
     """
-    if not isinstance(slp, pint.Quantity) or slp.unitless:
-        if slp.min() > 10000 and slp_units == "hPa":
+    # Don't automatically switch units to Pa if they have been explicitly set to Pa,
+    # even if they seem wrong
+    if (not isinstance(slp, units.Quantity) or slp.unitless) and slp_units is None:
+        if slp.magnitude.min() > 10000:
             warnings.warn(
                 "Caution, pressure are likely in Pa, they are being converted to hPa "
                 "for categorization. In future specify the units explicitly by passing "
                 'slp_units="Pa" to this function or setting '
                 'slp.attrs["units"] = "Pa"'
             )
-            slp = slp / 100
+            slp_units = "Pa"
+        else:
+            slp_units = "hPa"
+
+    slp = validate_units(slp, expected_units=slp_units)
 
     return category(
         slp,

@@ -20,6 +20,7 @@ def test_get_category(tracks_csv, with_units, with_units_on_bins, bins=[0, 10, 2
     assert result.min() == 1
     assert result.max() == 2
     assert result.sum() == 59 + 2 * 40
+    assert isinstance(result.data, np.ndarray)
 
 
 def test_category_warns(tracks_csv):

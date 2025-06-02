@@ -10,7 +10,9 @@ from pint.errors import UnitStrippedWarning
 import pandas as pd
 
 from metpy.xarray import preprocess_and_wrap
-from metpy.units import units
+
+
+from .._metpy import validate_units
 
 
 @preprocess_and_wrap(wrap_like="variable")
@@ -48,17 +50,18 @@ def category(variable, bins, labels=None, variable_units=None):
 
     # Account for one, both, or neither of the variable and bins having their units
     # specified
-    if not isinstance(variable, pint.Quantity) or variable.unitless:
+    variable = validate_units(
+        variable,
         # If variable has no units, but bins do, copy the units from the bins to the
         # variable. But if neither have units specified use the "variable_units" kwarg
-        if variable_units is None and isinstance(bins, pint.Quantity):
-            variable_units = str(bins.units)
-        variable = variable * units(variable_units)
+        expected_units=lambda: str(bins.units)
+        if variable_units is None and isinstance(bins, pint.Quantity)
+        else variable_units,
+    )
 
     # If bins has no units, copy the units to from the variable. Which may have already
     # been set by the "variable_units" kwarg
-    if not isinstance(bins, pint.Quantity) or bins.unitless:
-        bins = bins * variable.units
+    bins = validate_units(bins, str(variable.units))
 
     # Make sure the units match, however they have been set
     bins = bins.to(variable.units)
@@ -70,6 +73,6 @@ def category(variable, bins, labels=None, variable_units=None):
             message="The unit of the quantity is stripped when downcasting to ndarray.",
         )
 
-        result = np.array(pd.cut(variable, bins, labels=labels))
+        result = np.asarray(pd.cut(variable, bins, labels=labels))
 
     return result
