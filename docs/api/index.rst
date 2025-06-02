@@ -8,6 +8,7 @@ API
 
     self
     huracanpy
+    hrcn
     info
     calc
     tc
@@ -18,6 +19,8 @@ Modules
 -------
 ================ ================================
 :doc:`huracanpy` .. automodule:: huracanpy
+                     :no-index:
+:doc:`hrcn`      .. automodule:: huracanpy._accessor
                      :no-index:
 :doc:`info`      .. automodule:: huracanpy.info
                      :no-index:

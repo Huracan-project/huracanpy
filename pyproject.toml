@@ -47,6 +47,7 @@ docs = [
     "sphinx-design",
     "ipykernel",
     "myst-parser",
+    "sphinx_autosummary_accessors",
 ]
 
 [build-system]
