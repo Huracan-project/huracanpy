@@ -6,12 +6,11 @@ import warnings
 
 import numpy as np
 from numpy.polynomial.polynomial import Polynomial
-import pint
 from pint.errors import UnitStrippedWarning
 from metpy.xarray import preprocess_and_wrap
 from metpy.units import units
 
-from .._metpy import dequantify_results
+from .._metpy import dequantify_results, validate_units
 
 
 def ace(
@@ -67,10 +66,26 @@ def ace(
 
     """
 
-    ace_values = get_ace(wind, threshold, wind_units)
+    ace_values = _ace(wind, threshold, wind_units)
 
     if sum_by is not None:
         ace_values = ace_values.groupby(sum_by).sum()
+
+    return ace_values
+
+
+@dequantify_results
+@preprocess_and_wrap(wrap_like="wind")
+def _ace(wind, threshold=34 * units("knots"), wind_units="m s-1"):
+    wind = validate_units(wind, wind_units)
+    wind = wind.to(units("knots"))
+
+    if threshold is not None:
+        threshold = validate_units(threshold, wind_units)
+
+        wind[wind < threshold] = 0 * units("knots")
+
+    ace_values = (wind**2.0) * 1e-4
 
     return ace_values
 
@@ -83,6 +98,7 @@ def pace(
     threshold_wind=None,
     threshold_pressure=None,
     wind_units="m s-1",
+    pressure_units="hPa",
     **kwargs,
 ):
     """Calculate a pressure-based accumulated cyclone energy (PACE) for each individual
@@ -119,6 +135,7 @@ def pace(
     threshold_wind : scalar, optional
     threshold_pressure : scalar, optional
     wind_units : str, default="m s-1"
+    pressure_units : str, default="Pa"
     **kwargs
 
     Returns
@@ -128,13 +145,14 @@ def pace(
     model : object
 
     """
-    pace_values, model = get_pace(
+    pace_values, model = _pace(
         pressure,
         wind=wind,
         model=model,
         threshold_wind=threshold_wind,
         threshold_pressure=threshold_pressure,
         wind_units=wind_units,
+        pressure_units=pressure_units,
         **kwargs,
     )
 
@@ -145,105 +163,37 @@ def pace(
 
 
 @dequantify_results
-@preprocess_and_wrap(wrap_like="wind")
-def get_ace(wind, threshold=34 * units("knots"), wind_units="m s-1"):
-    """Calculate accumulate cyclone energy (ACE) for each individual point
-
-    Parameters
-    ----------
-    wind : array_like
-        Maximum velocity of a tropical cyclone
-    threshold : scalar, default=34 knots
-        ACE is set to zero below this threshold wind speed. The default argument is in
-        knots. To pass an argument with units, use :py:mod:`metpy.units`, otherwise any
-        non-default argument will be assumed to have the units of "wind_units" which is
-        "m s-1" by default.
-    wind_units : str, default="m s-1"
-        If the units of wind are not specified in the attributes then the function will
-        assume it is in these units before converting to knots
-
-    Returns
-    -------
-    array_like
-        The ACE at each point in wind
-
-    """
-    if not isinstance(wind, pint.Quantity) or wind.unitless:
-        wind = wind * units(wind_units)
-    wind = wind.to(units("knots"))
-
-    if threshold is not None:
-        if not isinstance(threshold, pint.Quantity) or threshold.unitless:
-            threshold = threshold * units(wind_units)
-
-        wind[wind < threshold] = 0 * units("knots")
-
-    ace_values = (wind**2.0) * 1e-4
-
-    return ace_values
-
-
-def get_pace(
+@preprocess_and_wrap(wrap_like=("pressure", None))
+def _pace(
     pressure,
     wind=None,
     model=None,
     threshold_wind=None,
     threshold_pressure=None,
     wind_units="m s-1",
+    pressure_units="hPa",
     **kwargs,
 ):
-    """Calculate a pressure-based accumulated cyclone energy (PACE) for each individual
-    point
+    pressure = validate_units(pressure, pressure_units)
+    pressure = pressure.to("hPa")
+    if wind is not None:
+        wind = validate_units(wind, wind_units)
+        wind = wind.to(units("knots"))
 
-    PACE is calculated the same way as ACE, but the wind is derived from fitting a
-    pressure-wind relationship and calculating wind values from pressure using this fit
-
-    Example
-    -------
-    This function can be called in two ways
-
-    1. Pass the pressure and wind to fit a pressure-wind relationship to the data and
-       then calculate pace from the winds derived from this fit
-
-    >>> pace, pw_model = get_pace(pressure, wind)
-
-    The default model to fit is a quadratic polynomial
-    (:py:class:`numpy.polynomial.polynomial.Polynomial` with `deg=2`)
-
-    2. Pass just the pressure and an already fit model to calculate the wind speeds from
-       this model
-
-    >>> pace, _ = get_pace(pressure, model=pw_model)
-
-    Parameters
-    ----------
-    pressure : array_like
-    wind : array_like, optional
-    model : str or class, optional
-    threshold_wind : scalar, optional
-    threshold_pressure : scalar, optional
-    wind_units : str, default="m s-1"
-    **kwargs
-
-    Returns
-    -------
-    pace_values : array_like
-
-    model : object
-
-    """
-    model_wind, model = get_pressure_wind_relation(
+    model_wind, model = _pressure_wind_relation(
         pressure, wind=wind, model=model, **kwargs
     )
-    pace_values = get_ace(model_wind, threshold=threshold_wind, wind_units=wind_units)
+    pace_values = _ace(model_wind, threshold=threshold_wind, wind_units="knots")
 
     if threshold_pressure is not None:
-        pace_values[pressure > threshold_pressure] = 0.0
+        threshold_pressure = validate_units(threshold_pressure, pressure_units)
+
+        pace_values[pressure > threshold_pressure] = 0.0 * pace_values.units
 
     return pace_values, model
 
 
-def get_pressure_wind_relation(pressure, wind=None, model=None, **kwargs):
+def _pressure_wind_relation(pressure, wind=None, model=None, **kwargs):
     if isinstance(model, str):
         if model.lower() == "z2021":
             model = pw_z2021
@@ -255,22 +205,21 @@ def get_pressure_wind_relation(pressure, wind=None, model=None, **kwargs):
             # Here, we calculate a quadratic P/W fit based off of the "control"
             if "deg" not in kwargs:
                 kwargs["deg"] = 2
-            model = Polynomial.fit(pressure, wind, **kwargs)
+            model = Polynomial.fit(pressure.magnitude, wind.magnitude, **kwargs)
 
         else:
-            model = model.fit(pressure, wind, **kwargs)
+            model = model.fit(pressure.magnitude, wind.magnitude, **kwargs)
 
     elif model is None:
         raise ValueError(
             "Need to specify either wind or model to calculate pressure-wind relation"
         )
 
-    wind_from_fit = _get_wind_from_model(pressure, model)
+    wind_from_fit = _get_wind_from_model(pressure.magnitude, model) * units("knots")
 
     return wind_from_fit, model
 
 
-@preprocess_and_wrap(wrap_like="pressure")
 def _get_wind_from_model(pressure, model):
     with warnings.catch_warnings():
         warnings.filterwarnings(
@@ -279,11 +228,12 @@ def _get_wind_from_model(pressure, model):
             message="The unit of the quantity is stripped when downcasting to ndarray.",
         )
 
-        result = np.array(model(pressure))
+        result = np.asarray(model(pressure))
     return result
 
 
 # Pre-determined pressure-wind relationships
+# Input pressure in hPa, output wind in knots
 _z2021 = Polynomial([1.43290190e01, 5.68356519e-01, -1.05371378e-03])
 
 

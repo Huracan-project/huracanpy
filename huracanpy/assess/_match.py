@@ -17,7 +17,8 @@ def match(
     tracksets : list[xarray.Dataset]
         list of track datasets to match together. Must be of length two or more.
     names : list, optional
-        list of track datasets names. Must be the same size as tracksets. The default is ['1','2'].
+        list of track datasets names. Must be the same size as tracksets. The default is
+        ['1','2'].
     max_dist : float, optional
         Threshold for maximum distance between two tracks. The default is 300.
     min_overlap : int, optional
@@ -112,8 +113,9 @@ def _match_pair(
 
         # Treat duplicates if required
         if tracks1_is_ref:
-            ## Treat the duplicates where one tracks2 track has several corresponding tracks1:
-            ## Keep the couple with the longest overlap
+            # Treat the duplicates where one tracks2 track has several corresponding
+            # tracks1:
+            # Keep the couple with the longest overlap
             matches = (
                 matches.sort_values("temp", ascending=False)
                 .groupby("track_id_y")
@@ -163,10 +165,6 @@ def _match_multiple(
         table of matching tracks among all the datasets
 
     """
-
-    if len(datasets) != len(names):
-        raise ValueError("datasets and names must have the same length.")
-
     M = pd.DataFrame(columns=["id_" + n for n in names[:2]])
     for names_pair, dataset_pair in zip(
         combinations(names, 2), combinations(datasets, 2)
@@ -180,8 +178,8 @@ def _match_multiple(
         )
         if len(m) == 0:
             raise NotImplementedError(
-                "For the moment, the case where two datasets have no match is not handled. Problem raised by datasets "  # TODO
-                + str(names_pair)
+                "For the moment, the case where two datasets have no match is not"
+                "handled. Problem raised by datasets " + str(names_pair)  # TODO
             )
         M = M.merge(m[["id_" + names_pair[0], "id_" + names_pair[1]]], how="outer")
     return M

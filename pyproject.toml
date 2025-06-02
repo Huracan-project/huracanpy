@@ -33,6 +33,7 @@ dependencies = [
 dev = [
     "pre-commit",
     "pytest",
+    "pytest-cov",
     "ruff>=0.9.0",
     "tox",
     "nbformat",
@@ -75,6 +76,7 @@ filterwarnings = [
     'ignore:numpy.ndarray size changed:RuntimeWarning',
     "ignore::cartopy.io.DownloadWarning"
 ]
+addopts = "--cov=huracanpy --cov-report html"
 
 [tool.tox]
 requires = ["tox>=4.15.0"]
