@@ -317,7 +317,7 @@ class HuracanPyDatasetAccessor:
         return self._dataset
 
     def get_pressure_category(
-        self, slp_name="slp", convention="Klotzbach", slp_units="hPa"
+        self, slp_name="slp", convention="Klotzbach", slp_units=None
     ):
         """
         Determine the pressure category based on the selected convention.
@@ -327,7 +327,7 @@ class HuracanPyDatasetAccessor:
         )
 
     def add_pressure_category(
-        self, slp_name="slp", convention="Klotzbach", slp_units="hPa"
+        self, slp_name="slp", convention="Klotzbach", slp_units=None
     ):
         """
         Add the pressure category to the dataset.
