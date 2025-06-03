@@ -13,6 +13,7 @@ demo
 load
 save
 subset
+units
 ```
 
 This User Guide is here to help you use HuracanPy, by providing explanations about the most important aspects of the packages.
