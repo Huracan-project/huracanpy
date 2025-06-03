@@ -33,7 +33,7 @@ def interp_time(
         requested frequency
     """
 
-    T = []
+    new_tracks = []
 
     if prog_bar:
         iterator = tqdm(np.unique(track_ids.values))
@@ -42,7 +42,7 @@ def interp_time(
 
     for tid in iterator:
         t = sel_id(tracks, track_ids, tid)
-        T.append(
+        new_tracks.append(
             t.set_coords("time")
             .swap_dims({"record": "time"})
             .interp(
@@ -51,4 +51,4 @@ def interp_time(
             .swap_dims({"time": "record"})
             .reset_coords("time")
         )
-    return xr.concat(T, dim="record")
+    return xr.concat(new_tracks, dim="record")

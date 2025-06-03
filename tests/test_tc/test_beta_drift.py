@@ -21,6 +21,6 @@ def test_radius_of_maximum_wind(lat_radians, dequantify_rmw, rmw_units):
     else:
         lat = data.lat
 
-    V_drift, theta_drift = huracanpy.tc.beta_drift(lat, data.feature_9, rmw)
-    np.testing.assert_allclose(V_drift.mean(), 4.50560945)
+    v_drift, theta_drift = huracanpy.tc.beta_drift(lat, data.feature_9, rmw)
+    np.testing.assert_allclose(v_drift.mean(), 4.50560945)
     np.testing.assert_allclose(theta_drift.mean(), 330.379092)

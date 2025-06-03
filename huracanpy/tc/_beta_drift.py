@@ -17,7 +17,8 @@ def beta_drift(
     radius_wind_max,
 ):
     """
-    Based on Smith, 1993: https://journals.ametsoc.org/view/journals/atsc/50/18/1520-0469_1993_050_3213_ahbdl_2_0_co_2.xml?tab_body=pdf
+    Based on Smith, 1993:
+    https://journals.ametsoc.org/view/journals/atsc/50/18/1520-0469_1993_050_3213_ahbdl_2_0_co_2.xml?tab_body=pdf
 
     Parameters
     ----------
@@ -61,10 +62,10 @@ def beta_drift(
     beta = 2 * omega * np.cos(lat) / Re  # s-1 m-1
 
     # Beta-drift parameters
-    V_char = (radius_wind_max**2) * beta  # m/s
-    B = V_char / wind_max  # non-dimensionnal
-    V_drift_adim = 0.72 * B ** (-0.54)  # non-dmensionnal
-    V_drift = V_drift_adim * V_char  # m/s
-    theta_drift = 308 - 9.6 * np.log(B)  # degrees
+    v_char = (radius_wind_max**2) * beta  # m/s
+    b = v_char / wind_max  # non-dimensionnal
+    v_drift_adim = 0.72 * b ** (-0.54)  # non-dmensionnal
+    v_drift = v_drift_adim * v_char  # m/s
+    theta_drift = 308 - 9.6 * np.log(b)  # degrees
 
-    return V_drift, theta_drift
+    return v_drift, theta_drift

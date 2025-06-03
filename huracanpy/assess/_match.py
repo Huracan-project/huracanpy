@@ -91,9 +91,9 @@ def _match_pair(
     merged = pd.merge(tracks1, tracks2, on="time")
 
     if len(merged) > 0:  # if there exist matching points, continue
-        X = np.concatenate([[merged.lat_x], [merged.lon_x]]).T
-        Y = np.concatenate([[merged.lat_y], [merged.lon_y]]).T
-        merged["dist"] = haversine_vector(X, Y, unit=Unit.KILOMETERS)
+        x = np.concatenate([[merged.lat_x], [merged.lon_x]]).T
+        y = np.concatenate([[merged.lat_y], [merged.lon_y]]).T
+        merged["dist"] = haversine_vector(x, y, unit=Unit.KILOMETERS)
         merged = merged[merged.dist <= max_dist]
         # Compute temporal overlap
         temp = (
@@ -165,7 +165,7 @@ def _match_multiple(
         table of matching tracks among all the datasets
 
     """
-    M = pd.DataFrame(columns=["id_" + n for n in names[:2]])
+    matches = pd.DataFrame(columns=["id_" + n for n in names[:2]])
     for names_pair, dataset_pair in zip(
         combinations(names, 2), combinations(datasets, 2)
     ):
@@ -181,8 +181,10 @@ def _match_multiple(
                 "For the moment, the case where two datasets have no match is not"
                 "handled. Problem raised by datasets " + str(names_pair)  # TODO
             )
-        M = M.merge(m[["id_" + names_pair[0], "id_" + names_pair[1]]], how="outer")
-    return M
+        matches = matches.merge(
+            m[["id_" + names_pair[0], "id_" + names_pair[1]]], how="outer"
+        )
+    return matches
 
 
 # TODO: Deal with duplicates: merge, max...?

@@ -36,8 +36,8 @@ def _get_function_args(tracks, function_args):
 def test_nunique():
     data = huracanpy.load(huracanpy.example_csv_file)
 
-    N_tracks = data.track_id.hrcn.nunique()
-    assert N_tracks == 3
+    n_tracks = data.track_id.hrcn.nunique()
+    assert n_tracks == 3
 
 
 @pytest.mark.parametrize("call_type", ["get", "add"])

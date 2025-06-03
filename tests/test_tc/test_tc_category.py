@@ -14,10 +14,10 @@ def test_sshs():
 
 def test_pressure_cat():
     data = huracanpy.load(huracanpy.example_csv_file, source="csv")
-    Klotz = huracanpy.tc.pressure_category(data.slp / 100)
-    Simps = huracanpy.tc.pressure_category(data.slp / 100, convention="Simpson")
-    assert Klotz.sum() == 62
-    assert Simps.sum() == -23
+    klotz = huracanpy.tc.pressure_category(data.slp / 100)
+    simps = huracanpy.tc.pressure_category(data.slp / 100, convention="Simpson")
+    assert klotz.sum() == 62
+    assert simps.sum() == -23
 
 
 @pytest.mark.parametrize("pass_as_numpy", [False, True])
