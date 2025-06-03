@@ -73,7 +73,8 @@ def test_doughnut_roberts2020():
     )
 
     # The second value in the centre is the number of southern hemisphere storms
-    # This isn't related to the data in the doughnut so I've just put a list of values here
+    # This isn't related to the data in the doughnut so I've just put a list of values
+    # here
     sh_values = [
         68.3,
         95.0,

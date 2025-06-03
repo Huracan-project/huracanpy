@@ -37,7 +37,9 @@ def trackswhere(tracks, track_ids, condition):
 
     e.g select all tracks that are solely in the Northern hemisphere:
 
-    >>> tracks_subset = huracanpy.trackswhere(tracks, tracks.track_id, lambda x: (x.lat > 0).all())
+    >>> tracks_subset = huracanpy.trackswhere(
+    >>>     tracks, tracks.track_id, lambda x: (x.lat > 0).all()
+    >>> )
 
     e.g. select all tracks that are category 2 at least once in their lifetime:
 

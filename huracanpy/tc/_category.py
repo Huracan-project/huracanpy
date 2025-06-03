@@ -30,7 +30,8 @@ def saffir_simpson_category(wind, convention="Saffir-Simpson", wind_units="m s-1
     -------
     array_like
         The category series.
-        You can append it to your tracks by running tracks["sshs"] = get_sshs_cat(tracks.wind)
+        You can append it to your tracks by running
+        tracks["sshs"] = get_sshs_cat(tracks.wind)
     """
     return category(
         wind,
@@ -61,7 +62,8 @@ def pressure_category(slp, convention="Klotzbach", slp_units=None):
     -------
     xarray.DataArray
         The category series.
-        You can append it to your tracks by running tracks["cat"] = get_pressure_cat(tracks.slp)
+        You can append it to your tracks by running
+        tracks["cat"] = get_pressure_cat(tracks.slp)
 
     """
     # Don't automatically switch units to Pa if they have been explicitly set to Pa,

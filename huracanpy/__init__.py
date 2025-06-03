@@ -1,4 +1,6 @@
-"""huracanpy - A python package for working with various forms of feature tracking data"""
+"""
+huracanpy - A python package for working with various forms of feature tracking data
+"""
 
 __all__ = [
     # Modules

@@ -93,7 +93,8 @@ def apex_vals(tracks, variable, track_id, stat="max"):
 
     """
 
-    # tracks will be sorted along var and then the first line of each track_id will be used
+    # tracks will be sorted along var and then the first line of each track_id will be
+    # used
     # asc determines whether the sorting must be ascending (True) or descending (False)
     if stat == "max":
         asc = False

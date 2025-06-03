@@ -93,7 +93,9 @@ def rate(var, time, track_ids=None, centering="forward"):
 
     ## Sort data by track_id and time
     # rate_var, track_ids, time = [a.sortby(time) for a in [rate_var, track_ids, time]]
-    # rate_var, time, track_ids = [a.sortby(track_ids) for a in [rate_var, time, track_ids]]
+    # rate_var, time, track_ids = [
+    #     a.sortby(track_ids) for a in [rate_var, time, track_ids]
+    # ]
 
     # TODO: If var has units, retrieve those
 

@@ -55,7 +55,8 @@ def load(
         * **witrack**
         * **ibtracs**
         * **csv**
-        * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided appropriate variable_names)
+        * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided
+          appropriate variable_names)
         * **old_hurdat**, **ecmwf**
 
     variable_names : list of str, optional
@@ -95,7 +96,8 @@ def load(
           the USA/Joint Typhoon Warning Centre. Methods are consistent across basins,
           but may not be complete.
 
-        To download online data, the subsets are the different filesp rovided by IBTrACS.
+        To download online data, the subsets are the different files provided by
+        IBTrACS.
 
         * **ACTIVE**: TCs currently active
         * **ALL**: Entire IBTrACS database

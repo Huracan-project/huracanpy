@@ -71,7 +71,8 @@ def season(track_id, lat, time, convention="tc-short"):
             warnings.filterwarnings(
                 "ignore",
                 category=UnitStrippedWarning,
-                message="The unit of the quantity is stripped when downcasting to ndarray.",
+                message="The unit of the quantity is stripped when downcasting to"
+                "ndarray.",
             )
             time = pd.to_datetime(time)
         year = time.year
@@ -92,7 +93,8 @@ def season(track_id, lat, time, convention="tc-short"):
             {"hemi": hemi, "year": year, "month": month, "track_id": track_id}
         )
     # Most frequent year, month and hemisphere for each track
-    # Grouping is done to avoid labelling differently points in a track that might cross hemisphere or seasons.
+    # Grouping is done to avoid labelling differently points in a track that might cross
+    # hemisphere or seasons.
     group = df.groupby("track_id")[["year", "month", "hemi"]].agg(
         lambda x: pd.Series.mode(x)[0]
     )

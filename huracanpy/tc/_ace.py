@@ -21,7 +21,8 @@ def ace(
 ):
     r"""Calculate accumulate cyclone energy (ACE)
 
-    .. math:: \mathrm{ACE} = 10^{-4} \sum v_\mathrm{max}^2 \quad (v_\mathrm{max} \ge 34 \mathrm{kn})
+    .. math:: \mathrm{ACE} =
+        10^{-4} \sum v_\mathrm{max}^2 \quad (v_\mathrm{max} \ge 34 \mathrm{kn})
 
     By default, this function will return the "ACE" for each individual point in `wind`.
     To calculate more useful quantities of ACE, use the `sum_by` keyword.
@@ -42,7 +43,9 @@ def ace(
 
     Similarly to calculate a climatological mean ACE by year, run
 
-    >>> climatological_ace = huracanpy.tc.ace(tracks.wind,sum_by=tracks.time.dt.year).mean()
+    >>> climatological_ace = huracanpy.tc.ace(
+    >>>    tracks.wind, sum_by=tracks.time.dt.year
+    >>> ).mean()
 
     Parameters
     ----------

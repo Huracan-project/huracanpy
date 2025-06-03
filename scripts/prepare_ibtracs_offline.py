@@ -76,7 +76,8 @@ def prepare_offline(wmo=True, jtwc=True):
         ## Remove lines with no data
         ib_usa = ib_usa.where(~np.isnan(ib_usa.lon), drop=True)
 
-        ## Deal with var types to reduce size ( at the moment, reduces by 25% ) -> TODO : Manage wind and slp data...
+        ## Deal with var types to reduce size ( at the moment, reduces by 25% ) ->
+        # TODO : Manage wind and slp data...
         for var in ["lat", "lon", "wind", "slp"]:
             ib_usa[var] = ib_usa[var].astype(np.float16)
         for var in ["season"]:
@@ -88,7 +89,8 @@ def prepare_offline(wmo=True, jtwc=True):
         huracanpy.save(ib_usa, ibtracs.jtwc_file)
 
     warnings.warn(
-        "If you just updated the offline files within the package, do not forget to update information in offline loader warnings"
+        "If you just updated the offline files within the package, do not forget to"
+        "update information in offline loader warnings"
     )
 
 

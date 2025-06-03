@@ -44,8 +44,8 @@ example_TRACK_netcdf_file = str(
 )
 
 example_TRACK_timestep_file = str(
-    testdata_dir
-    / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind.nolat.tcident.hart_sample"
+    testdata_dir / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind"
+    ".nolat.tcident.hart_sample"
 )
 example_TE_file = str(testdata_dir / "TempestExtremes-sample.txt")
 
