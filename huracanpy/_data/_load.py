@@ -332,6 +332,22 @@ def load(
     return data
 
 def load_list(filelist, **kwargs):
+    """
+    This function opens all the files in a list and concatenate them. All files should be opened with the exact same load command.
+    Track ids will be made unique by appending an index at the start.
+
+    Parameters
+    ----------
+    filename : list or np.ndarray
+        The list of file to be opened
+        
+    kwargs: 
+        Any parameter you would give to huracanpy.load to load individual files
+
+    Returns
+    -------
+    xarray.Dataset
+    """
     # Loop through all the files and open them
     tracks = []
     for i, filepath in enumerate(tqdm(filelist)):
