@@ -52,31 +52,33 @@ def venn(datasets, match, labels, colors=None, circle_color="k"):
 
 
 def _venn_2datasets(data1, data2, match, colors, labels=None, circle_color="k"):
-    N1 = len(np.unique(data1.track_id.values))  # Number of tracks in dataset 1
-    N2 = len(np.unique(data2.track_id.values))  # Number of tracks in dataset 2
+    n1 = len(np.unique(data1.track_id.values))  # Number of tracks in dataset 1
+    n2 = len(np.unique(data2.track_id.values))  # Number of tracks in dataset 2
     m = len(match)  # Number of tracks matching
-    venn2((N1 - m, N2 - m, m), set_colors=colors, set_labels=labels)
-    venn2_circles((N1 - m, N2 - m, m), color=circle_color)
+    venn2((n1 - m, n2 - m, m), set_colors=colors, set_labels=labels)
+    venn2_circles((n1 - m, n2 - m, m), color=circle_color)
 
 
-def _venn_3datasets(data1, data2, data3, M, colors, labels=None, circle_color="k"):
-    N1 = len(np.unique(data1.track_id.values))  # Number of tracks in dataset 1
-    N2 = len(np.unique(data2.track_id.values))  # Number of tracks in dataset 2
-    N3 = len(np.unique(data3.track_id.values))  # Number of tracks in dataset 3
+def _venn_3datasets(
+    data1, data2, data3, matches, colors, labels=None, circle_color="k"
+):
+    n1 = len(np.unique(data1.track_id.values))  # Number of tracks in dataset 1
+    n2 = len(np.unique(data2.track_id.values))  # Number of tracks in dataset 2
+    n3 = len(np.unique(data3.track_id.values))  # Number of tracks in dataset 3
 
-    M_not1 = len(M[M.iloc[:, 0].isna()])
-    M_not2 = len(M[M.iloc[:, 1].isna()])
-    M_not3 = len(M[M.iloc[:, 2].isna()])
-    M_all = len(M[M.isna().sum(axis=1) == 0])
+    m_not1 = len(matches[matches.iloc[:, 0].isna()])
+    m_not2 = len(matches[matches.iloc[:, 1].isna()])
+    m_not3 = len(matches[matches.iloc[:, 2].isna()])
+    m_all = len(matches[matches.isna().sum(axis=1) == 0])
 
     subsets = (
-        (N1 - M_all - M_not2 - M_not3),
-        (N2 - M_all - M_not1 - M_not3),
-        M_not3,
-        (N3 - M_all - M_not1 - M_not2),
-        M_not2,
-        M_not1,
-        M_all,
+        (n1 - m_all - m_not2 - m_not3),
+        (n2 - m_all - m_not1 - m_not3),
+        m_not3,
+        (n3 - m_all - m_not1 - m_not2),
+        m_not2,
+        m_not1,
+        m_all,
     )
 
     venn3(

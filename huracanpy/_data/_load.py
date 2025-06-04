@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack, _old_HURDAT
+from . import _csv, track_files, _netcdf, _tempestextremes, witrack, old_hurdat
 from . import ibtracs
 
 
@@ -55,7 +55,8 @@ def load(
         * **witrack**
         * **ibtracs**
         * **csv**
-        * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided appropriate variable_names)
+        * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided
+          appropriate variable_names)
         * **old_hurdat**, **ecmwf**
 
     variable_names : list of str, optional
@@ -95,7 +96,8 @@ def load(
           the USA/Joint Typhoon Warning Centre. Methods are consistent across basins,
           but may not be complete.
 
-        To download online data, the subsets are the different filesp rovided by IBTrACS.
+        To download online data, the subsets are the different files provided by
+        IBTrACS.
 
         * **ACTIVE**: TCs currently active
         * **ALL**: Entire IBTrACS database
@@ -165,13 +167,13 @@ def load(
     else:
         source = source.lower()
         if source == "track":
-            data = _TRACK.load(
+            data = track_files.load(
                 filename,
                 calendar=track_calendar,
                 variable_names=variable_names,
             )
         elif source == "track.tilt":
-            data = _TRACK.load_tilts(
+            data = track_files.load_tilts(
                 filename,
                 calendar=track_calendar,
             )
@@ -194,7 +196,7 @@ def load(
             "old_hurdat",
             "ecmwf",
         ]:
-            data = _old_HURDAT.load(filename)
+            data = old_hurdat.load(filename)
         else:
             raise ValueError(f"Source {source} unsupported or misspelled")
 

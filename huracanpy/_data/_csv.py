@@ -66,7 +66,8 @@ def load(
     filename : str
         The file must contain at least longitude, latitude, time and track ID.
             - longitude and latitude can be named that, or lon and lat.
-            - time must be defined a single `time`column or by four columns : year, month, day, hour
+            - time must be defined a single `time`column or by four columns:
+              year, month, day, hour
             - track ID must be within a column named track_id.
 
     load_function : callable

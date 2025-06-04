@@ -56,7 +56,7 @@ myst_enable_extensions = [
 html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "github_url": "https://github.com/Huracan-project/huracanpy",
-    "show_toc_level": 3,
+    "show_toc_level": 2,
 }
 html_static_path = ["_static"]
 html_logo = "images/logo/logo-with-name/Slide1.png"

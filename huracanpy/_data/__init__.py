@@ -26,6 +26,7 @@ from ._save import save
 here = pathlib.Path(__file__).parent
 testdata_dir = here / "example_data"
 
+# ruff: noqa: N816
 example_TRACK_file = str(
     testdata_dir / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind.tcident.new"
 )
@@ -44,8 +45,8 @@ example_TRACK_netcdf_file = str(
 )
 
 example_TRACK_timestep_file = str(
-    testdata_dir
-    / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind.nolat.tcident.hart_sample"
+    testdata_dir / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind"
+    ".nolat.tcident.hart_sample"
 )
 example_TE_file = str(testdata_dir / "TempestExtremes-sample.txt")
 
