@@ -9,7 +9,7 @@ self
 install
 quickstart
 accessor
-demo
+demos/index
 load
 save
 subset
