@@ -6,6 +6,8 @@ from dateutil.parser import parse
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
+import xarray as xr
 from pandas.errors import OutOfBoundsDatetime
 
 from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack, _old_HURDAT, iris_tc
@@ -195,6 +197,7 @@ def load(
     xarray.Dataset
 
     """
+    
     # Overwrite default arguments with explicit arguments passed to rename by putting
     # "rename" second in this dictionary combination
     rename = {**rename_defaults, **rename}
@@ -320,7 +323,23 @@ def load(
     if baselon is not None:
         tracks["lon"] = ((tracks.lon - baselon) % 360) + baselon
 
+<<<<<<< HEAD
     if infer_track_id is not None:
         tracks = tracks.hrcn.add_inferred_track_id(*infer_track_id)
 
     return tracks
+=======
+    return data
+
+def load_list(filelist, **kwargs):
+    # Loop through all the files and open them
+    tracks = []
+    for i, filepath in enumerate(tqdm(filelist)):
+        data = load(filepath, **kwargs)
+        if "tracks" in data.dims:
+            data = data.drop_dims("tracks")
+        data["track_id"] = str(i) + '-' + data["track_id"].astype(str) # Make sure track_ids remain unique
+        tracks.append(data)
+    # Concatenate in one object
+    return xr.concat(tracks, dim = "record")
+>>>>>>> 5e0068d (Add load_list function for loading and concatenating several files at once)
