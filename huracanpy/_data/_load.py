@@ -323,13 +323,10 @@ def load(
     if baselon is not None:
         tracks["lon"] = ((tracks.lon - baselon) % 360) + baselon
 
-<<<<<<< HEAD
     if infer_track_id is not None:
         tracks = tracks.hrcn.add_inferred_track_id(*infer_track_id)
 
     return tracks
-=======
-    return data
 
 def load_list(filelist, **kwargs):
     """
@@ -358,4 +355,3 @@ def load_list(filelist, **kwargs):
         tracks.append(data)
     # Concatenate in one object
     return xr.concat(tracks, dim = "record")
->>>>>>> 5e0068d (Add load_list function for loading and concatenating several files at once)
