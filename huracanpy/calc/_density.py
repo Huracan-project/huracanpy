@@ -83,6 +83,6 @@ def _kde(lon, lat, x_mid, y_mid, function_kws):
     # Evaluation kernel along positions
     H = np.reshape(kernel(positions), (len(y_mid), len(x_mid)))
     # Account for cell area differences
-    H = H / np.transpose([np.cos(y_mid * np.pi / 180)])
+    H = H / np.transpose([np.sin(y_mid * np.pi / 180)])
     # Normalize so that H integrates to the total number of points
     return H * len(lon) / H.sum()
