@@ -9,6 +9,7 @@ __all__ = [
     "tc",
     # Functions
     "load",
+    "load_list",
     "save",
     "sel_id",
     "trackswhere",
@@ -35,6 +36,7 @@ __all__ = [
 
 from ._data import (
     load,
+    load_list,
     save,
     example_csv_file,
     example_parquet_file,
