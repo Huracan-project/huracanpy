@@ -2,6 +2,7 @@
 
 __all__ = [
     "load",
+    "load_list",
     "save",
     "example_csv_file",
     "example_parquet_file",
@@ -22,7 +23,7 @@ __all__ = [
 
 import pathlib
 
-from ._load import load
+from ._load import load, load_list
 from ._save import save
 
 here = pathlib.Path(__file__).parent

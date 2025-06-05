@@ -1,11 +1,13 @@
 import warnings
 from datetime import timedelta
+from tqdm import tqdm
 
 import cftime
 from dateutil.parser import parse
 
 import numpy as np
 import pandas as pd
+import xarray as xr
 from pandas.errors import OutOfBoundsDatetime
 
 from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack, _old_HURDAT, iris_tc
@@ -322,5 +324,35 @@ def load(
 
     if infer_track_id is not None:
         tracks = tracks.hrcn.add_inferred_track_id(*infer_track_id)
-
     return tracks
+
+
+def load_list(filelist, **kwargs):
+    """
+    This function opens all the files in a list and concatenate them. All files should be opened with the exact same load command.
+    Track ids will be made unique by appending an index at the start.
+
+    Parameters
+    ----------
+    filename : list or np.ndarray
+        The list of file to be opened
+
+    kwargs:
+        Any parameter you would give to huracanpy.load to load individual files
+
+    Returns
+    -------
+    xarray.Dataset
+    """
+    # Loop through all the files and open them
+    tracks = []
+    for i, filepath in enumerate(tqdm(filelist)):
+        data = load(filepath, **kwargs)
+        if "tracks" in data.dims:
+            data = data.drop_dims("tracks")
+        data["track_id"] = (
+            str(i) + "-" + data["track_id"].astype(str)
+        )  # Make sure track_ids remain unique
+        tracks.append(data)
+    # Concatenate in one object
+    return xr.concat(tracks, dim="record")

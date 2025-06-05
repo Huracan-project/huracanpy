@@ -26,7 +26,7 @@ Our goal is to make track data analysis more accessible, and to promote good rep
 
 **Getting started?** Head to the User Guide below! Do not forget:
 
-* This package is distributed under the `MIT licence <https://github.com/Huracan-project/huracanpy/blob/master/LICENSE>`_. 
+* This package is distributed under the `MIT licence <https://github.com/Huracan-project/huracanpy/blob/main/LICENSE>`_.
 
 * A JOSS paper is currently being prepared. We ask that you cite it in published papers using HuracanPy. This help us get credit for the work we put in the development, and also to track how the package is used. 
 

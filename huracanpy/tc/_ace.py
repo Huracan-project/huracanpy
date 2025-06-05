@@ -2,9 +2,12 @@
 Module containing functions to compute ACE
 """
 
+import warnings
+
 import numpy as np
 from numpy.polynomial.polynomial import Polynomial
 import pint
+from pint.errors import UnitStrippedWarning
 from metpy.xarray import preprocess_and_wrap
 from metpy.units import units
 
@@ -269,7 +272,15 @@ def get_pressure_wind_relation(pressure, wind=None, model=None, **kwargs):
 
 @preprocess_and_wrap(wrap_like="pressure")
 def _get_wind_from_model(pressure, model):
-    return np.array(model(pressure))
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            category=UnitStrippedWarning,
+            message="The unit of the quantity is stripped when downcasting to ndarray.",
+        )
+
+        result = np.array(model(pressure))
+    return result
 
 
 # Pre-determined pressure-wind relationships

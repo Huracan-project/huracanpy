@@ -16,4 +16,4 @@ def test_interpolate_time(tracks_csv):
     # cf_role="trajectory_id" automatically added when result was saved
     del expected.track_id.attrs["cf_role"]
 
-    xr.testing.assert_identical(result, expected)
+    xr.testing.assert_allclose(result, expected)

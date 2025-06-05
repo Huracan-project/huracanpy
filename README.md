@@ -2,7 +2,7 @@
 
 [![Documentation Status](https://readthedocs.org/projects/huracanpy/badge/?version=latest)](https://huracanpy.readthedocs.io/en/latest/?badge=latest)
 [![status](https://joss.theoj.org/papers/bb15b667a6306bcd0383d06d3b788cb6/status.svg)](https://joss.theoj.org/papers/bb15b667a6306bcd0383d06d3b788cb6)
-
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/huracanpy/badges/version.svg)](https://anaconda.org/conda-forge/huracanpy)
 
 *A python package for working with various forms of feature tracking data, including but not restricted to cyclone tracks.*
 
@@ -17,10 +17,19 @@ Our goal is to make track data analysis more accessible, and to promote good rep
 You can follow [user guide](https://huracanpy.readthedocs.io/en/latest/user_guide/index.html), try out some of the [examples](https://huracanpy.readthedocs.io/en/latest/examples/index.html), or follow the steps below (taken from the user guide).
 
 ## Install
+You can install huracanpy with conda
 ```bash
-pip install huracanpy
+conda install -c conda-forge huracanpy
 ```
-For older python versions, the installation may fail due to issues with installing cartopy through pip. If this happens, use conda to install cartopy first (e.g. ``conda install -c conda-forge cartopy``), then install huracanpy as normal.
+or pip
+```bash
+python -m pip install huracanpy
+```
+
+To install the most up-to-date version of huracanpy, you can install directly from the repository with
+```bash
+python -m pip install huracanpy @ git+https://github.com/Huracan-project/huracanpy
+```
 
 ## Basic usage
 HuracanPy provides a standard way for working with cyclone track data from different sources.

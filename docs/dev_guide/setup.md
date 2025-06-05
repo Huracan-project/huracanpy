@@ -2,15 +2,35 @@
 
 First create your own fork of huracanpy from the [github page](https://github.com/Huracan-project/huracanpy).
 "Create new fork" from the dropdown.
-Then clone your repository e.g.
+Then clone your repository
 
 ```shell
-    git clone /https://github.com/{your-username}/huracanpy.git
+git clone https://github.com/{your-username}/huracanpy.git
 ```
 
-To install your copy locally run
+Navigate to the directory of the cloned repository
 ```shell
-    pip install -e .[dev, docs]
+cd huracanpy
+```
+
+Create and activate a new environment
+```
+conda create -n huracanpy-testing python=3.13
+conda activate huracanpy-testing
+```
+
+<details>
+<summary>Alternatively, create environment with venv</summary>
+
+```shell
+python -m venv .venv
+source .venv/bin/activate
+```
+</details>
+
+Install your copy locally
+```shell
+python -m pip install -e ".[dev,docs]"
 ```
 
 The "[dev]" argument installs the following optional packages that are useful for
@@ -25,7 +45,7 @@ contributing to development
 
 2. **ruff**
 
-    We use [ruff](<https://docs.astral.sh/ruff/) to automatically keep the style of the code consistent, so we don't have to worry about it.
+    We use [ruff](https://docs.astral.sh/ruff/) to automatically keep the style of the code consistent, so we don't have to worry about it.
 
     To check that your code passes you can run `ruff check` and `ruff format --check`.
 
