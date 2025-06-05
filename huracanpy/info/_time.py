@@ -71,8 +71,7 @@ def season(track_id, lat, time, convention="tc-short"):
             warnings.filterwarnings(
                 "ignore",
                 category=UnitStrippedWarning,
-                message="The unit of the quantity is stripped when downcasting to"
-                "ndarray.",
+                message="The unit of the quantity is stripped",
             )
             time = pd.to_datetime(time)
         year = time.year
@@ -87,7 +86,7 @@ def season(track_id, lat, time, convention="tc-short"):
         warnings.filterwarnings(
             "ignore",
             category=UnitStrippedWarning,
-            message="The unit of the quantity is stripped when downcasting to ndarray.",
+            message="The unit of the quantity is stripped",
         )
         df = pd.DataFrame(
             {"hemi": hemi, "year": year, "month": month, "track_id": track_id}
