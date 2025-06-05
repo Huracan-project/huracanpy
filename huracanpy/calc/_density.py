@@ -81,8 +81,8 @@ def _kde(lon, lat, x_mid, y_mid, function_kws):
     # Compute kernel density estimate
     kernel = gaussian_kde([lon, lat], **function_kws)
     # Evaluation kernel along positions
-    H = np.reshape(kernel(positions), (len(y_mid), len(x_mid)))
+    h = np.reshape(kernel(positions), (len(y_mid), len(x_mid)))
     # Account for cell area differences
-    H = H / np.transpose([np.sin(y_mid * np.pi / 180)])
+    h = h / np.transpose([np.sin(y_mid * np.pi / 180)])
     # Normalize so that H integrates to the total number of points
-    return H * len(lon) / H.sum()
+    return h * len(lon) / h.sum()
