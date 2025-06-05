@@ -197,7 +197,7 @@ def load(
     xarray.Dataset
 
     """
-    
+
     # Overwrite default arguments with explicit arguments passed to rename by putting
     # "rename" second in this dictionary combination
     rename = {**rename_defaults, **rename}
@@ -328,6 +328,7 @@ def load(
 
     return tracks
 
+
 def load_list(filelist, **kwargs):
     """
     This function opens all the files in a list and concatenate them. All files should be opened with the exact same load command.
@@ -337,8 +338,8 @@ def load_list(filelist, **kwargs):
     ----------
     filename : list or np.ndarray
         The list of file to be opened
-        
-    kwargs: 
+
+    kwargs:
         Any parameter you would give to huracanpy.load to load individual files
 
     Returns
@@ -351,7 +352,9 @@ def load_list(filelist, **kwargs):
         data = load(filepath, **kwargs)
         if "tracks" in data.dims:
             data = data.drop_dims("tracks")
-        data["track_id"] = str(i) + '-' + data["track_id"].astype(str) # Make sure track_ids remain unique
+        data["track_id"] = (
+            str(i) + "-" + data["track_id"].astype(str)
+        )  # Make sure track_ids remain unique
         tracks.append(data)
     # Concatenate in one object
-    return xr.concat(tracks, dim = "record")
+    return xr.concat(tracks, dim="record")

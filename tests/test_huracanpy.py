@@ -84,12 +84,19 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
         for name in ["track_id", "time", "lon", "lat"]:
             assert name in data
 
+
 def test_load_list():
-    filelist = [huracanpy.example_csv_file, huracanpy.example_year_file] # Two csv file that should load with the same options
+    filelist = [
+        huracanpy.example_csv_file,
+        huracanpy.example_year_file,
+    ]  # Two csv file that should load with the same options
     ds1 = huracanpy.load(filelist[0])
     ds2 = huracanpy.load(filelist[1])
     ds_list = huracanpy.load_list(filelist)
-    assert len(ds_list.record) == ( len(ds1.record) + len(ds2.record) ) # Check that they have been properly concatenated
+    assert len(ds_list.record) == (
+        len(ds1.record) + len(ds2.record)
+    )  # Check that they have been properly concatenated
+
 
 @pytest.mark.parametrize(
     "filename, source",
