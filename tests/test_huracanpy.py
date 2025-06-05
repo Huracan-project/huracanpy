@@ -72,7 +72,7 @@ import huracanpy
     ],
 )
 def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
-    data = _load_with_checked_warnings(filename, **kwargs)
+    data = huracanpy.load(filename, **kwargs)
 
     assert len(data) == nvars
     assert len(data.coords) == ncoords
