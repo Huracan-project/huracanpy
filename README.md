@@ -32,8 +32,7 @@ python -m pip install huracanpy @ git+https://github.com/Huracan-project/huracan
 ```
 
 ## Basic usage
-HuracanPy provides a standard way for working with cyclone track data from different sources.
-HuracanPy can load track data from various sources as an xarray [Dataset](https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html) with a minimal number of assumed variables (track_id, lon, lat, time). e.g. 
+The first step is to load in some tracks. HuracanPy can load track data from various sources as an [xarray.Dataset](https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html) with a minimal number of assumed variables (track_id, lon, lat, time) e.g.
 ```python
 import huracanpy
 
@@ -42,15 +41,11 @@ print(tracks)
 ```
 
 ```
-<xarray.Dataset> Size: 10kB
+<xarray.Dataset> Size: 7kB
 Dimensions:   (record: 99)
 Dimensions without coordinates: record
 Data variables:
     track_id  (record) int64 792B 0 0 0 0 0 0 0 0 0 0 0 ... 2 2 2 2 2 2 2 2 2 2
-    year      (record) int64 792B 1980 1980 1980 1980 ... 1980 1980 1980 1980
-    month     (record) int64 792B 1 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1 1
-    day       (record) int64 792B 6 6 6 7 7 7 7 8 8 ... 29 29 29 29 30 30 30 30
-    hour      (record) int64 792B 6 12 18 0 6 12 18 0 6 ... 0 6 12 18 0 6 12 18
     i         (record) int64 792B 482 476 476 477 478 ... 229 230 234 241 249
     j         (record) int64 792B 417 419 420 420 422 ... 501 509 517 528 542
     lon       (record) float64 792B 120.5 119.0 119.0 119.2 ... 58.5 60.25 62.25
@@ -58,31 +53,42 @@ Data variables:
     slp       (record) float64 792B 9.988e+04 9.981e+04 ... 9.747e+04 9.754e+04
     zs        (record) float64 792B -10.71 -16.11 -40.21 ... -218.5 -211.5
     wind10    (record) float64 792B 14.65 13.99 13.7 17.98 ... 23.69 23.96 23.4
+    time      (record) datetime64[ns] 792B 1980-01-06T06:00:00 ... 1980-01-30...
 ```
 Each "record" corresponds to a TC point (time, lon, lat).
 
 Note that the data is one dimensional but represents multiple tracks.
 This is done rather than having track_id as an additional dimension to avoid having to add blank data to each track when they are not the same length.
-The `groupby` function, built in to xarray, allows us to easily loop over or index tracks in this format.
+The `groupby` function, built in to xarray, allows us to easily loop over tracks in this format.
 ```python
-import huracanpy
-
-tracks = huracanpy.load(huracanpy.example_csv_file)
-
-track_groups = tracks.groupby("track_id")
-
-# Selecting track by ID
-# The track_id is not necessarily an integer, it follows whatever you have loaded
-# e.g. could be a string for IBTrACS
-track_id1 = track_groups[1]
-
 # Iterating over all tracks
 # Each track will be a subset of the xarray Dataset with a unique track_id
-for n, track in track_groups:
+# The track_id is not necessarily an integer, it follows whatever you have loaded
+# e.g. could be a string for IBTrACS
+for track_id, track in tracks.groupby("track_id"):
     # Do something with the track
-    print(track)
+    print(track_id, len(track.time))
+```
+```
+0 31
+1 20
+2 48
 ```
 
+With the data loaded, we can apply the functions from HuracanPy. The example below is
+using the `hrcn` accessor from HuracanPy. See the [accessor](accessor.ipynb) page for
+more details.
+
+```python
+# Quickly view the tracks
+tracks.hrcn.plot_tracks(intensity_var_name="wind10")
+
+# Add a new variable to the tracks and plot this instead
+tracks = tracks.hrcn.add_is_land()
+tracks.hrcn.plot_tracks(intensity_var_name="is_land")
+```
+![Plot showing 3 tracks in the southern hemisphere with points coloured by wind speed](docs/images/readme/plot_tracks_wind.png)
+![Plot showing 3 tracks in the southern hemisphere with points coloured by whether they are over land or ocean](docs/images/readme/plot_tracks_is_land.png)
 
 # Contact
 Please use GitHub's functions to communicate with HuracanPy's developers.
