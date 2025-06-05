@@ -324,7 +324,6 @@ def load(
 
     if infer_track_id is not None:
         tracks = tracks.hrcn.add_inferred_track_id(*infer_track_id)
-
     return tracks
 
 
