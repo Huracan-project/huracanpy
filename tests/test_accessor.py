@@ -260,11 +260,9 @@ def test_accessor_plot_methods_match_functions(
         getattr(tracks_csv.hrcn, accessor_name)(**accessor_function_kwargs, ax=ax)
 
 
-def test_inferred_track_id():
-    ## Inferred track_id
-    data = huracanpy.load(huracanpy.example_year_file)
-    track_id = data.hrcn.get_inferred_track_id("track_id")
-    xr.testing.assert_equal(track_id, data.track_id)
+def test_inferred_track_id(tracks_csv):
+    track_id = tracks_csv.hrcn.get_inferred_track_id("track_id")
+    xr.testing.assert_equal(track_id, tracks_csv.track_id)
 
 
 def test_interp_methods():
