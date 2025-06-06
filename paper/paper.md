@@ -72,7 +72,11 @@ HuracanPy currently supports loading tracks from:
 
 * Text files from TempestExtreme's StitchNodes (GFDL format, see [@ullrich2021tempestextremes])
 
-* Text files from TRACK [@TRACKa, @TRACKb]
+* Text files from TRACK ([@TRACKa], [@TRACKb])
+
+* Text files from IRIS [sparks2024imperial]
+
+* Text files using the "original HURDAT" format [here](https://www.aoml.noaa.gov/hrd/data_sub/hurdat.html) and used in particular within the European Centre for Medium-range Weather Forecast (ECMWF).
 
 HuracanPy can also load IBTrACS [@gahtan2024international] from the online source, or from an embedded file. 
 
@@ -115,9 +119,9 @@ Where possible, functions have been made unit aware by using the accessor and wr
 
 We welcome suggestions of other track data format to support, and are happy to receive contribution of code to do so. 
 
-At the moment, HuracanPy only include TC-specific diagnoses, but we are more than happy to receive contribution and feedback from other communities, included but not restricted to extra-tropical cyclones, polar lows, medicanes, subtropical cyclones, etc.
+At the moment, HuracanPy only include tropical cyclones--specific diagnoses, but we are more than happy to receive contribution and feedback from other communities, included but not restricted to extra-tropical cyclones, polar lows, medicanes, subtropical cyclones, etc.
 While the motivation for HuracanPy is analysis of cyclone tracks, the data format and workflow should also apply to other types of trajectories, such as Lagrangian air-mass trajectories, and we would be interested in supporting common data formats for these.
-Main avenues for a potential v2 are supporting multi-dimensional data (e.g. snapshots from TempestExtremes' NodeFileCompose [@ullrich2021tempestextremes], WiTRACK footprints [@befort2020objective]) 
+Main avenues for a potential v2 are supporting multi-dimensional data (e.g. snapshots from TempestExtremes' NodeFileCompose [@ullrich2021tempestextremes], WiTRACK footprints [@befort2020objective]).
 
 
 # Acknowledgements
@@ -125,6 +129,6 @@ Main avenues for a potential v2 are supporting multi-dimensional data (e.g. snap
 Both authors acknowledge financial support from the HUrricane Risk Amplification and Changing North Atlantic Natural disasters (Huracán) NERC-NSF large grant n°NE/W009587/1 (NERC) & AGS-2244917 (NSF). 
 This work also benefited from the TROPICANA program, supported by the Institut Pascal at Université Paris-Saclay, under “Investissements d’avenir” ANR-11-IDEX-0003- 01.
 
-The package includes code that was originally developed in the scope of SB's thesis, which was funded by the Comissariat à l'Energie Atomique et aux Energies Alternatives (CEA), and the EUR IPSL-Climate Graduate School through the ICOCYCLONES2 project, managed by the ANR under the “Investissements d’avenir” programme with the reference ANR-11-IDEX-0004 - 17-EURE-0006
+The package includes code that was originally developed in the scope of SB's thesis, which was funded by the Comissariat à l'Energie Atomique et aux Energies Alternatives (CEA), and the EUR IPSL-Climate Graduate School through the ICOCYCLONES2 project, managed by the ANR under the “Investissements d’avenir” programme with the reference ANR-11-IDEX-0004 - 17-EURE-0006.
 
 # References
