@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `huracanpy.infer_track_id` to generate a track ID from unique combinations of variables. e.g. "year" and "storm number in year".
   - Also add as an option to `huracanpy.load`
 - Can use `huracanpy.load` with a list of files
+- `huracanpy.concat_tracks` to concatenate tracks while keeping the track_id as a unique identifier
+- `huracanpy.reset_track_id` to replace the track_id with an ascending set of numbers
 ### Changed
 - Reduced unnecessary warning messages
 - Always use `var_name` as the accessor keyword for choosing a specific variable. Previously some functions used `varname`

@@ -11,11 +11,12 @@ __all__ = [
     "tc",
     # Functions
     "load",
-    "load_list",
     "save",
     "sel_id",
     "trackswhere",
     "interp_time",
+    "concat_tracks",
+    "reset_track_id",
     # Parameters
     "basins",
     "example_csv_file",
@@ -38,7 +39,6 @@ __all__ = [
 
 from ._data import (
     load,
-    load_list,
     save,
     example_csv_file,
     example_parquet_file,
@@ -58,6 +58,7 @@ from ._data import (
 )
 from ._basins import basins
 from ._interp import interp_time
+from ._merge import concat_tracks, reset_track_id
 from ._subset import sel_id, trackswhere
 from . import calc, plot, assess, info, tc
 

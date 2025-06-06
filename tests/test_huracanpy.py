@@ -79,6 +79,15 @@ import huracanpy
             134,
         ),
         (huracanpy.example_IRIS_file, dict(source="iris"), 10, 0, 40, 2),
+        # Two csv file that should load with the same options
+        (
+            [huracanpy.example_csv_file, huracanpy.example_year_file],
+            dict(),
+            13,
+            0,
+            2373,
+            92,
+        ),
     ],
 )
 def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
@@ -156,19 +165,6 @@ def test_load_baselon():
 
     assert tracks.lon.max() <= 1360
     assert tracks.lon.min() >= 1000
-
-
-def test_load_list():
-    filelist = [
-        huracanpy.example_csv_file,
-        huracanpy.example_year_file,
-    ]  # Two csv file that should load with the same options
-    ds1 = huracanpy.load(filelist[0])
-    ds2 = huracanpy.load(filelist[1])
-    ds_list = huracanpy.load_list(filelist)
-    assert len(ds_list.record) == (
-        len(ds1.record) + len(ds2.record)
-    )  # Check that they have been properly concatenated
 
 
 @pytest.mark.parametrize(
