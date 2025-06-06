@@ -28,7 +28,7 @@ python -m pip install huracanpy
 
 To install the most up-to-date version of huracanpy, you can install directly from the repository with
 ```bash
-python -m pip install huracanpy @ git+https://github.com/Huracan-project/huracanpy
+python -m pip install "huracanpy@git+https://github.com/Huracan-project/huracanpy"
 ```
 
 ## Basic usage
