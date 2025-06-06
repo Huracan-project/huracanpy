@@ -1,5 +1,5 @@
 ---
-title: 'HuracanPy: A python package for reading and analysing cyclone tracks'
+title: 'HuracanPy: A Python package for reading and analysing cyclone tracks'
 tags:
   - Python
   - cyclones
@@ -28,10 +28,10 @@ bibliography: paper.bib
 
 # Summary
 
-HuracanPy is a python module for working with cyclone track data, where cyclone tracks are recorded as a list of points in space and time. 
-HuracanPy provides a powerful loading function that supports most of the most common track data formats and loads the tracks as xarray datasets [@xarray2017].
-As such, we draw from the power of xarray's built-in functions and the functionality of other libraries that work with xarray, such as MetPy [@metpy]. 
-We also provide functions specific to cyclone analysis, which are gathered as methods in an xarray accessor. 
+HuracanPy is a Python module for working with cyclone track data, where cyclone tracks are recorded as a list of points in space and time. 
+HuracanPy provides a powerful loading function that supports all the track data formats the authors are aware of, and loads the tracks as Xarray datasets [@xarray2017].
+As such, we draw from the power of Xarray's built-in functions and the functionality of other libraries that work with Xarray, such as MetPy [@metpy]. 
+We also provide functions specific to cyclone analysis, which are gathered as methods in an Xarray accessor. 
 These include functions to subset or interpolate track data, to add useful information, to compute common diagnoses, and to make quick exploration plots. 
 With this package, we hope to make track data analysis more accessible and more reproducible. 
 
@@ -57,18 +57,18 @@ Our aim is to make track data analysis more accessible, and to promote good repr
 
 # Description
 
-HuracanPy is built on xarray. It loads track data as an xarray dataset, and provides an xarray accessor to provide cyclone-specific analysis methods. 
-This allows us to draw from xarray's performance and existing methods, and also means that we can handle track attributes which are not just scalar.
+HuracanPy is built on Xarray. It loads track data as an Xarray dataset, and provides an Xarray accessor to provide cyclone-specific analysis methods. 
+This allows us to draw from Xarray's performance and existing methods, and also means that we can handle track attributes which are not just scalar.
 
 ## Loading data
 
 HuracanPy currently supports loading tracks from:
 
-* CSV (comma-separated variable) files where each row correspond to a cyclone point and each column to a feature.
+* CSV (comma-separated values) files where each row corresponds to a cyclone point and each column to a feature.
   
 * NetCDF (Network Common Data Form) files following CF (Climate and Forecast) conventions [@cfconventions], specifically the formats for trajectory data described in H.4 [@cfconventionswebpage].
 
-* NetCDF files similar to the CF conventions can also be loaded provided they use specific naming for the track ID.
+* NetCDF files similar to the CF conventions can also be loaded, provided they use specific naming for the track ID.
 
 * Text files from TempestExtreme's StitchNodes (GFDL format, see [@ullrich2021tempestextremes])
 
@@ -76,16 +76,16 @@ HuracanPy currently supports loading tracks from:
 
 HuracanPy can also load IBTrACS [@gahtan2024international] from the online source, or from an embedded file. 
 
-Tracks are loaded as an xarray dataset with one main dimension called `record`. 
+Tracks are loaded as an Xarray dataset with one main dimension called `record`. 
 
 HuracanPy can also save the track data as CSV and NetCDF files. 
 
 ## Analysis
 
-Most of HuracanPy's analysis functions can be called through an xarray accessor named `hrcn`.
+Most of HuracanPy's analysis functions can be called through an Xarray accessor named `hrcn`.
 
-* Manupulating data:
-    Loading the track data as an xarray object means the user can easily use xarray's methods such as `.where` to subset. 
+* Manipulating data:
+    Loading the track data as an Xarray object means the user can easily use Xarray's methods such as `.where` to subset. 
 However we found useful to add specific function that allows for subsetting based on a specific track ID, and on some track properties. 
 We also added a specific function to interpolate track to a different time resolution. 
 
@@ -106,10 +106,10 @@ We also added a specific function to interpolate track to a different time resol
 * Plot:
     HuracanPy currently embeds a small number of functions which are meant mostly for preliminary visualisation.
     These include plotting the track points, and the track density.
-    Due to the package being built on xarray, xarray's plot function can be used.
-    We leave it to the user to build more elaborate plots using their preferred libraries, noting that xarray in particular works well with seaborn. 
+    Due to the package being built on Xarray, Xarray's plot function can be used.
+    We leave it to the user to build more elaborate plots using their preferred libraries, noting that Xarray in particular works well with seaborn. 
 
-Where possible, functions have been made unit aware by using the accessor and wrapper from metpy [@metpy], which converts the inputs into a pint quantity [@pint] internally using the units from the xarray variable's attributes.
+Where possible, functions have been made unit aware by using the accessor and wrapper from MetPy [@metpy], which converts the inputs into a Pint quantity [@pint] internally using the units from the Xarray variable's attributes.
 
 # Perspectives
 
@@ -125,6 +125,6 @@ Main avenues for a potential v2 are supporting multi-dimensional data (e.g. snap
 Both authors acknowledge financial support from the HUrricane Risk Amplification and Changing North Atlantic Natural disasters (Huracán) NERC-NSF large grant n°NE/W009587/1 (NERC) & AGS-2244917 (NSF). 
 This work also benefited from the TROPICANA program, supported by the Institut Pascal at Université Paris-Saclay, under “Investissements d’avenir” ANR-11-IDEX-0003- 01.
 
-The package includes code that was originally developped in the scope of SB's thesis, which was funded by the Comissariat à l'Energie Atomique et aux Energies Alternatives (CEA), and the EUR IPSL-Climate Graduate School through the ICOCYCLONES2 project, managed by the ANR under the “Investissements d’avenir” programme with the reference ANR-11-IDEX-0004 - 17-EURE-0006
+The package includes code that was originally developed in the scope of SB's thesis, which was funded by the Comissariat à l'Energie Atomique et aux Energies Alternatives (CEA), and the EUR IPSL-Climate Graduate School through the ICOCYCLONES2 project, managed by the ANR under the “Investissements d’avenir” programme with the reference ANR-11-IDEX-0004 - 17-EURE-0006
 
 # References
