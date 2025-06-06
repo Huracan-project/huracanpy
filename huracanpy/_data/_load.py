@@ -10,7 +10,7 @@ import pandas as pd
 import xarray as xr
 from pandas.errors import OutOfBoundsDatetime
 
-from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack, _old_HURDAT, iris_tc
+from . import _csv, track_files, _netcdf, _tempestextremes, witrack, old_hurdat, iris_tc
 from . import ibtracs
 
 
@@ -93,7 +93,8 @@ def load(
         * **witrack**
         * **ibtracs**
         * **csv**
-        * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided appropriate variable_names)
+        * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided
+          appropriate variable_names)
         * **old_hurdat**, **ecmwf**
         * **iris**
 
@@ -141,7 +142,8 @@ def load(
           the USA/Joint Typhoon Warning Centre. Methods are consistent across basins,
           but may not be complete.
 
-        To download online data, the subsets are the different filesp rovided by IBTrACS.
+        To download online data, the subsets are the different files provided by
+        IBTrACS.
 
         * **ACTIVE**: TCs currently active
         * **ALL**: Entire IBTrACS database
@@ -217,13 +219,13 @@ def load(
     else:
         source = source.lower()
         if source == "track":
-            tracks = _TRACK.load(
+            tracks = track_files.load(
                 filename,
                 calendar=track_calendar,
                 variable_names=variable_names,
             )
         elif source == "track.tilt":
-            tracks = _TRACK.load_tilts(
+            tracks = track_files.load_tilts(
                 filename,
                 calendar=track_calendar,
             )
@@ -246,7 +248,7 @@ def load(
             "old_hurdat",
             "ecmwf",
         ]:
-            tracks = _old_HURDAT.load(filename)
+            tracks = old_hurdat.load(filename)
         elif source == "iris":
             tracks = iris_tc.load(filename, iris_timestep, **kwargs)
         else:
@@ -329,12 +331,13 @@ def load(
 
 def load_list(filelist, **kwargs):
     """
-    This function opens all the files in a list and concatenate them. All files should be opened with the exact same load command.
+    This function opens all the files in a list and concatenate them. All files should
+    be opened with the exact same load command.
     Track ids will be made unique by appending an index at the start.
 
     Parameters
     ----------
-    filename : list or np.ndarray
+    filelist : list or np.ndarray
         The list of file to be opened
 
     kwargs:

@@ -12,6 +12,8 @@ import huracanpy
         (huracanpy.example_csv_file, dict(), 9, 0, 99, 3),
         (huracanpy.example_parquet_file, dict(), 9, 0, 99, 3),
         (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86),
+        (huracanpy.example_TRACK_netcdf_file, dict(source="netcdf"), 20, 17, 4580, 86),
+        (huracanpy.example_TRACK_timestep_file, dict(source="TRACK"), 38, 0, 416, 19),
         (
             huracanpy.example_TRACK_timestep_file,
             dict(source="TRACK", track_calendar=("1940-01-01", 6)),
@@ -35,6 +37,14 @@ import huracanpy
             19,
         ),
         (huracanpy.example_TE_file, dict(source="tempestextremes"), 8, 0, 210, 8),
+        (
+            huracanpy.example_TE_file,
+            dict(source="tempestextremes", variable_names=["slp", "wind"]),
+            8,
+            0,
+            210,
+            8,
+        ),
         (huracanpy.example_CHAZ_file, dict(), 11, 0, 1078, 20),
         (huracanpy.example_MIT_file, dict(), 10, 1, 2138, 11),
         (huracanpy.example_WiTRACK_file, dict(source="witrack"), 14, 0, 3194, 268),
@@ -85,6 +95,69 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
             assert name in data
 
 
+def _fake_ibtracs_data(url, filename):  # noqa ARG001
+    return huracanpy.example_csv_file, None
+
+
+def test_load_ibtracs_online(monkeypatch):
+    with monkeypatch.context() as m:
+        from huracanpy._data import ibtracs
+
+        m.setattr(ibtracs, "urlretrieve", _fake_ibtracs_data)
+        tracks = huracanpy.load(source="ibtracs", ibtracs_subset="last3years")
+
+    assert len(tracks) == 9
+    assert len(tracks.coords) == 0
+    # IBTrACS online load skips the second line (first line after header) so this is one
+    # less than expected
+    assert len(tracks.time) == 98
+    assert len(tracks.groupby("track_id")) == 3
+    assert "record" not in tracks.coords
+
+    for name in ["track_id", "time", "lon", "lat"]:
+        assert name in tracks
+
+
+@pytest.mark.parametrize(
+    "filename, kwargs, error, message",
+    [
+        ("", dict(source="nonsense"), ValueError, "Source nonsense unsupported"),
+        ("", dict(), ValueError, "Source is set to None"),
+    ],
+)
+def test_load_fails(filename, kwargs, error, message):
+    with pytest.raises(error, match=message):
+        huracanpy.load(filename, **kwargs)
+
+
+def test_load_rename():
+    tracks = huracanpy.load(
+        huracanpy.example_csv_file,
+        rename=dict(slp="pressure", not_a_variable="should_be_ignored"),
+    )
+
+    assert "pressure" in tracks
+    assert "slp" not in tracks
+    assert "should_be_ignored" not in tracks
+
+
+def test_load_units():
+    tracks = huracanpy.load(huracanpy.example_csv_file, units=dict(slp="Pa"))
+
+    assert tracks.slp.attrs["units"] == "Pa"
+
+    slp_hpa = tracks.slp.metpy.convert_units("hPa")
+
+    np.testing.assert_allclose(tracks.slp.values, slp_hpa.data.magnitude * 100)
+
+
+def test_load_baselon():
+    tracks = huracanpy.load(huracanpy.example_csv_file, baselon=1000)
+
+    assert tracks.lon.max() <= 1360
+    assert tracks.lon.min() >= 1000
+
+
 def test_load_list():
     filelist = [
         huracanpy.example_csv_file,
@@ -114,8 +187,10 @@ def test_load_list():
     ],
 )
 @pytest.mark.parametrize("extension", ["csv", "nc"])
-@pytest.mark.parametrize("muddle", [False, True])
-def test_save(filename, source, extension, muddle, tmp_path):
+@pytest.mark.parametrize(
+    "muddle, use_accessor", [(False, False), (True, False), (False, True)]
+)
+def test_save(filename, source, extension, muddle, use_accessor, tmp_path):
     if extension == "csv" and (
         filename == huracanpy.example_TRACK_tilt_file
         or (filename is not None and filename.split(".")[-1] == "nc")
@@ -134,7 +209,12 @@ def test_save(filename, source, extension, muddle, tmp_path):
 
     # Copy the data because save modifies the dataset at the moment
     data_orig = data.copy()
-    huracanpy.save(data, str(tmp_path / f"tmp_file.{extension}"))
+
+    filename = str(tmp_path / f"tmp_file.{extension}")
+    if use_accessor:
+        data.hrcn.save(filename)
+    else:
+        huracanpy.save(data, filename)
 
     # Check that the original data is not modified by the save function
     _assert_dataset_identical(data_orig, data)
@@ -143,8 +223,13 @@ def test_save(filename, source, extension, muddle, tmp_path):
     # Saving as netcdf does force sorting by track_id so apply this
     if extension == "nc":
         data = data.sortby("track_id")
-    data_reload = huracanpy.load(str(tmp_path / f"tmp_file.{extension}"))
+    data_reload = huracanpy.load(filename)
     _assert_dataset_identical(data, data_reload)
+
+
+def test_save_fails(tracks_csv):
+    with pytest.raises(NotImplementedError, match="File format not recognized"):
+        huracanpy.save(tracks_csv, "filename.unsupported_extension")
 
 
 def _load_with_checked_warnings(filename, **kwargs):

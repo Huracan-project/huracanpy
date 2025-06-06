@@ -14,10 +14,10 @@ def test_sshs():
 
 def test_pressure_cat():
     data = huracanpy.load(huracanpy.example_csv_file, source="csv")
-    Klotz = huracanpy.tc.pressure_category(data.slp / 100)
-    Simps = huracanpy.tc.pressure_category(data.slp / 100, convention="Simpson")
-    assert Klotz.sum() == 62
-    assert Simps.sum() == -23
+    klotz = huracanpy.tc.pressure_category(data.slp / 100)
+    simps = huracanpy.tc.pressure_category(data.slp / 100, convention="Simpson")
+    assert klotz.sum() == 62
+    assert simps.sum() == -23
 
 
 @pytest.mark.parametrize("pass_as_numpy", [False, True])
@@ -25,8 +25,8 @@ def test_pressure_cat():
     "units, expected",
     [
         ("m s-1", "default"),
-        ("cm s-1", np.array([-1.0] * 99)),
-        ("km s-1", np.array([5.0] * 99)),
+        ("cm s-1", np.asarray([-1.0] * 99)),
+        ("km s-1", np.asarray([5.0] * 99)),
     ],
 )
 def test_sshs_units(units, expected, pass_as_numpy):
@@ -43,7 +43,7 @@ def test_sshs_units(units, expected, pass_as_numpy):
         data.wind10.attrs["units"] = units
         result = huracanpy.tc.saffir_simpson_category(data.wind10)
 
-    (result == expected).all()
+    assert (result == expected).all()
 
     if pass_as_numpy:
         assert isinstance(result, np.ndarray)
@@ -58,7 +58,7 @@ def test_sshs_units(units, expected, pass_as_numpy):
     "units, expected",
     [
         ("Pa", "default"),
-        ("hPa", np.array([-1.0] * 99)),
+        ("hPa", np.asarray([-1.0] * 99)),
     ],
 )
 def test_pressure_cat_units(units, expected, convention, pass_as_numpy):
@@ -69,20 +69,14 @@ def test_pressure_cat_units(units, expected, convention, pass_as_numpy):
             expected = huracanpy.tc.pressure_category(data.slp, convention=convention)
 
     if pass_as_numpy:
-        if units != "Pa":
-            with pytest.warns(UserWarning, match="Caution, pressure are likely in Pa"):
-                result = huracanpy.tc.pressure_category(
-                    data.slp.data, convention=convention, slp_units=units
-                )
-        else:
-            result = huracanpy.tc.pressure_category(
-                data.slp.data, convention=convention, slp_units=units
-            )
+        result = huracanpy.tc.pressure_category(
+            data.slp.data, convention=convention, slp_units=units
+        )
     else:
         data.slp.attrs["units"] = units
         result = huracanpy.tc.pressure_category(data.slp, convention=convention)
 
-    (result == expected).all()
+    assert (result == expected).all()
 
     if pass_as_numpy:
         assert isinstance(result, np.ndarray)

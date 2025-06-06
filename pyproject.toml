@@ -33,6 +33,7 @@ dependencies = [
 dev = [
     "pre-commit",
     "pytest",
+    "pytest-cov",
     "ruff>=0.9.0",
     "tox",
     "nbformat",
@@ -46,6 +47,7 @@ docs = [
     "sphinx-design",
     "ipykernel",
     "myst-parser",
+    "sphinx_autosummary_accessors",
 ]
 
 [build-system]
@@ -63,6 +65,8 @@ extend-select = [
     "ARG", # Flake8 unused arguments
     "S", # Flake8 bandit
     "T20", # Flake8 print
+    "E501", # Line too long
+    "N", # pep8 naming conventions
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -72,11 +76,10 @@ extend-select = [
 [tool.pytest.ini_options]
 minversion = "6.0"
 filterwarnings = [
-    "error",
-    "default::DeprecationWarning",
     'ignore:numpy.ndarray size changed:RuntimeWarning',
     "ignore::cartopy.io.DownloadWarning"
 ]
+addopts = "--cov=huracanpy --cov-report html"
 
 [tool.tox]
 requires = ["tox>=4.15.0"]

@@ -49,6 +49,13 @@ def test_get_delta(tracks_csv, var, track_id, expected, unit, centering):
         )
 
 
+def test_delta_fails(tracks_csv):
+    with pytest.raises(ValueError, match="centering must be one of"):
+        huracanpy.calc.delta(
+            tracks_csv.wind10, tracks_csv.track_id, centering="nonsense"
+        )
+
+
 def test_get_rate():
     data = huracanpy.load(huracanpy.example_csv_file)
 
@@ -69,3 +76,8 @@ def test_get_rate():
     np.testing.assert_approx_equal(
         intensification_rate_slp.min(), -124.115, significant=6
     )
+
+
+def test_rate_warns(tracks_csv):
+    with pytest.warns(UserWarning, match="track_id is not provided"):
+        huracanpy.calc.rate(tracks_csv.wind10, tracks_csv.time)

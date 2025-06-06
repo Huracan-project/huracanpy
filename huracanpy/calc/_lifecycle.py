@@ -20,7 +20,9 @@ def time_from_genesis(time, track_ids):
         The time_from_genesis series.
         You can append it to your tracks by running
 
-        >>> tracks["time_from_genesis"] = time_from_genesis(tracks.time, tracks.track_id)
+        >>> tracks["time_from_genesis"] = time_from_genesis(
+        >>>     tracks.time, tracks.track_id
+        >>> )
 
     """
     data_df = pd.DataFrame({"time": time, "track_id": track_ids})

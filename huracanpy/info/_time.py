@@ -43,10 +43,13 @@ def season(track_id, lat, time, convention="tc-short"):
     lat : xarray.DataArray
     time : xarray.DataArray
     convention : str
-        * 'tc-short' : In the Northern hemisphere, the season is the same as calendar year.
-        In the southern hemisphere, the season n corresponds to July n-1 to June n
-        * 'tc-long' : In the Northern hemisphere, the season is the same as calendar year.
-        In the southern hemisphere, the season from July n-1 to June n is named "(n-1)n"
+
+        * 'tc-short' : In the Northern hemisphere, the season is the same as calendar
+          year. In the southern hemisphere, the season n corresponds to July n-1 to
+          June n
+        * 'tc-long' : In the Northern hemisphere, the season is the same as calendar
+          year. In the southern hemisphere, the season from July n-1 to June n is named
+          "(n-1)n"
 
     Raises
     ------
@@ -56,8 +59,8 @@ def season(track_id, lat, time, convention="tc-short"):
     Returns
     -------
     xarray.DataArray
-        The season series.
-        You can append it to your tracks by running tracks["season"] = get_season(tracks.track_id, tracks.lat, tracks.time)
+        The season series. You can append it to your tracks by running
+        tracks["season"] = get_season(tracks.track_id, tracks.lat, tracks.time)
     """
 
     # Derive values
@@ -68,28 +71,29 @@ def season(track_id, lat, time, convention="tc-short"):
             warnings.filterwarnings(
                 "ignore",
                 category=UnitStrippedWarning,
-                message="The unit of the quantity is stripped when downcasting to ndarray.",
+                message="The unit of the quantity is stripped",
             )
             time = pd.to_datetime(time)
         year = time.year
         month = time.month
     except TypeError:
         # Fix for cftime
-        year = np.array([t.year for t in time])
-        month = np.array([t.month for t in time])
+        year = np.asarray([t.year for t in time])
+        month = np.asarray([t.month for t in time])
 
     # Store in a dataframe
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore",
             category=UnitStrippedWarning,
-            message="The unit of the quantity is stripped when downcasting to ndarray.",
+            message="The unit of the quantity is stripped",
         )
         df = pd.DataFrame(
             {"hemi": hemi, "year": year, "month": month, "track_id": track_id}
         )
     # Most frequent year, month and hemisphere for each track
-    # Grouping is done to avoid labelling differently points in a track that might cross hemisphere or seasons.
+    # Grouping is done to avoid labelling differently points in a track that might cross
+    # hemisphere or seasons.
     group = df.groupby("track_id")[["year", "month", "hemi"]].agg(
         lambda x: pd.Series.mode(x)[0]
     )
