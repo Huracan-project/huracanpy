@@ -142,7 +142,7 @@ def fancyline(
         y = xyz[:, 1]
 
     # Break the xy points up in to line segments
-    points = np.array([x, y]).T.reshape(-1, 1, 2)
+    points = np.asarray([x, y]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
 
     # Collect the line segments

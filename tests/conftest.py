@@ -34,7 +34,7 @@ def tracks_with_extra_coord(tracks_csv):
         thing=(
             (
                 ("record", "level"),
-                np.array(
+                np.asarray(
                     [np.ones_like(tracks_csv.lon), np.ones_like(tracks_csv.lon) * 2],
                 ).T,
             )

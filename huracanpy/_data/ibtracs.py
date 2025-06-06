@@ -78,22 +78,26 @@ def online(subset, filename=None, **kwargs):
 
 def offline(subset="wmo"):
     """
-    Function to load offline IBTrACS datasets. These are embedded within the package, rather than downloaded online.
-    Because of the offline nature of this feature, the datasets might be outdated depending on your last update of the
-    package and/or the last update of the datasets by the developers.
-    Last update by the developers for this version dates back to May 24th, 2024.
+    Function to load offline IBTrACS datasets. These are embedded within the package,
+    rather than downloaded online. Because of the offline nature of this feature, the
+    datasets might be outdated depending on your last update of the package and/or the
+    last update of the datasets by the developers. Last update by the developers for
+    this version dates back to May 24th, 2024.
 
-    In order to reduce the size of the embedded files, filtering was made both on the attributes and on the records.
-    All offline datasets are based on the "since1980" subset of IBTrACS.
-    Recent seasons with tracks marked as "provisionnal" were removed. All spur tracks were removed.
-    Only 6-hourly data is provided.
+    In order to reduce the size of the embedded files, filtering was made both on the
+    attributes and on the records. All offline datasets are based on the "since1980"
+    subset of IBTrACS. Recent seasons with tracks marked as "provisionnal" were removed.
+    All spur tracks were removed. Only 6-hourly data is provided.
 
     Two subsets are currently available:
-        * "wmo" contains the data provided in the "wmo" columns, which correspond to the data provided by the center
-          responsible for the area of a given point. (see https://community.wmo.int/en/tropical-cyclone-regional-bodies)
-          Note that within this dataset, wind units are not homogeneous: they are provided as collected from the
-          meteorological agencies, which means that they have different time-averaging for wind extrema.
-        * "jtwc" contains the data provided in the "wmo" columns, which is provided by the NHC or the JTWC.
+        * "wmo" contains the data provided in the "wmo" columns, which correspond to the
+          data provided by the center responsible for the area of a given point
+          (see https://community.wmo.int/en/tropical-cyclone-regional-bodies). Note that
+          within this dataset, wind units are not homogeneous: they are provided as
+          collected from the meteorological agencies, which means that they have
+          different time-averaging for wind extrema.
+        * "jtwc" contains the data provided in the "wmo" columns, which is provided by
+          the NHC or the JTWC.
 
     For more information, you may see the IBTrACS column documentation at
     https://www.ncei.noaa.gov/sites/default/files/2021-07/IBTrACS_v04_column_documentation.pdf
@@ -110,17 +114,22 @@ def offline(subset="wmo"):
 
     """
     warnings.warn(
-        "This offline function loads a light version of IBTrACS which is embedded within the package, based on a file produced manually by the developers.\n\
-                  It was last updated on the 15th Nov 2024, based on the IBTrACS file at that date.\n\
-                  It contains only data from 1980 up to the last year with no provisional tracks. All spur tracks were removed. Only 6-hourly time steps were kept."
+        "This offline function loads a light version of IBTrACS which is embedded"
+        " within the package, based on a file produced manually by the developers.\n"
+        " It was last updated on the 15th Nov 2024, based on the IBTrACS file at that"
+        " date.\n It contains only data from 1980 up to the last year with no"
+        " provisional tracks. All spur tracks were removed. Only 6-hourly time steps"
+        " were kept."
     )
     if subset.lower() == "wmo":
         warnings.warn(
-            "You are loading the IBTrACS-WMO subset. \
-                      This dataset contains the positions and intensity reported by the WMO agency responsible for each basin\n\
-                      Be aware of the fact that wind and pressure data is provided as they are in IBTrACS, \
-                      which means in particular that wind speeds are in knots and averaged over different time periods.\n\
-                    For more information, see the IBTrACS column documentation at https://www.ncei.noaa.gov/sites/default/files/2021-07/IBTrACS_v04_column_documentation.pdf"
+            "You are loading the IBTrACS-WMO subset. This dataset contains the"
+            " positions and intensity reported by the WMO agency responsible for"
+            " each basin\n Be aware of the fact that wind and pressure data is provided"
+            " as they are in IBTrACS, which means in particular that wind speeds are in"
+            " knots and averaged over different time periods.\n For more information,"
+            " see the IBTrACS column documentation at"
+            " https://www.ncei.noaa.gov/sites/default/files/2021-07/IBTrACS_v04_column_documentation.pdf"
         )
         return _csv.load(wmo_file)
     if subset.lower() in ["usa", "jtwc"]:

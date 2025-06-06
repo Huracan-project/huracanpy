@@ -147,8 +147,8 @@ def load(filename, calendar=None, variable_names=None):
                 # Other variables are a dictionary mapping variable name to a tuple of
                 # (time, data_array) as this is what is passed to xarray.Dataset
 
-                # Add track ID as a variable along the record dimension so that it can be used
-                # for groupby
+                # Add track ID as a variable along the record dimension so that it can
+                # be used for groupby
                 track_id.extend([track_info["track_id"]] * npoints)
 
                 # Populate time and data line by line
@@ -199,7 +199,7 @@ def load_tilts(filename, calendar=None, nans=1e25):
         nfields = header["nfields"]
 
         line_fmt = "LEVELS " + " ".join(["{:f}"] * nfields)
-        levels = np.array(_parse(line_fmt, f.readline().strip()).fixed)
+        levels = np.asarray(_parse(line_fmt, f.readline().strip()).fixed)
 
         # Read in each track as an xarray dataset with time as the coordinate
         for n in range(ntracks):
@@ -207,8 +207,8 @@ def load_tilts(filename, calendar=None, nans=1e25):
             track_info = _parse(tilt_track_header_fmt, f.readline().strip()).named
             npoints = track_info["npoints"]
 
-            # Add track ID as a variable along the record dimension so that it can be used
-            # for groupby
+            # Add track ID as a variable along the record dimension so that it can be
+            # used for groupby
             track_id.extend([track_info["track_id"]] * npoints)
 
             # Populate time and data line by line

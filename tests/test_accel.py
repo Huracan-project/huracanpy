@@ -123,8 +123,8 @@ def test_accel_match(tracks, request):
             if len(track_.time) > 0:
                 track_ref_ = track_ref.where(track_ref.time.isin(track.time), drop=True)
 
-                yx_track = np.array([track_.lat, track_.lon]).T
-                yx_ref = np.array([track_ref_.lat, track_ref_.lon]).T
+                yx_track = np.asarray([track_.lat, track_.lon]).T
+                yx_ref = np.asarray([track_ref_.lat, track_ref_.lon]).T
 
                 dists = haversine_vector(yx_track, yx_ref, Unit.KILOMETERS)
 
@@ -137,10 +137,10 @@ def test_accel_match(tracks, request):
                     npoints.append(len(dists_track))
                     dist.append(np.mean(dists_track))
 
-    np.testing.assert_equal(result.id_1, np.array(track_id1))
-    np.testing.assert_equal(result.id_2, np.array(track_id2))
-    np.testing.assert_equal(result.temp, np.array(npoints))
-    np.testing.assert_allclose(result.dist, np.array(dist), rtol=1e-12)
+    np.testing.assert_equal(result.id_1, np.asarray(track_id1))
+    np.testing.assert_equal(result.id_2, np.asarray(track_id2))
+    np.testing.assert_equal(result.temp, np.asarray(npoints))
+    np.testing.assert_allclose(result.dist, np.asarray(dist), rtol=1e-12)
 
 
 @pytest.mark.parametrize(
@@ -166,5 +166,5 @@ def test_accel_overlap(tracks, request):
         delta_start.append((track_ref.time[0] - track.time[0]) / np.timedelta64(1, "D"))
         delta_end.append((track_ref.time[-1] - track.time[-1]) / np.timedelta64(1, "D"))
 
-    np.testing.assert_equal(result.delta_start, np.array(delta_start))
-    np.testing.assert_equal(result.delta_end, np.array(delta_end))
+    np.testing.assert_equal(result.delta_start, np.asarray(delta_start))
+    np.testing.assert_equal(result.delta_end, np.asarray(delta_end))

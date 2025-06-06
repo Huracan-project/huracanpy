@@ -59,5 +59,4 @@ contributing to development
 
 
 The "[docs]" argument installs extra dependencies needed to build the documentation locally.
-If you are adding or modifying functions it will probably be useful to also update the documentation.
-For further instructions see {doc}`this page <doc>`.
+If you are adding or modifying functions it will probably be useful to also update the documentation ([documentation](doc.md)).

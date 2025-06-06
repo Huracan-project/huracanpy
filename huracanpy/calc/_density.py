@@ -47,9 +47,9 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
 
     # Compute density
     if method == "histogram":
-        H = _histogram(lon, lat, x_edge, y_edge, function_kws)
+        h = _histogram(lon, lat, x_edge, y_edge, function_kws)
     elif method == "kde":
-        H = _kde(lon, lat, x_mid, y_mid, function_kws)
+        h = _kde(lon, lat, x_mid, y_mid, function_kws)
     else:
         raise NotImplementedError(
             f"Method {method} not implemented yet. Use one 'histogram'"
@@ -57,7 +57,7 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
 
     # Turn into xarray
     da = xr.DataArray(
-        H,
+        h,
         dims=["lat", "lon"],
         coords={"lon": x_mid, "lat": y_mid},
     )
@@ -71,8 +71,8 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
 
 def _histogram(lon, lat, x_edge, y_edge, function_kws):
     # Compute 2D histogram with numpy
-    H, _x, _y = np.histogram2d(lon, lat, bins=[x_edge, y_edge], **function_kws)
-    return H.T  # Transpose result
+    h, _x, _y = np.histogram2d(lon, lat, bins=[x_edge, y_edge], **function_kws)
+    return h.T  # Transpose result
 
 
 def _kde(lon, lat, x_mid, y_mid, function_kws):

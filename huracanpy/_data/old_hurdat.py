@@ -48,7 +48,7 @@ def load(filename):
 
     # Parse through file
     c, track_length = 0, 0
-    L = []
+    lines_out = []
     while len(lines) > 0:
         line = lines.pop(0)
         nb, content = parse_any_line(line)
@@ -63,13 +63,13 @@ def load(filename):
         elif line_type == "track_point":
             c += 1  # Count point
             time, lat, lon, wind, pres, lat_wind, lon_wind = parse_track_point(content)
-            L.append([track_id, time, lat, lon, wind, pres, lat_wind, lon_wind])
+            lines_out.append([track_id, time, lat, lon, wind, pres, lat_wind, lon_wind])
         elif line_type == "track_type":
             pass
 
     # Format
     df = pd.DataFrame(
-        L,
+        lines_out,
         columns=[
             "track_id",
             "time",

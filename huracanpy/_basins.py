@@ -31,7 +31,8 @@ B = dict(SH, **NH)
 basins["WMO-TC"] = gpd.GeoDataFrame(index=B.keys(), geometry=list(B.values()))
 
 # Sainsbury et. al. (2022)
-# What Governs the Interannual Variability of Recurving North Atlantic Tropical Cyclones?
+# What Governs the Interannual Variability of Recurving North Atlantic Tropical
+# Cyclones?
 # https://doi.org/10.1175/JCLI-D-21-0712.1
 B = dict(
     MDR=Polygon([(-70, 6), (-10, 6), (-10, 20), (-70, 20)]),

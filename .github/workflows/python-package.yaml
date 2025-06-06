@@ -20,19 +20,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: conda-incubator/setup-miniconda@v3
+    - uses: mamba-org/setup-micromamba@v2
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+        environment-name: test-huracanpy
+        create-args: >-
+          python=${{matrix.python-version}}
+    - name: Install dependencies and test
       run: |
-        conda install -c conda-forge cartopy
-        python -m pip install --upgrade pip
-        pip install .[dev]
+        python -c "import sys; print(sys.version)"
+        eval "$(micromamba shell hook --shell bash)"
+        micromamba activate test-huracanpy
+        python -c "import sys; print(sys.version)"
+        python -m pip install .[dev]
+        python -m pytest
     - uses: chartboost/ruff-action@v1
     - uses: chartboost/ruff-action@v1
       with:
         args: 'format --check'
-    - name: Test with pytest
-      run: |
-        pytest

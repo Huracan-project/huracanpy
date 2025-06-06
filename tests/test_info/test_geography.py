@@ -8,9 +8,9 @@ import huracanpy
 @pytest.mark.parametrize(
     "data, expected",
     [
-        ("tracks_minus180_plus180", np.array(["S"] * 12 + ["N"] * 12)),
-        ("tracks_0_360", np.array(["S"] * 12 + ["N"] * 12)),
-        ("tracks_csv", np.array(["S"] * 99)),
+        ("tracks_minus180_plus180", np.asarray(["S"] * 12 + ["N"] * 12)),
+        ("tracks_0_360", np.asarray(["S"] * 12 + ["N"] * 12)),
+        ("tracks_csv", np.asarray(["S"] * 99)),
     ],
 )
 def test_hemisphere(data, expected, request):
@@ -24,13 +24,17 @@ def test_hemisphere(data, expected, request):
     [
         (
             "tracks_minus180_plus180",
-            np.array(["SP"] * 8 + ["SA"] * 4 + ["MED"] * 2 + ["NI"] * 4 + ["WNP"] * 6),
+            np.asarray(
+                ["SP"] * 8 + ["SA"] * 4 + ["MED"] * 2 + ["NI"] * 4 + ["WNP"] * 6
+            ),
         ),
         (
             "tracks_0_360",
-            np.array(["SP"] * 8 + ["SA"] * 4 + ["MED"] * 2 + ["NI"] * 4 + ["WNP"] * 6),
+            np.asarray(
+                ["SP"] * 8 + ["SA"] * 4 + ["MED"] * 2 + ["NI"] * 4 + ["WNP"] * 6
+            ),
         ),
-        ("tracks_csv", np.array(["AUS"] * 51 + ["SI"] * 48)),
+        ("tracks_csv", np.asarray(["AUS"] * 51 + ["SI"] * 48)),
     ],
 )
 def test_basin(data, expected, request):
@@ -51,7 +55,7 @@ def test_basin(data, expected, request):
 )
 def test_basin_definition(convention, expected):
     lon = np.arange(-80, 20, 5)
-    lat = np.array([15, 45] * 10)
+    lat = np.asarray([15, 45] * 10)
     result = huracanpy.info.basin(lon, lat, convention=convention)
 
     np.testing.assert_array_equal(result, expected)
@@ -62,7 +66,7 @@ def test_basin_definition(convention, expected):
     [
         (
             "tracks_minus180_plus180",
-            np.array(
+            np.asarray(
                 [False]
                 + [True] * 6
                 + [False] * 2
@@ -75,7 +79,7 @@ def test_basin_definition(convention, expected):
         ),
         (
             "tracks_0_360",
-            np.array(
+            np.asarray(
                 [False]
                 + [True] * 6
                 + [False] * 2
@@ -86,7 +90,7 @@ def test_basin_definition(convention, expected):
                 + [True] * 3
             ),
         ),
-        ("tracks_csv", np.array([True] * 15 + [False] * 15 + [True] * 69)),
+        ("tracks_csv", np.asarray([True] * 15 + [False] * 15 + [True] * 69)),
     ],
 )
 def test_get_land_ocean(data, expected, request):
@@ -103,7 +107,7 @@ def test_get_land_ocean(data, expected, request):
     [
         (
             "tracks_minus180_plus180",
-            np.array(
+            np.asarray(
                 ["Antarctica"]
                 + [""] * 6
                 + ["Argentina"] * 2
@@ -120,7 +124,7 @@ def test_get_land_ocean(data, expected, request):
         ),
         (
             "tracks_0_360",
-            np.array(
+            np.asarray(
                 ["Antarctica"]
                 + [""] * 6
                 + ["Argentina"] * 2
@@ -135,7 +139,7 @@ def test_get_land_ocean(data, expected, request):
                 + [""] * 3
             ),
         ),
-        ("tracks_csv", np.array([""] * 15 + ["Australia"] * 15 + [""] * 69)),
+        ("tracks_csv", np.asarray([""] * 15 + ["Australia"] * 15 + [""] * 69)),
     ],
 )
 def test_get_country(data, expected, request):
@@ -149,7 +153,7 @@ def test_get_country(data, expected, request):
     [
         (
             "tracks_minus180_plus180",
-            np.array(
+            np.asarray(
                 ["Antarctica"]
                 + [""] * 6
                 + ["South America"] * 2
@@ -163,7 +167,7 @@ def test_get_country(data, expected, request):
         ),
         (
             "tracks_0_360",
-            np.array(
+            np.asarray(
                 ["Antarctica"]
                 + [""] * 6
                 + ["South America"] * 2
@@ -175,7 +179,7 @@ def test_get_country(data, expected, request):
                 + [""] * 3
             ),
         ),
-        ("tracks_csv", np.array([""] * 15 + ["Oceania"] * 15 + [""] * 69)),
+        ("tracks_csv", np.asarray([""] * 15 + ["Oceania"] * 15 + [""] * 69)),
     ],
 )
 def test_get_continent(data, expected, request):

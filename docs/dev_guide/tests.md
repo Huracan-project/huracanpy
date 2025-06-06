@@ -4,6 +4,8 @@
 Tests are run using [pytest](https://docs.pytest.org/en/latest/). Simply run
 `pytest` from the top of your repository and it will run all the existing tests.
 
+A coverage report is automatically generated using [pytest-cov](https://pytest-cov.readthedocs.io/en/stable/readme.html) at `htmlcov/index.html`. This can be useful for checking that all of your newly added code is being run in testing.
+
 If you want to run the tests across multiple python versions use [tox](https://tox.wiki/en/stable/).
 Instead, run `tox` from the top of your repository, and tox will build a virtual environment for each python version supported by huracanpy and run the tests for each version.
 Note, the python versions need to be installed on your system for `tox` to build the environments.

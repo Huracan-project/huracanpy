@@ -53,7 +53,7 @@ def load(
         times = [None] * npoints
         track_data = {label: ("record", np.zeros(npoints)) for label in varnames}
 
-        track_id_array = np.array([track_id] * npoints)
+        track_id_array = np.asarray([track_id] * npoints)
         track_data["track_id"] = ("record", track_id_array)
 
         # Populate time and data line by line

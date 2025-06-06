@@ -13,3 +13,4 @@ tc
     pace
     saffir_simpson_category
     pressure_category
+    beta_drift

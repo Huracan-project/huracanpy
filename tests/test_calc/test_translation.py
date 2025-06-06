@@ -1,5 +1,6 @@
 import numpy as np
 import pint
+import pytest
 from metpy.units import units
 
 import huracanpy
@@ -11,6 +12,11 @@ def test_azimuth():
 
     np.testing.assert_approx_equal(az[0], -109.07454278, significant=6)
     np.testing.assert_approx_equal(az.mean(), 28.99955985, significant=6)
+
+
+def test_azimuth_warns(tracks_csv):
+    with pytest.warns(UserWarning, match="track_id is not provided"):
+        huracanpy.calc.azimuth(tracks_csv.lon, tracks_csv.lat)
 
 
 def test_get_distance():
@@ -28,6 +34,28 @@ def test_get_distance():
     for dist in dist_haversine, dist_geod:
         assert not isinstance(dist.data, pint.Quantity)
         assert dist.metpy.units == units("m")
+
+
+def test_distance_warns(tracks_csv):
+    with pytest.warns(UserWarning, match="track_id is not provided"):
+        huracanpy.calc.distance(tracks_csv.lon, tracks_csv.lat)
+
+
+@pytest.mark.parametrize(
+    "varnames, method, message",
+    [
+        (["lon", "lat", "lon"], "geod", "Distance either takes 2 arrays"),
+        (["lon", "lat", "lon", "lat", "lon"], "geod", "Distance either takes 2 arrays"),
+        (["lon", "lat"], "nonsense", "Method nonsense for distance calculation"),
+    ],
+)
+def test_distance_fails(tracks_csv, varnames, method, message):
+    with pytest.raises(ValueError, match=message):
+        huracanpy.calc.distance(
+            *[tracks_csv[varname] for varname in varnames],
+            track_id=tracks_csv.track_id,
+            method=method,
+        )
 
 
 def test_radius_of_maximum_wind():
@@ -50,3 +78,10 @@ def test_get_translation_speed():
 
     assert not isinstance(ts.data, pint.Quantity)
     assert ts.metpy.units == units("m s-1")
+
+
+def test_translation_speed_warns(tracks_csv):
+    with pytest.warns(UserWarning, match="track_id is not provided"):
+        huracanpy.calc.translation_speed(
+            tracks_csv.lon, tracks_csv.lat, tracks_csv.time
+        )
