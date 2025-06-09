@@ -12,6 +12,7 @@ import huracanpy
 # Functions not in the accessor
 _intentionally_missing = [
     "load",
+    "concat_tracks",
     # add_ functions that would have output with a different shape
     "add_apex_vals",
     "add_gen_vals",
@@ -258,6 +259,11 @@ def test_accessor_plot_methods_match_functions(
             getattr(tracks_csv.hrcn, accessor_name)(**accessor_function_kwargs, ax=ax)
     else:
         getattr(tracks_csv.hrcn, accessor_name)(**accessor_function_kwargs, ax=ax)
+
+
+def test_inferred_track_id(tracks_csv):
+    track_id = tracks_csv.hrcn.get_inferred_track_id("track_id")
+    xr.testing.assert_equal(track_id, tracks_csv.track_id)
 
 
 def test_interp_methods():

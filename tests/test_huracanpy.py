@@ -51,6 +51,43 @@ import huracanpy
         (None, dict(source="ibtracs", ibtracs_subset="wmo"), 8, 0, 143287, 4540),
         (None, dict(source="ibtracs", ibtracs_subset="usa"), 10, 0, 121806, 4170),
         (huracanpy.example_old_HURDAT_file, dict(source="ecmwf"), 8, 0, 183, 29),
+        (
+            huracanpy.example_STORM_file,
+            dict(
+                source="csv",
+                names=[
+                    "year",
+                    "month",
+                    "time",
+                    "TC_num",
+                    "timeStep",
+                    "basinID",
+                    "lat",
+                    "lon",
+                    "minP",
+                    "Vmax",
+                    "Rmax",
+                    "cat",
+                    "landfall",
+                    "dist_land",
+                ],
+                infer_track_id=["year", "tc_num"],
+            ),
+            15,
+            0,
+            3909,
+            134,
+        ),
+        (huracanpy.example_IRIS_file, dict(source="iris"), 10, 0, 40, 2),
+        # Two csv file that should load with the same options
+        (
+            [huracanpy.example_csv_file, huracanpy.example_year_file],
+            dict(),
+            13,
+            0,
+            2373,
+            92,
+        ),
     ],
 )
 def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):

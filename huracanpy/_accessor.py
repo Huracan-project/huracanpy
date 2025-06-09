@@ -2,7 +2,16 @@ import xarray as xr
 from metpy.units import units
 import pandas as pd
 
-from . import plot, tc, info, calc, save, interp_time, sel_id, trackswhere
+from . import (
+    plot,
+    tc,
+    info,
+    calc,
+    save,
+    interp_time,
+    sel_id,
+    trackswhere,
+)
 
 
 @xr.register_dataarray_accessor("hrcn")
@@ -254,6 +263,14 @@ class HuracanPyDatasetAccessor:
         self._dataset["season"] = self.get_season(
             track_id_name, lat_name, time_name, convention
         )
+        return self._dataset
+
+    # --- utils
+    def get_inferred_track_id(self, *variable_names):
+        return info.inferred_track_id(*[self._dataset[var] for var in variable_names])
+
+    def add_inferred_track_id(self, *variable_names, track_id_name="track_id"):
+        self._dataset[track_id_name] = self.get_inferred_track_id(*variable_names)
         return self._dataset
 
     # --- category
