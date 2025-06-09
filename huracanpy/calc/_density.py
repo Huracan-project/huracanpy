@@ -6,6 +6,8 @@ import numpy as np
 import xarray as xr
 from scipy.stats import gaussian_kde
 
+import warnings
+
 
 def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=dict()):
     """Function to compute the track density, based on a simple 2D histogram.
@@ -83,6 +85,8 @@ def _kde(lon, lat, x_mid, y_mid, function_kws):
     # Evaluation kernel along positions
     h = np.reshape(kernel(positions), (len(y_mid), len(x_mid)))
     # Account for cell area differences
-    h = h / np.transpose([np.sin(y_mid * np.pi / 180)])
+    warnings.warn(
+        "The kde function does not currently take into account the spherical geometry of the Earth."
+    )
     # Normalize so that H integrates to the total number of points
     return h * len(lon) / h.sum()
