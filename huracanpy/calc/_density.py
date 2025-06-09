@@ -86,7 +86,8 @@ def _kde(lon, lat, x_mid, y_mid, function_kws):
     h = np.reshape(kernel(positions), (len(y_mid), len(x_mid)))
     # Account for cell area differences
     warnings.warn(
-        "The kde function does not currently take into account the spherical geometry of the Earth."
+        "The kde function does not currently take into account the spherical "
+        "geometry of the Earth."
     )
     # Normalize so that H integrates to the total number of points
     return h * len(lon) / h.sum()
