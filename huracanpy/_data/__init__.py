@@ -16,6 +16,8 @@ __all__ = [
     "example_ERA20C_file",
     "example_WiTRACK_file",
     "example_old_HURDAT_file",
+    "example_STORM_file",
+    "example_IRIS_file",
 ]
 
 import pathlib
@@ -26,6 +28,7 @@ from ._save import save
 here = pathlib.Path(__file__).parent
 testdata_dir = here / "example_data"
 
+# ruff: noqa: N816
 example_TRACK_file = str(
     testdata_dir / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind.tcident.new"
 )
@@ -44,8 +47,8 @@ example_TRACK_netcdf_file = str(
 )
 
 example_TRACK_timestep_file = str(
-    testdata_dir
-    / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind.nolat.tcident.hart_sample"
+    testdata_dir / "tr_trs_pos.2day_addT63vor_addmslp_add925wind_add10mwind"
+    ".nolat.tcident.hart_sample"
 )
 example_TE_file = str(testdata_dir / "TempestExtremes-sample.txt")
 
@@ -55,3 +58,7 @@ example_ERA20C_file = str(testdata_dir / "ERA20C_TRACK_NATL_tcident.nc")
 example_WiTRACK_file = str(testdata_dir / "event_tracks_2017_ERA5.dat")
 
 example_old_HURDAT_file = str(testdata_dir / "00012024050100_050_0005160_atl")
+
+example_STORM_file = str(testdata_dir / "STORM_DATA_NA_10_YEARS_0.txt")
+
+example_IRIS_file = str(testdata_dir / "IRIS_NI_1000Y_n6.txt")

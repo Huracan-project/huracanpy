@@ -12,7 +12,7 @@ from pint.errors import UnitStrippedWarning
 import pyproj
 
 
-from ._rates import delta
+from ._rates import delta, _dummy_track_id
 from .._metpy import dequantify_results
 
 
@@ -43,8 +43,8 @@ def _get_distance_haversine(lon1, lat1, lon2, lat2):
             category=UnitStrippedWarning,
             message="The unit of the quantity is stripped when downcasting to ndarray.",
         )
-        yx1 = np.array([lat1, lon1]).T
-        yx2 = np.array([lat2, lon2]).T
+        yx1 = np.asarray([lat1, lon1]).T
+        yx2 = np.asarray([lat2, lon2]).T
 
     return haversine_vector(yx1, yx2, unit="m")
 
@@ -70,6 +70,8 @@ def azimuth(lon, lat, track_id=None, ellps="WGS84"):
             180° corresponds to southward;
             -90° corresponds to westwards.
     """
+    if track_id is None:
+        track_id = _dummy_track_id(lon)
 
     # Compute azimuth
     _, azimuth = _get_distance_azimuth_geod(
@@ -77,14 +79,8 @@ def azimuth(lon, lat, track_id=None, ellps="WGS84"):
     )
 
     # Mask track transition points
-    if track_id is not None:
-        azimuth[track_id[1:] != track_id[:-1]] = np.nan * azimuth[0]
-        azimuth = np.concatenate([azimuth, [np.nan * azimuth[0]]])
-    else:
-        warnings.warn(
-            "track_id is not provided, all points are considered to come from the"
-            "same track"
-        )
+    azimuth[track_id[1:] != track_id[:-1]] = np.nan * azimuth[0]
+    azimuth = np.concatenate([azimuth, [np.nan * azimuth[0]]])
 
     return azimuth
 
@@ -138,13 +134,15 @@ def distance(lon, lat, *args, track_id=None, method="geod", ellps="WGS84"):
         lat2 = lat[1:]
 
         if len(args) == 1:
-            track_id = args[0]
+            if track_id is None:
+                track_id = args[0]
+            else:
+                raise ValueError(
+                    "Distance either takes 2 arrays (lon/lat) or 4 arrays 2x(lon/lat)"
+                )
 
         if track_id is None:
-            warnings.warn(
-                "track_id is not provided, all points are considered to come from the"
-                "same track"
-            )
+            track_id = _dummy_track_id(lon)
 
     elif len(args) == 2:
         lon1 = lon
@@ -203,14 +201,10 @@ def translation_speed(lon, lat, time, track_id=None, method="geod", ellps="WGS84
     # Curate input
     # If track_id is not provided, all points are considered to belong to the same track
     if track_id is None:
-        np.zeros_like(lon)
-        warnings.warn(
-            "track_id is not provided, all points are considered to come from the same"
-            "track"
-        )
+        track_id = _dummy_track_id(lon)
 
     # Distance between each points
-    dx = distance(lon, lat, track_id, method=method, ellps=ellps)
+    dx = distance(lon, lat, track_id=track_id, method=method, ellps=ellps)
 
     # time between each points
     dt = delta(time, track_id)

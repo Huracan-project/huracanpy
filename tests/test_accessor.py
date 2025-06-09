@@ -1,142 +1,188 @@
-import pytest
+from inspect import getmembers, isfunction
 
+import matplotlib.pyplot as plt
+from matplotlib.testing.decorators import check_figures_equal
 import numpy as np
+import pytest
 import xarray as xr
 
 import huracanpy
+
+
+# Functions not in the accessor
+_intentionally_missing = [
+    "load",
+    "concat_tracks",
+    # add_ functions that would have output with a different shape
+    "add_apex_vals",
+    "add_gen_vals",
+    "add_density",
+    "add_track_duration",
+    # plot_ functions that are for multiple datasets
+    "plot_doughnut",
+    "plot_venn",
+]
+
+
+def _get_function_args(tracks, function_args):
+    # Get the function arguments as arrays. Use "all" as a wildcard for the full dataset
+    # Keep other types of arguments as is
+    return [
+        var if not isinstance(var, str) else tracks if var == "all" else tracks[var]
+        for var in function_args
+    ]
 
 
 # %% DataArrayAccessor
 def test_nunique():
     data = huracanpy.load(huracanpy.example_csv_file)
 
-    N_tracks = data.track_id.hrcn.nunique()
-    assert N_tracks == 3
+    n_tracks = data.track_id.hrcn.nunique()
+    assert n_tracks == 3
 
 
 @pytest.mark.parametrize("call_type", ["get", "add"])
 @pytest.mark.parametrize(
-    "function, function_args, accessor_name, accessor_function_kwargs",
+    "function, function_args, accessor_function_kwargs",
     [
-        (huracanpy.info.hemisphere, ["lat"], "hemisphere", {}),
-        (huracanpy.info.basin, ["lon", "lat"], "basin", {}),
-        (huracanpy.info.is_land, ["lon", "lat"], "is_land", {}),
-        (huracanpy.info.is_ocean, ["lon", "lat"], "is_ocean", {}),
-        (huracanpy.info.country, ["lon", "lat"], "country", {}),
-        (huracanpy.info.continent, ["lon", "lat"], "continent", {}),
-        (huracanpy.tc.ace, ["wind10"], "ace", {"wind_name": "wind10"}),
+        (huracanpy.info.hemisphere, ["lat"], {}),
+        (huracanpy.info.basin, ["lon", "lat"], {}),
+        (huracanpy.info.is_land, ["lon", "lat"], {}),
+        (huracanpy.info.is_ocean, ["lon", "lat"], {}),
+        (huracanpy.info.country, ["lon", "lat"], {}),
+        (huracanpy.info.continent, ["lon", "lat"], {}),
         (
-            huracanpy.tc.ace,
-            ["wind10", "track_id"],
-            "ace",
-            {"wind_name": "wind10", "sum_by": "track_id"},
+            huracanpy.info.category,
+            ["wind10", [0, 10, 20, 30], [0, 1, 2]],
+            {"var_name": "wind10", "bins": [0, 10, 20, 30], "labels": [0, 1, 2]},
         ),
-        # (huracanpy.tc.pace, ["slp", "wind10"], "pace", {"pressure_name": "slp", "wind_name": "wind10"}),
-        (huracanpy.info.season, ["track_id", "lat", "time"], "season", {}),
+        (huracanpy.info.season, ["track_id", "lat", "time"], {}),
+        (huracanpy.info.time_components, ["time"], {}),
+        (huracanpy.calc.density, ["lon", "lat"], {}),
+        (huracanpy.calc.track_duration, ["time", "track_id"], {}),
+        (huracanpy.calc.gen_vals, ["all", "time", "track_id"], {}),
         (
-            huracanpy.tc.saffir_simpson_category,
-            ["wind10"],
-            "saffir_simpson_category",
-            {"wind_name": "wind10"},
-        ),
-        (
-            huracanpy.tc.pressure_category,
-            ["slp"],
-            "pressure_category",
-            {"slp_name": "slp", "slp_units": "Pa"},
-        ),
-        (huracanpy.calc.distance, ["lon", "lat", "track_id"], "distance", {}),
-        (huracanpy.calc.azimuth, ["lon", "lat", "track_id"], "azimuth", {}),
-        (
-            huracanpy.calc.translation_speed,
-            ["lon", "lat", "time", "track_id"],
-            "translation_speed",
-            {},
-        ),
-        (
-            huracanpy.calc.delta,
-            ["wind10", "track_id"],
-            "delta",
+            huracanpy.calc.apex_vals,
+            ["all", "wind10", "track_id"],
             {"var_name": "wind10"},
         ),
-        # (
-        #     huracanpy.calc.get_rate,
-        #     ["wind10", "time", "track_id"],
-        #     "rate",
-        #     {"var_name": "wind10"},
-        # ),
-        (
-            huracanpy.calc.time_from_genesis,
-            ["time", "track_id"],
-            "time_from_genesis",
-            {},
-        ),
+        (huracanpy.calc.time_from_genesis, ["time", "track_id"], {}),
         (
             huracanpy.calc.time_from_apex,
             ["time", "track_id", "wind10"],
-            "time_from_apex",
             {"intensity_var_name": "wind10"},
         ),
+        (huracanpy.calc.delta, ["wind10", "track_id"], {"var_name": "wind10"}),
         (
-            huracanpy.calc.track_duration,
-            ["time", "track_id"],
-            "track_duration",
-            {},
+            huracanpy.calc.delta,
+            ["wind10"],
+            {"var_name": "wind10", "track_id_name": None},
         ),
-        #        (huracanpy.calc.get_freq, ["track_id"], "freq", {}),
-        #        (huracanpy.calc.get_tc_days, ["time", "track_id"], "tc_days", {}),
-        # (huracanpy.calc.get_gen_vals, ["all", "time", "track_id"], "gen_vals", {}),
-        # (
-        #     huracanpy.calc.get_apex_vals,
-        #     ["all", "wind10", "track_id"],
-        #     "apex_vals",
-        #     {"varname": "wind10"},
-        # ),
+        (huracanpy.calc.rate, ["wind10", "time", "track_id"], {"var_name": "wind10"}),
+        (
+            huracanpy.calc.rate,
+            ["wind10", "time"],
+            {"var_name": "wind10", "track_id_name": None},
+        ),
+        (huracanpy.calc.distance, ["lon", "lat", "track_id"], {}),
+        (huracanpy.calc.distance, ["lon", "lat"], {"track_id_name": None}),
+        (huracanpy.calc.azimuth, ["lon", "lat", "track_id"], {}),
+        (huracanpy.calc.azimuth, ["lon", "lat"], {"track_id_name": None}),
+        (huracanpy.calc.translation_speed, ["lon", "lat", "time", "track_id"], {}),
+        (
+            huracanpy.calc.translation_speed,
+            ["lon", "lat", "time"],
+            {"track_id_name": None},
+        ),
+        (huracanpy.tc.ace, ["wind10"], {"wind_name": "wind10"}),
+        (
+            huracanpy.tc.ace,
+            ["wind10", "track_id"],
+            {"wind_name": "wind10", "sum_by": "track_id"},
+        ),
+        (
+            huracanpy.tc.pace,
+            ["slp", "wind10"],
+            {"pressure_name": "slp", "wind_name": "wind10"},
+        ),
+        (huracanpy.tc.saffir_simpson_category, ["wind10"], {"wind_name": "wind10"}),
+        (
+            huracanpy.tc.pressure_category,
+            ["slp"],
+            {"slp_name": "slp", "slp_units": "Pa"},
+        ),
+        # SLP for RMW is nonsense, but I'm just testing that the results are the same
+        # and SLP is the best variable available for a reasonable order of magnitude
+        (
+            huracanpy.tc.beta_drift,
+            ["lat", "wind10", "slp"],
+            {"wind_name": "wind10", "rmw_name": "slp"},
+        ),
     ],
 )
 def test_accessor_methods_match_functions(
     tracks_csv,
     function,
     function_args,
-    accessor_name,
     accessor_function_kwargs,
     call_type,
 ):
+    accessor_name = f"{call_type}_{function.__name__}"
     # Skip functions that only have a "get_" version
-    if call_type == "add":
-        if accessor_name in [
-            "track_duration",
-            "freq",
-            "tc_days",
-            "gen_vals",
-            "apex_vals",
-        ]:
-            pytest.skip(f"Accessor function add_{accessor_name} does not exist")
-        elif accessor_name in ["ace"] and "sum_by" in accessor_function_kwargs:
-            pytest.skip(f"sum_by not a valid argument for add_{accessor_name}")
+    if accessor_name in _intentionally_missing:
+        pytest.skip(f"Accessor function {accessor_name} does not exist")
+    if accessor_name == "add_ace" and "sum_by" in accessor_function_kwargs:
+        pytest.skip(f"sum_by not a valid argument for {accessor_name}")
 
     # Call the huracanpy function
-    # Get the function arguments as arrays. Use "all" as a wildcard for the full dataset
-    function_args = [
-        tracks_csv[var] if not var == "all" else tracks_csv for var in function_args
-    ]
+    function_args = _get_function_args(tracks_csv, function_args)
     if function == huracanpy.tc.pressure_category:
         with pytest.warns(UserWarning, match="Caution, pressure are likely in Pa"):
             result = function(*function_args)
     else:
-        result = function(*function_args)
+        if (
+            "track_id_name" in accessor_function_kwargs
+            and accessor_function_kwargs["track_id_name"] is None
+        ):
+            with pytest.warns(UserWarning, match="track_id is not provided"):
+                result = function(*function_args)
+        else:
+            result = function(*function_args)
 
     # Call the accessor method
-    result_accessor = getattr(tracks_csv.hrcn, f"{call_type}_{accessor_name}")(
-        **accessor_function_kwargs
-    )
+    if (
+        "track_id_name" in accessor_function_kwargs
+        and accessor_function_kwargs["track_id_name"] is None
+    ):
+        with pytest.warns(UserWarning, match="track_id is not provided"):
+            result_accessor = getattr(tracks_csv.hrcn, accessor_name)(
+                **accessor_function_kwargs
+            )
+    else:
+        result_accessor = getattr(tracks_csv.hrcn, accessor_name)(
+            **accessor_function_kwargs
+        )
+
+    # Special case for PACE returning the values and the model
+    if function == huracanpy.tc.pace:
+        assert result[1] == result_accessor[1]
+        result = result[0]
+        result_accessor = result_accessor[0]
 
     # When using the "add_" method a new Dataset is returned with the variable added
     # The naming of the new variable is either simply the function name (minus "add_")
     # or the function name plus the name of the variable specified if it can be applied
     # to different variables
     if call_type == "add":
-        varname = accessor_name
+        # Special cases for multiple variables being added
+        if accessor_name == "add_time_components":
+            varname = ["year", "month", "day", "hour"]
+            result = xr.Dataset({name: result[n] for n, name in enumerate(varname)})
+        elif accessor_name == "add_beta_drift":
+            varname = ["v_drift", "theta_drift"]
+            result = xr.Dataset({name: result[n] for n, name in enumerate(varname)})
+        else:
+            varname = function.__name__
         if "var_name" in accessor_function_kwargs:
             varname = f"{varname}_{accessor_function_kwargs['var_name']}"
         result_accessor = result_accessor[varname]
@@ -145,68 +191,79 @@ def test_accessor_methods_match_functions(
     assert type(result) is type(result_accessor), (
         "accessor return type differs from function"
     )
-    np.testing.assert_equal(
-        np.array(result),
-        np.array(result_accessor),
-        err_msg="accessor output differs from function output",
-    )
+    if isinstance(result, xr.Dataset):
+        xr.testing.assert_identical(result, result_accessor)
+    else:
+        np.testing.assert_equal(
+            np.asarray(result),
+            np.asarray(result_accessor),
+            err_msg="accessor output differs from function output",
+        )
 
 
-# %% DatasetAccessor
-# Currently keeping tests here that return more than just a DataArray as the testing is
-# less generic
-def test_get_methods(tracks_csv):
-    """Test get_ accessors output is same as function"""
-    data = tracks_csv
+@check_figures_equal()
+@pytest.mark.parametrize(
+    "function, function_args, accessor_function_kwargs",
+    [
+        (huracanpy.plot.density, [], {}),
+        (huracanpy.plot.fancyline, ["lon", "lat", "wind10"], {"colors": "wind10"}),
+        (
+            huracanpy.plot.tracks,
+            ["lon", "lat", "wind10"],
+            {"intensity_var_name": "wind10"},
+        ),
+        (huracanpy.plot.tracks, ["lon", "lat"], {}),
+    ],
+)
+def test_accessor_plot_methods_match_functions(
+    fig_test, fig_ref, tracks_csv, function, function_args, accessor_function_kwargs
+):
+    accessor_name = f"plot_{function.__name__}"
 
-    ## - pace
-    pace_acc, _ = data.hrcn.get_pace(pressure_name="slp", wind_name="wind10")
-    pace_fct, model_fct = huracanpy.tc.pace(data.slp, data.wind10)
-    np.testing.assert_array_equal(
-        pace_acc, pace_fct, err_msg="accessor output differs from function output"
-    )
+    if function is huracanpy.plot.density:
+        function_args = [huracanpy.calc.density(tracks_csv.lon, tracks_csv.lat)]
+    elif function is huracanpy.plot.fancyline:
+        function_args = [
+            _get_function_args(track, function_args)
+            for track_id, track in tracks_csv.groupby("track_id")
+        ]
+    else:
+        function_args = _get_function_args(tracks_csv, function_args)
 
-    ## - time components
-    year_acc, month_acc, day_acc, hour_acc = data.hrcn.get_time_components()
-    year_fct, month_fct, day_fct, hour_fct = huracanpy.info.time_components(data.time)
-    np.testing.assert_array_equal(
-        year_acc, year_fct, err_msg="Year component does not match"
-    )
-    np.testing.assert_array_equal(
-        month_acc, month_fct, err_msg="Month component does not match"
-    )
-    np.testing.assert_array_equal(
-        day_acc, day_fct, err_msg="Day component does not match"
-    )
-    np.testing.assert_array_equal(
-        hour_acc, hour_fct, err_msg="Hour component does not match"
-    )
+    plt.figure(fig_ref)
+    ax = plt.gca()
 
-    ## - track pace
-    pace_acc, _ = data.hrcn.get_pace(wind_name="wind10", sum_by="track_id")
-    pace_fct, _ = huracanpy.tc.pace(data.slp, data.wind10, sum_by=data.track_id)
-    np.testing.assert_array_equal(
-        pace_acc,
-        pace_fct,
-        "Track PACE accessor output differs from function output",
-    )
+    if function is huracanpy.plot.fancyline:
+        [function(*args, ax=ax) for args in function_args]
+    elif (
+        function is huracanpy.plot.tracks
+        and "intensity_var_name" not in accessor_function_kwargs
+    ):
+        with pytest.warns(
+            UserWarning, match="Ignoring `palette` because no `hue` variable"
+        ):
+            function(*function_args, ax=ax)
+    else:
+        function(*function_args, ax=ax)
 
-    ## - Genesis Values
-    gen_vals_acc = data.hrcn.get_gen_vals(
-        time_name="time",
-        track_id_name="track_id",
-    )
-    gen_vals_fct = huracanpy.calc.gen_vals(data, data.time, data.track_id)
-    xr.testing.assert_equal(gen_vals_acc, gen_vals_fct)
+    plt.figure(fig_test)
+    ax = plt.gca()
 
-    ## - Apex Values
-    apex_vals_acc = data.hrcn.get_apex_vals(
-        track_id_name="track_id", varname="wind10", stat="max"
-    )
-    apex_vals_fct = huracanpy.calc.apex_vals(
-        data, data.wind10, data.track_id, stat="max"
-    )
-    xr.testing.assert_equal(apex_vals_acc, apex_vals_fct)
+    if (
+        function is huracanpy.plot.tracks
+        and "intensity_var_name" not in accessor_function_kwargs
+    ):
+        with pytest.warns(
+            UserWarning, match="Ignoring `palette` because no `hue` variable"
+        ):
+            getattr(tracks_csv.hrcn, accessor_name)(**accessor_function_kwargs, ax=ax)
+    else:
+        getattr(tracks_csv.hrcn, accessor_name)(**accessor_function_kwargs, ax=ax)
+
+
+def test_inferred_track_id(tracks_csv):
+    track_id = tracks_csv.hrcn.get_inferred_track_id("track_id")
+    xr.testing.assert_equal(track_id, tracks_csv.track_id)
 
 
 def test_interp_methods():
@@ -236,3 +293,48 @@ def test_accessor_trackswhere(tracks_csv):
     )
 
     xr.testing.assert_identical(result, expected)
+
+
+def test_accessor_namespace_matches():
+    # Functions at the top level have the same name as in the module
+    expected_functions = [m[0] for m in getmembers(huracanpy) if isfunction(m[1])]
+
+    # Functions in calc, info, and tc should have get_ and add_ equivalents in the
+    # accessor
+    expected_functions += [
+        f"{prefix}_{m[0]}"
+        for prefix in ["get", "add"]
+        for module in [huracanpy.calc, huracanpy.info, huracanpy.tc]
+        for m in getmembers(module)
+        if isfunction(m[1])
+    ]
+
+    # Function in plot should be named plot_ in the accessor
+    expected_functions += [
+        f"plot_{m[0]}" for m in getmembers(huracanpy.plot) if isfunction(m[1])
+    ]
+
+    # Remove functions that do not go in the accessor
+    for func in _intentionally_missing:
+        expected_functions.remove(func)
+
+    # The names of functions actually available on the accessor
+    accessor_functions = [
+        m[0]
+        for m in getmembers(huracanpy._accessor.HuracanPyDatasetAccessor)
+        if isfunction(m[1]) and m[0][0] != "_"
+    ]
+
+    if sorted(expected_functions) != sorted(accessor_functions):
+        missing = [
+            func for func in expected_functions if func not in accessor_functions
+        ]
+        extras = [func for func in accessor_functions if func not in expected_functions]
+
+        raise ValueError(
+            "Module and accessor functions do not match\n"
+            + "Functions missing from accessor\n    - "
+            + "\n    - ".join(missing)
+            + "\nExtra functions in the accessor\n    - "
+            + "\n    - ".join(extras)
+        )

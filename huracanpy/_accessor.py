@@ -2,7 +2,16 @@ import xarray as xr
 from metpy.units import units
 import pandas as pd
 
-from . import plot, tc, info, calc, save, interp_time, sel_id, trackswhere
+from . import (
+    plot,
+    tc,
+    info,
+    calc,
+    save,
+    interp_time,
+    sel_id,
+    trackswhere,
+)
 
 
 @xr.register_dataarray_accessor("hrcn")
@@ -196,7 +205,7 @@ class HuracanPyDatasetAccessor:
         """
         Add PACE calculation to the dataset.
         """
-        pace_values = self.get_pace(
+        pace_values, model = self.get_pace(
             pressure_name=pressure_name,
             wind_name=wind_name,
             model=model,
@@ -207,7 +216,7 @@ class HuracanPyDatasetAccessor:
             **kwargs,
         )
         self._dataset["pace"] = pace_values
-        return self._dataset
+        return self._dataset, model
 
     # ---- time
     def get_time_components(self, time_name="time"):
@@ -220,12 +229,9 @@ class HuracanPyDatasetAccessor:
         """
         Add year, month, day, and hour as new variables to the dataset.
         """
-        year, month, day, hour = self.get_time_components(time_name)
-        self._dataset["year"] = year
-        self._dataset["month"] = month
-        self._dataset["day"] = day
-        self._dataset["hour"] = hour
-        return self._dataset
+        components = self.get_time_components(time_name)
+
+        return xr.merge([self._dataset, *components])
 
     def get_season(
         self,
@@ -259,10 +265,18 @@ class HuracanPyDatasetAccessor:
         )
         return self._dataset
 
+    # --- utils
+    def get_inferred_track_id(self, *variable_names):
+        return info.inferred_track_id(*[self._dataset[var] for var in variable_names])
+
+    def add_inferred_track_id(self, *variable_names, track_id_name="track_id"):
+        self._dataset[track_id_name] = self.get_inferred_track_id(*variable_names)
+        return self._dataset
+
     # --- category
     def get_category(
         self,
-        variable_name,
+        var_name,
         bins=None,
         labels=None,
         variable_units=None,
@@ -271,7 +285,7 @@ class HuracanPyDatasetAccessor:
         Calculate a generic category from a variable and a set of thresholds.
         """
         return info.category(
-            self._dataset[variable_name],
+            self._dataset[var_name],
             bins=bins,
             labels=labels,
             variable_units=variable_units,
@@ -279,8 +293,8 @@ class HuracanPyDatasetAccessor:
 
     def add_category(
         self,
-        variable_name,
-        new_var_name,
+        var_name,
+        new_var_name=None,
         bins=None,
         labels=None,
         variable_units=None,
@@ -288,8 +302,10 @@ class HuracanPyDatasetAccessor:
         """
         Add a generic category to the dataset as a new variable.
         """
+        if new_var_name is None:
+            new_var_name = f"category_{var_name}"
         self._dataset[new_var_name] = self.get_category(
-            variable_name,
+            var_name,
             bins=bins,
             labels=labels,
             variable_units=variable_units,
@@ -318,7 +334,7 @@ class HuracanPyDatasetAccessor:
         return self._dataset
 
     def get_pressure_category(
-        self, slp_name="slp", convention="Klotzbach", slp_units="hPa"
+        self, slp_name="slp", convention="Klotzbach", slp_units=None
     ):
         """
         Determine the pressure category based on the selected convention.
@@ -328,7 +344,7 @@ class HuracanPyDatasetAccessor:
         )
 
     def add_pressure_category(
-        self, slp_name="slp", convention="Klotzbach", slp_units="hPa"
+        self, slp_name="slp", convention="Klotzbach", slp_units=None
     ):
         """
         Add the pressure category to the dataset.
@@ -336,6 +352,18 @@ class HuracanPyDatasetAccessor:
         self._dataset["pressure_category"] = self.get_pressure_category(
             slp_name, convention, slp_units
         )
+        return self._dataset
+
+    def get_beta_drift(self, lat_name="lat", wind_name="wind", rmw_name="rmw"):
+        return tc.beta_drift(
+            self._dataset[lat_name], self._dataset[wind_name], self._dataset[rmw_name]
+        )
+
+    def add_beta_drift(self, lat_name="lat", wind_name="wind", rmw_name="rmw"):
+        v_drift, theta_drift = self.get_beta_drift(lat_name, wind_name, rmw_name)
+
+        self._dataset["v_drift"] = v_drift
+        self._dataset["theta_drift"] = theta_drift
         return self._dataset
 
     # ---- translation
@@ -359,7 +387,7 @@ class HuracanPyDatasetAccessor:
         if (track_id_name is None) or (
             track_id_name not in list(self._dataset.variables)
         ):
-            return calc.distance(
+            return calc.azimuth(
                 self._dataset[lon_name],
                 self._dataset[lat_name],
                 track_id=None,
@@ -593,6 +621,38 @@ class HuracanPyDatasetAccessor:
         d = self.get_density(lon_name=lon_name, lat_name=lat_name, **density_kws)
         return plot.density(d, **kwargs)
 
+    def plot_fancyline(
+        self,
+        lon_name="lon",
+        lat_name="lat",
+        track_id_name="track_id",
+        colors=None,
+        linewidths=None,
+        alphas=None,
+        linestyles=None,
+        **kwargs,
+    ):
+        extra_names = dict(
+            colors=colors, linewidths=linewidths, alphas=alphas, linestyles=linestyles
+        )
+        output = []
+        for track_id, track in self._dataset.groupby(track_id_name):
+            # Allow the other variables to be passed as variable names or constant
+            # strings
+            # e.g. colors can be a variable on the track or could just be "red"
+            extra_variables = {
+                key: (track[name] if name in track else name)
+                for key, name in extra_names.items()
+            }
+
+            output.append(
+                plot.fancyline(
+                    track[lon_name], track[lat_name], **extra_variables, **kwargs
+                )
+            )
+
+        return output
+
     # %% diags
     # ---- density
     def get_density(self, lon_name="lon", lat_name="lat", method="histogram", **kwargs):
@@ -611,10 +671,10 @@ class HuracanPyDatasetAccessor:
             self._dataset, self._dataset[time_name], self._dataset[track_id_name]
         )
 
-    def get_apex_vals(self, varname, track_id_name="track_id", stat="max"):
+    def get_apex_vals(self, var_name, track_id_name="track_id", stat="max"):
         return calc.apex_vals(
             self._dataset,
-            variable=self._dataset[varname],
+            variable=self._dataset[var_name],
             track_id=self._dataset[track_id_name],
             stat=stat,
         )

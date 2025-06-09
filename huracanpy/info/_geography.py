@@ -113,8 +113,8 @@ def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, cr
     if not isinstance(lon, np.ndarray):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=UnitStrippedWarning)
-            lon = np.array(lon)
-            lat = np.array(lat)
+            lon = np.asarray(lon)
+            lat = np.asarray(lat)
 
     if crs is None:
         crs = Geodetic()
@@ -125,7 +125,7 @@ def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, cr
     # Transform into Points within a GeoDataFrame
     points = gpd.GeoDataFrame(points.coords.apply(Point), geometry="coords", crs=df.crs)
 
-    result = np.array(
+    result = np.asarray(
         gpd.tools.sjoin(df, points, how="right", predicate="contains")[feature]
     ).astype(str)
 

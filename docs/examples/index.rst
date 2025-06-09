@@ -15,4 +15,4 @@ Examples
     utils
     ERA-20C_assessment
     beta_drift
-    speed
+    Select_basin_plot_interannual_variability

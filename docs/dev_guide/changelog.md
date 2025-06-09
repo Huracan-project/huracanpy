@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## v1.3.0
+### Added
+- Include missing accessor functions
+  - `get_beta_drift` and `add_beta_drift`
+  - `plot_fancyline`
+- `plot.tracks` and `plot.density` can be placed on existing axes if they are explicitly passed to the function
+- Load tracks from the Imperial College Storm Model (IRIS)
+- `huracanpy.infer_track_id` to generate a track ID from unique combinations of variables. e.g. "year" and "storm number in year".
+  - Also add as an option to `huracanpy.load`
+- Can use `huracanpy.load` with a list of files
+- `huracanpy.concat_tracks` to concatenate tracks while keeping the track_id as a unique identifier
+
+### Changed
+- Reduced unnecessary warning messages
+- Always use `var_name` as the accessor keyword for choosing a specific variable. Previously some functions used `varname`
+
+### Fixed
+- Consistent use of track_id in `delta` calculations
+- Correctly convert units in `category` functions
+- Always do the `beta_drift` calculation with wind speed in metres per second
+- Allow requesting other time components than year/month/day/hour from `add_time_components`, consistent with `info.time_components`
+- `get_azimuth` was calling the wrong function
+- Correctly use wind in "knots" and pressure in "hPa" when using pre-calculated pressure-wind relations ("holland", "z2021") in `tc.pace`
+- Use a lower precision `datetime64` when times are outside the default representable range
+
 ## v1.2.0
 ### Added
 - Modify `huracanpy.load` to load TRACK files with timesteps instead of dates  (e.g. `track_calendar=("1940-01-01", 6)` to specify start time and timestep length in hours)
