@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Reduced unnecessary warning messages
 - Always use `var_name` as the accessor keyword for choosing a specific variable. Previously some functions used `varname`
+- track density kde function integrates to the total number of points being passed, so that numbers are reasonable.
 
 ### Fixed
 - Consistent use of track_id in `delta` calculations
