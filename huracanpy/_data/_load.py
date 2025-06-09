@@ -9,7 +9,7 @@ from pandas.errors import OutOfBoundsDatetime
 
 from . import _csv, track_files, _netcdf, _tempestextremes, witrack, old_hurdat, iris_tc
 from . import ibtracs
-from .._merge import concat_tracks
+from .._concat import concat_tracks
 
 
 rename_defaults = dict(

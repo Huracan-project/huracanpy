@@ -2,12 +2,11 @@ import numpy as np
 import pytest
 
 import huracanpy
+from huracanpy._concat import _reset_track_id
 
 
 def test_reset_track_id(tracks_year):
-    tracks = huracanpy.reset_track_id(
-        tracks_year, tracks_year.track_id, keep_original=True
-    )
+    tracks = _reset_track_id(tracks_year, tracks_year.track_id, keep_original=True)
 
     # Check that the old array has been kept
     np.testing.assert_array_equal(tracks.track_id_original, tracks_year.track_id)

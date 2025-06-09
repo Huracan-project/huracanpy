@@ -45,7 +45,7 @@ def concat_tracks(
             )
 
         else:
-            tracks = reset_track_id(
+            tracks = _reset_track_id(
                 tracks,
                 track_id_old,
                 start=current_track_id,
@@ -58,13 +58,13 @@ def concat_tracks(
     return xr.concat(all_tracks, dim=track_id_old.dims[0], **kwargs)
 
 
-def reset_track_id(tracks, track_ids, start=0, *, keep_original=False):
+def _reset_track_id(tracks, track_ids, start=0, *, keep_original=False):
     """Replace the track IDs with an ascending sequence of numbers
 
     Examples
-    >>> tracks1 = reset_track_id(tracks1, tracks1.track_id)
-    >>> tracks2 = reset_track_id(
-    >>>     tracks2, tracks2.track_id, start=tracks1.track_id.values.max() + 1
+    >>> tracks1 = _reset_track_id(tracks1,tracks1.track_id)
+    >>> tracks2 = _reset_track_id(
+    >>>     tracks2,tracks2.track_id,start=tracks1.track_id.values.max() + 1
     >>> )
     >>> all_tracks = xr.concat([tracks1, tracks2], dim="record")
 

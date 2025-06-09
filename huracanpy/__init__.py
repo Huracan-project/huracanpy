@@ -16,7 +16,6 @@ __all__ = [
     "trackswhere",
     "interp_time",
     "concat_tracks",
-    "reset_track_id",
     # Parameters
     "basins",
     "example_csv_file",
@@ -58,7 +57,7 @@ from ._data import (
 )
 from ._basins import basins
 from ._interp import interp_time
-from ._merge import concat_tracks, reset_track_id
+from ._concat import concat_tracks
 from ._subset import sel_id, trackswhere
 from . import calc, plot, assess, info, tc
 

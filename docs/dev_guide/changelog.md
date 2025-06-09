@@ -17,10 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Also add as an option to `huracanpy.load`
 - Can use `huracanpy.load` with a list of files
 - `huracanpy.concat_tracks` to concatenate tracks while keeping the track_id as a unique identifier
-- `huracanpy.reset_track_id` to replace the track_id with an ascending set of numbers
+
 ### Changed
 - Reduced unnecessary warning messages
 - Always use `var_name` as the accessor keyword for choosing a specific variable. Previously some functions used `varname`
+
 ### Fixed
 - Consistent use of track_id in `delta` calculations
 - Correctly convert units in `category` functions

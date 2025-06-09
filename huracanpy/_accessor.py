@@ -11,7 +11,6 @@ from . import (
     interp_time,
     sel_id,
     trackswhere,
-    reset_track_id,
 )
 
 
@@ -62,14 +61,6 @@ class HuracanPyDatasetAccessor:
 
     def trackswhere(self, condition, track_id_name="track_id"):
         return trackswhere(self._dataset, self._dataset[track_id_name], condition)
-
-    def reset_track_id(self, track_id_name="track_id", start=0, keep_original=False):
-        return reset_track_id(
-            self._dataset,
-            self._dataset[track_id_name],
-            start=start,
-            keep_original=keep_original,
-        )
 
     # %% utils
     # ---- geography
