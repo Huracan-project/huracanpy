@@ -1,17 +1,15 @@
-import warnings
 from datetime import timedelta
-from tqdm import tqdm
+import warnings
 
 import cftime
 from dateutil.parser import parse
-
 import numpy as np
 import pandas as pd
-import xarray as xr
 from pandas.errors import OutOfBoundsDatetime
 
-from . import _csv, _TRACK, _netcdf, _tempestextremes, witrack, _old_HURDAT, iris_tc
+from . import _csv, track_files, _netcdf, _tempestextremes, witrack, old_hurdat, iris_tc
 from . import ibtracs
+from .._concat import concat_tracks
 
 
 rename_defaults = dict(
@@ -63,6 +61,7 @@ def load(
     units=None,
     baselon=None,
     infer_track_id=None,
+    track_id_prefix=None,
     ibtracs_subset="wmo",
     iris_timestep=timedelta(hours=3),
     tempest_extremes_unstructured=False,
@@ -78,10 +77,10 @@ def load(
 
     Parameters
     ----------
-    filename : str, optional
-        The file to be loaded. If `source="ibtracs"`, this is not needed as the data is
-        either included in huracanpy or downloaded when called. If the filename is
-        provided for an online IBTrACS subset, then the raw downloaded data will be
+    filename : str or list, optional
+        The file or files to be loaded. If `source="ibtracs"`, this is not needed as the
+        data is either included in huracanpy or downloaded when called. If the filename
+        is provided for an online IBTrACS subset, then the raw downloaded data will be
         saved there.
     source : str, optional
         If the file is not a CSV or NetCDF (identified by the file extension) then the
@@ -93,7 +92,8 @@ def load(
         * **witrack**
         * **ibtracs**
         * **csv**
-        * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided appropriate variable_names)
+        * **netcdf**, **nc** (includes support for CHAZ & MIT-Open file provided
+          appropriate variable_names)
         * **old_hurdat**, **ecmwf**
         * **iris**
 
@@ -132,6 +132,11 @@ def load(
         storm number by year, then pass a list with those variable names, and a new
         track_id variable will be created
 
+    track_id_prefix : str, optional
+        If loading from a list of tracks. Add this formattable prefix to the start of
+        the track_ids to keep them as unique identifiers. See
+        :py:func:`huracanpy.concat_tracks` for more details
+
     ibtracs_subset : str, default="wmo"
         IBTrACS subset. Two offline versions are available:
 
@@ -141,7 +146,8 @@ def load(
           the USA/Joint Typhoon Warning Centre. Methods are consistent across basins,
           but may not be complete.
 
-        To download online data, the subsets are the different filesp rovided by IBTrACS.
+        To download online data, the subsets are the different files provided by
+        IBTrACS.
 
         * **ACTIVE**: TCs currently active
         * **ALL**: Entire IBTrACS database
@@ -201,6 +207,29 @@ def load(
     # "rename" second in this dictionary combination
     rename = {**rename_defaults, **rename}
 
+    if isinstance(filename, (list, tuple, np.ndarray)):
+        # Loop through all the files and open them
+        tracks = [
+            load(
+                filename=f,
+                source=source,
+                variable_names=variable_names,
+                rename=rename,
+                units=units,
+                baselon=baselon,
+                infer_track_id=infer_track_id,
+                ibtracs_subset=ibtracs_subset,
+                iris_timestep=iris_timestep,
+                tempest_extremes_unstructured=tempest_extremes_unstructured,
+                tempest_extremes_header_str=tempest_extremes_header_str,
+                track_calendar=track_calendar,
+                **kwargs,
+            )
+            for f in filename
+        ]
+
+        return concat_tracks(tracks, prefix=track_id_prefix)
+
     # If source is not given, try to derive the right function from the file extension
     if source is None:
         extension = filename.split(".")[-1]
@@ -217,13 +246,13 @@ def load(
     else:
         source = source.lower()
         if source == "track":
-            tracks = _TRACK.load(
+            tracks = track_files.load(
                 filename,
                 calendar=track_calendar,
                 variable_names=variable_names,
             )
         elif source == "track.tilt":
-            tracks = _TRACK.load_tilts(
+            tracks = track_files.load_tilts(
                 filename,
                 calendar=track_calendar,
             )
@@ -246,7 +275,7 @@ def load(
             "old_hurdat",
             "ecmwf",
         ]:
-            tracks = _old_HURDAT.load(filename)
+            tracks = old_hurdat.load(filename)
         elif source == "iris":
             tracks = iris_tc.load(filename, iris_timestep, **kwargs)
         else:
@@ -324,35 +353,5 @@ def load(
 
     if infer_track_id is not None:
         tracks = tracks.hrcn.add_inferred_track_id(*infer_track_id)
+
     return tracks
-
-
-def load_list(filelist, **kwargs):
-    """
-    This function opens all the files in a list and concatenate them. All files should be opened with the exact same load command.
-    Track ids will be made unique by appending an index at the start.
-
-    Parameters
-    ----------
-    filename : list or np.ndarray
-        The list of file to be opened
-
-    kwargs:
-        Any parameter you would give to huracanpy.load to load individual files
-
-    Returns
-    -------
-    xarray.Dataset
-    """
-    # Loop through all the files and open them
-    tracks = []
-    for i, filepath in enumerate(tqdm(filelist)):
-        data = load(filepath, **kwargs)
-        if "tracks" in data.dims:
-            data = data.drop_dims("tracks")
-        data["track_id"] = (
-            str(i) + "-" + data["track_id"].astype(str)
-        )  # Make sure track_ids remain unique
-        tracks.append(data)
-    # Concatenate in one object
-    return xr.concat(tracks, dim="record")
