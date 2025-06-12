@@ -55,6 +55,16 @@ For this reason, HuracanPy's second purpose is to offer a suite of functions to 
 As such, HuracanPy is mainly an analysis tool, that goes after the tracking, and before the writing in a research project. 
 Our aim is to make track data analysis more accessible, and to promote good reproducibility practices. 
 
+## Comparison with other packages
+Prior to developing HuracanPy, we were not aware of any standard way of working with track data in python.
+Even within our own project and research groups we found that most people had different ways of loading and working with track data.
+There is one noteable python package similar to HuracanPy, Tropycal [@tropycal].
+Tropycal is a python packaged designed for analysing and visualising tropical-cyclone tracks from observations and is commonly used in the tropical-cyclone community.
+However, Tropycal is very tailored to the specific observational datasets it uses and is therefore difficult to adapt to work with track data from other sources.
+For example, the loading of track data is part of the initialisation of the custom class used by Tropycal.
+Tropycal also largely uses python lists as the underlying data type by default, meaning it performs poorly with large numbers of tracks compared to HuracanPy.
+We see HuracanPy as complementary to Tropycal and a future plan is to support conversion of track data to Tropycal objects with Huracanpy.
+
 # Description
 
 HuracanPy is built on Xarray. It loads track data as an Xarray dataset, and provides an Xarray accessor to provide cyclone-specific analysis methods. 
