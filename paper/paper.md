@@ -56,14 +56,10 @@ As such, HuracanPy is mainly an analysis tool, that goes after the tracking, and
 Our aim is to make track data analysis more accessible, and to promote good reproducibility practices. 
 
 ## Comparison with other packages
-Prior to developing HuracanPy, we were not aware of any standard way of working with track data in python.
-Even within our own project and research groups we found that most people had different ways of loading and working with track data.
-There is one noteable python package similar to HuracanPy, Tropycal [@tropycal].
-Tropycal is a python packaged designed for analysing and visualising tropical-cyclone tracks from observations and is commonly used in the tropical-cyclone community.
-However, Tropycal is very tailored to the specific observational datasets it uses and is therefore difficult to adapt to work with track data from other sources.
-For example, the loading of track data is part of the initialisation of the custom class used by Tropycal.
-Tropycal also largely uses python lists as the underlying data type by default, meaning it performs poorly with large numbers of tracks compared to HuracanPy.
-We see HuracanPy as complementary to Tropycal and a future plan is to support conversion of track data to Tropycal objects with Huracanpy.
+HruacanPy aims at becoming a standard community tool covering track data reading and analysis, which did not exist before. 
+A few packages covered part of HuracanPy's functionality, with less flexibility in terms of supported track formats and analysis functions:
+* Tropycal [@tropycal] is a python packaged designed for analysing and visualising tropical-cyclone tracks from observations and operational forecasts. However, it does not have the flexibility to read data from other sources. For example, the loading of track data is part of the initialisation of the custom class used by Tropycal. We see HuracanPy as complementary to Tropycal and a future plan is to support conversion of track data to Tropycal objects with Huracanpy.
+* The Cyclone Metrics Package (CyMeP, [@zarzycki2021metrics]) is a software suite providing a command-line function to provide standard assessment graphs. It can only run with CSV track data, and while it provides a good tool for rapid comparison of datasets, it is not flexible enough for exploratory and in-depth scientific analysis that HuracanPy wants to support. An assessment package based on merging functionalities from CyMeP and HuracanPy is in development. 
 
 # Description
 
@@ -136,7 +132,7 @@ Main avenues for a potential v2 are supporting multi-dimensional data (e.g. snap
 
 # Acknowledgements
 
-Both authors acknowledge financial support from the HUrricane Risk Amplification and Changing North Atlantic Natural disasters (Huracán) NERC-NSF large grant n°NE/W009587/1 (NERC) & AGS-2244917 (NSF). 
+Both authors acknowledge financial support from the HUrricane Risk Amplification and Changing North Atlantic Natural disasters (Huracán) NERC-NSF large grant n°NE/W009587/1 (NERC) & AGS-2244917 (NSF). The package is named after this project.
 This work also benefited from the TROPICANA program, supported by the Institut Pascal at Université Paris-Saclay, under “Investissements d’avenir” ANR-11-IDEX-0003- 01.
 
 The package includes code that was originally developed in the scope of SB's thesis, which was funded by the Comissariat à l'Energie Atomique et aux Energies Alternatives (CEA), and the EUR IPSL-Climate Graduate School through the ICOCYCLONES2 project, managed by the ANR under the “Investissements d’avenir” programme with the reference ANR-11-IDEX-0004 - 17-EURE-0006.
