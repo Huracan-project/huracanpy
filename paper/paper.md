@@ -76,7 +76,7 @@ HuracanPy currently supports loading tracks from:
 * NetCDF files similar to the CF conventions can also be loaded, provided they use specific naming for the track ID.
 * Text files from TempestExtreme's StitchNodes (GFDL format, see [@ullrich2021tempestextremes])
 * Text files from TRACK ([@TRACKa], [@TRACKb])
-* Text files from IRIS [sparks2024imperial]
+* Text files from IRIS [@sparks2024imperial]
 * Text files using the "original HURDAT" format [here](https://www.aoml.noaa.gov/hrd/data_sub/hurdat.html) and used in particular within the European Centre for Medium-range Weather Forecast (ECMWF).
 
 HuracanPy can also load IBTrACS [@gahtan2024international] from an online source, or from an embedded file. 
