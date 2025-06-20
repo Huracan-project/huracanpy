@@ -60,7 +60,7 @@ HuracanPy aims at becoming a standard community tool covering track data reading
 A few packages covered part of HuracanPy's functionality, with less flexibility in terms of supported track formats and analysis functions:
 
 * Tropycal [@tropycal] is a Python package designed for analysing and visualising tropical-cyclone tracks from observations and operational forecasts. However, it does not have the flexibility to read data from other sources. For example, the loading of track data is part of the initialisation of the custom class used by Tropycal. We see HuracanPy as complementary to Tropycal and a future plan is to support conversion of track data to Tropycal objects with Huracanpy.
-* The Cyclone Metrics Package (CyMeP, [@zarzycki2021metrics]) is a software suite providing a command-line function to provide standard assessment graphs. It can only run with CSV track data, and while it provides a good tool for rapid comparison of datasets, it is not flexible enough for exploratory and in-depth scientific analysis that HuracanPy wants to support. An assessment package based on merging functionalities from CyMeP and HuracanPy is in development. 
+* The Cyclone Metrics Package (CyMeP) [@zarzycki2021metrics] is a software suite providing a command-line function to provide standard assessment graphs. It can only run with CSV track data, and while it provides a good tool for rapid comparison of datasets, it is not flexible enough for exploratory and in-depth scientific analysis that HuracanPy wants to support. An assessment package based on merging functionalities from CyMeP and HuracanPy is in development. 
 
 # Description
 
@@ -75,7 +75,7 @@ HuracanPy currently supports loading tracks from:
 * NetCDF (Network Common Data Form) files following CF (Climate and Forecast) conventions [@cfconventions], specifically the formats for trajectory data described in H.4 [@cfconventionswebpage].
 * NetCDF files similar to the CF conventions can also be loaded, provided they use specific naming for the track ID.
 * Text files from TempestExtreme's StitchNodes (GFDL format, see [@ullrich2021tempestextremes])
-* Text files from TRACK ([@TRACKa], [@TRACKb])
+* Text files from TRACK [@TRACKa; @TRACKb]
 * Text files from IRIS [@sparks2024imperial]
 * Text files using the "original HURDAT" format [here](https://www.aoml.noaa.gov/hrd/data_sub/hurdat.html) and used in particular within the European Centre for Medium-range Weather Forecast (ECMWF).
 
