@@ -52,14 +52,14 @@ HuracanPy's first purpose is to be able to read all these files in a common Pyth
 There is also a lack of a common analysis tool fostering reproducible analysis of such track data. 
 For this reason, HuracanPy's second purpose is to offer a suite of functions to build analysis workflows. 
 
-As such, HuracanPy is mainly an analysis tool that goes after the tracking and before the writing in a research project. 
+As such, HuracanPy is mainly an analysis tool that comes after the tracking and up to preliminary plots in a research project. 
 Our aim is to make track data analysis more accessible, and to promote good reproducibility practices. 
 
 ## Comparison with other packages
 HuracanPy aims at becoming a standard community tool covering track data reading and analysis, which did not exist before. 
 A few packages covered part of HuracanPy's functionality, with less flexibility in terms of supported track formats and analysis functions:
 
-* Tropycal [@tropycal] is a Python package designed for analysing and visualising tropical-cyclone tracks from observations and operational forecasts. However, it does not have the flexibility to read data from other sources. For example, the loading of track data is part of the initialisation of the custom class used by Tropycal. We see HuracanPy as complementary to Tropycal and a future plan is to support conversion of track data to Tropycal objects with Huracanpy.
+* Tropycal [@tropycal] is a Python package designed for analysing and visualising tropical cyclone tracks from observations and operational forecasts. However, it does not have the flexibility to read data from other sources. For example, the loading of track data is part of the initialisation of the custom class used by Tropycal. We see HuracanPy as complementary to Tropycal and a future plan is to support conversion of track data to Tropycal objects with HuracanPy.
 * The Cyclone Metrics Package (CyMeP) [@zarzycki2021metrics] is a software suite providing a command-line function to provide standard assessment graphs. It can only run with CSV track data, and while it provides a good tool for rapid comparison of datasets, it is not flexible enough for exploratory and in-depth scientific analysis that HuracanPy wants to support. An assessment package based on merging functionalities from CyMeP and HuracanPy is in development. 
 
 # Description
