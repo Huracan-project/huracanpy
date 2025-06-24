@@ -29,9 +29,9 @@ bibliography: paper.bib
 # Summary
 
 HuracanPy is a Python module for working with cyclone track data, where cyclone tracks are recorded as a list of points in space and time. 
-HuracanPy provides a powerful loading function that supports all the track data formats the authors are aware of, and loads the tracks as Xarray datasets [@xarray2017].
+HuracanPy provides a powerful loading function that supports all the most commonly used track data formats the authors are aware of, and loads the tracks as Xarray datasets [@xarray2017].
 As such, we draw from the power of Xarray's built-in functions and the functionality of other libraries that work with Xarray, such as MetPy [@metpy]. 
-We also provide functions specific to cyclone analysis, which are gathered as methods in an Xarray accessor. 
+We also provide functions specific to cyclone analysis, which are also gathered as methods in an Xarray accessor. 
 These include functions to subset or interpolate track data, to add useful information, to compute common diagnoses, and to make quick exploration plots. 
 With this package, we hope to make track data analysis more accessible and more reproducible. 
 
@@ -40,7 +40,7 @@ With this package, we hope to make track data analysis more accessible and more 
 Cyclones can be defined as pointwise features in space and time. 
 Therefore, their trajectory can be recorded as a list of points in space and time. 
 We call "track data" a list of such points. 
-In many cases, the list not only consist of position in space and time, but also contains additional information about the cyclone, such as intensity. 
+In many cases, the list not only consists of position in space and time, but also contains additional information about the cyclone, such as intensity. 
 When the dataset contains data about several cyclones, each individual track is identified by a "track ID". 
 
 # Statement of need
@@ -56,7 +56,9 @@ As such, HuracanPy is mainly an analysis tool that comes after the tracking and 
 Our aim is to make track data analysis more accessible, and to promote good reproducibility practices. 
 
 ## Comparison with other packages
-HuracanPy aims at becoming a standard community tool covering track data reading and analysis, which did not exist before. 
+HuracanPy aims at becoming a standard community tool covering track data reading and analysis, which did not exist before.
+Prior to developing HuracanPy, we were not aware of any standard way of working with track data in python.
+Even within our own project and research groups we found that most people had different ways of loading and working with track data.
 A few packages covered part of HuracanPy's functionality, with less flexibility in terms of supported track formats and analysis functions:
 
 * Tropycal [@tropycal] is a Python package designed for analysing and visualising tropical cyclone tracks from observations and operational forecasts. However, it does not have the flexibility to read data from other sources. For example, the loading of track data is part of the initialisation of the custom class used by Tropycal. We see HuracanPy as complementary to Tropycal and a future plan is to support conversion of track data to Tropycal objects with HuracanPy.
@@ -86,24 +88,22 @@ Tracks are loaded as an Xarray dataset with one main dimension called `record`.
 HuracanPy can also save the track data as CSV and NetCDF files. 
 
 ## Analysis
-
-Most of HuracanPy's analysis functions can be called through an Xarray accessor named `hrcn`.
-
-* Manipulating data:
+HuracanPy contains various modules for analaysis and visualisation of track data.
+* Manipulating data (`huracanpy`).
     Loading the track data as an Xarray object means the user can easily use Xarray's methods such as `.where` to subset. 
 However, we found it useful to add a specific function that allows for subsetting based on a specific track ID, and on some track properties. 
 We also added a specific function to interpolate the track to a different time resolution. 
-* Adding track info:
+* Adding track info (`huracanpy.info`).
     HuracanPy includes functions to add common geographical and categorical information to the tracks, such as whether a point is over land or the ocean, or which category it belongs to in a defined convention. 
-* Computing common diagnoses:
+* Computing common diagnostics (`huracanpy.calc`).
     HuracanPy includes functions to compute track duration, genesis or lifetime maximum intensity attributes, translation speed, lifecycles and rates.
-* Tropical Cyclones-specific diagnoses:
-    These include accumulated cyclone energy ([ACE](https://en.wikipedia.org/wiki/Accumulated_cyclone_energy)), pressure-derived ACE (PACE) [@zarzycki2021metrics], [Saffir-Simpson categories](https://www.nhc.noaa.gov/aboutsshws.php), Klotzbach pressure categories [@klotzbach2020surface].
-* Comparing two (or more) sets of tracks:
-    HuracanPy provides a one-on-one track matching function.
+* Tropical-cyclone specific diagnostics (`huracanpy.tc`).
+    These include accumulated cyclone energy ([ACE](https://en.wikipedia.org/wiki/Accumulated_cyclone_energy)), pressure-derived ACE (PACE) [@zarzycki2021metrics], [Saffir-Simpson categories](https://www.nhc.noaa.gov/aboutsshws.php), and Klotzbach pressure categories [@klotzbach2020surface].
+* Comparing two (or more) sets of tracks (`huracanpy.assess`).
+    HuracanPy provides a one-to-one track matching function.
     From such a matching table, scores of Probability of Detection (also called Hit Rate) and False Alarm Rate can be computed.
     We also provide a function for computing the delay in onset and offset between the matched tracks.
-* Plot:
+* Plot (`huracanpy.plot`).
     HuracanPy currently embeds a small number of functions, which are meant mostly for preliminary visualisation.
     These include plotting the track points and the track density.
     Due to the package being built on Xarray, Xarray's plot function can be used.
@@ -111,11 +111,13 @@ We also added a specific function to interpolate the track to a different time r
 
 Where possible, functions have been made unit aware by using the accessor and wrapper from MetPy [@metpy], which converts the inputs into a Pint quantity [@pint] internally using the units from the Xarray variable's attributes.
 
+Most of HuracanPy's analysis functions can be called through an Xarray accessor named `hrcn`. The accessor provides a simpler syntax because it knows the variable types and default naming conventions, whereas the functions are generally more flexible with types and naming.
+
 # Perspectives
 
 We welcome suggestions of other track data formats to support, and are happy to receive contributions of code to do so. 
 
-At the moment, HuracanPy only include tropical cyclones--specific diagnoses, but we are more than happy to receive contributions and feedback from other communities, including but not restricted to extra-tropical cyclones, polar lows, medicanes, subtropical cyclones, etc.
+At the moment, HuracanPy only includes tropical-cyclones specific diagnostics, but we are more than happy to receive contributions and feedback from other communities, including but not restricted to extratropical cyclones, polar lows, medicanes, subtropical cyclones, etc.
 While the motivation for HuracanPy is analysis of cyclone tracks, the data format and workflow should also apply to other types of trajectories, such as Lagrangian air-mass trajectories, and we would be interested in supporting common data formats for these.
 Main avenues for a potential v2 are supporting multi-dimensional data (e.g. snapshots from TempestExtremes' NodeFileCompose [@ullrich2021tempestextremes], WiTRACK footprints [@befort2020objective]).
 
