@@ -15,8 +15,12 @@ def load(filename, rename, **kwargs):
     dataset = xr.open_dataset(filename, **kwargs)
 
     # xarray.Dataset.rename only accepts keys that are actually in the dataset
+    # Also, don't rename to a variable that already exists
     rename = {
-        key: rename[key] for key in rename if key in dataset or key in dataset.dims
+        key: rename[key]
+        for key in rename
+        if (key in dataset and rename[key] not in dataset)
+        or (key in dataset.dims and rename[key] not in dataset.dims)
     }
     if len(rename) > 0:
         dataset = dataset.rename(rename)

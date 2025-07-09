@@ -277,7 +277,12 @@ def load(
             raise ValueError(f"Source {source} unsupported or misspelled")
 
     # xarray.Dataset.rename only accepts keys that are actually in the dataset
-    rename = {key: rename[key] for key in rename if key in tracks}
+    # Also, don't rename to a variable that already exists
+    rename = {
+        key: rename[key]
+        for key in rename
+        if key in tracks and rename[key] not in tracks
+    }
 
     if len(rename) > 0:
         tracks = tracks.rename(rename)
