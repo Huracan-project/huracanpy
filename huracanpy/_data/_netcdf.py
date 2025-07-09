@@ -49,9 +49,12 @@ def save(dataset, filename):
 
     # Sort by trajectory_id so each track can be described by the first index and
     # number of elements of the unique trajectory id
-    dataset = dataset.sortby(trajectory_id.name)
-    trajectory_ids = np.unique(trajectory_id)
-    rowsize = [np.count_nonzero(trajectory_id == x) for x in trajectory_ids]
+    if not (np.diff(trajectory_id) >= 0).all():
+        dataset = dataset.sortby(trajectory_id.name)
+    else:
+        dataset = dataset.copy()
+
+    trajectory_ids, rowsize = np.unique(trajectory_id, return_counts=True)
 
     dataset[trajectory_id.name] = ("trajectory", trajectory_ids)
     dataset[trajectory_id.name].attrs = trajectory_id.attrs
