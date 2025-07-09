@@ -49,7 +49,7 @@ def save(dataset, filename):
 
     # Sort by trajectory_id so each track can be described by the first index and
     # number of elements of the unique trajectory id
-    if not (np.diff(trajectory_id) >= 0).all():
+    if not (trajectory_id[1:] >= trajectory_id[:-1]).all():
         dataset = dataset.sortby(trajectory_id.name)
     else:
         dataset = dataset.copy()
