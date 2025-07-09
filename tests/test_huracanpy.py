@@ -88,6 +88,7 @@ import huracanpy
             2373,
             92,
         ),
+        (huracanpy._test_ibtracs_netcdf_file, dict(), 149, 3, 72, 2),
     ],
 )
 def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
