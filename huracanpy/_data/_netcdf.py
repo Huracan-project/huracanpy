@@ -77,10 +77,9 @@ def stretch_trid(dataset):
 
     dataset = dataset.drop_vars([trajectory_id.name, rowsize.name])
 
-    dataset[trajectory_id.name] = (sample_dimension, trajectory_id_stretched)
+    dataset["track_id"] = (sample_dimension, trajectory_id_stretched)
     # Keep attributes (add cf_role if not already there)
-    dataset[trajectory_id.name].attrs = trajectory_id.attrs
-    dataset[trajectory_id.name].attrs["cf_role"] = "trajectory_id"
+    dataset["track_id"].attrs = trajectory_id.attrs
 
     return dataset
 
@@ -100,12 +99,28 @@ def as1d(dataset):
         dataset[dim] = ("record", record[dim].values)
 
     # Remove data that is only nans
-    dataset = dataset.where(~np.isnan(dataset.lon), drop=True)
+    dataset = dataset.isel(record=np.where(~np.isnan(dataset.lon))[0])
 
     # Add cf role to track_id
-    dataset.track_id.attrs["cf_role"] = "trajectory_id"
+    track_id = _find_trajectory_id(dataset)
+    if track_id.name != "track_id":
+        dataset = dataset.rename({track_id.name: "track_id"})
 
     return dataset.sortby(["track_id", "time"])
+
+
+_trajectory_id_names = [
+    # Default name for HuracanPy
+    "track_id",
+    # TRACK
+    "TRACK_ID",
+    # MIT netCDF
+    "n_track",
+    # CHAZ
+    "stormID",
+    # IBTrACS netCDF
+    "storm",
+]
 
 
 def _find_trajectory_id(dataset):
@@ -120,13 +135,16 @@ def _find_trajectory_id(dataset):
     if len(trajectory_id) == 1:
         return trajectory_id[0]
     else:
-        if "track_id" in dataset:
-            return dataset["track_id"]
-        else:
-            raise ValueError(
-                f"Found {len(trajectory_id)} variables with cf_role=trajectory_id."
-                f"Should be exactly one."
-            )
+        for name in _trajectory_id_names:
+            if name in dataset:
+                trajectory_id = dataset[name]
+                trajectory_id.attrs["cf_role"] = "trajectory_id"
+                return trajectory_id
+
+        raise ValueError(
+            f"Found {len(trajectory_id)} variables with cf_role=trajectory_id."
+            f"Should be exactly one."
+        )
 
 
 def _find_rowsize(dataset):

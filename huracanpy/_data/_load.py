@@ -16,13 +16,8 @@ rename_defaults = dict(
     longitude="lon",
     latitude="lat",
     # Names for MIT netCDF
-    n_track="track_id",
     lon_track="lon",
     lat_track="lat",
-    # Names for CHAZ netCDF
-    stormID="track_id",
-    # Names for TRACK netCDF
-    TRACK_ID="track_id",
     # Possible time names
     iso_time="time",
     isotime="time",
@@ -353,5 +348,7 @@ def load(
 
     if infer_track_id is not None:
         tracks = tracks.hrcn.add_inferred_track_id(*infer_track_id)
+
+    tracks.track_id.attrs["cf_role"] = "trajectory_id"
 
     return tracks

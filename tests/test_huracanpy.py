@@ -98,6 +98,7 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
     assert len(data.time) == npoints
     assert len(data.groupby("track_id")) == ntracks
     assert "record" not in data.coords
+    assert data.track_id.attrs["cf_role"] == "trajectory_id"
 
     if filename != huracanpy.example_TRACK_tilt_file:
         for name in ["track_id", "time", "lon", "lat"]:
