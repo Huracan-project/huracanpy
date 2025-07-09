@@ -241,16 +241,9 @@ def load(
     else:
         source = source.lower()
         if source == "track":
-            tracks = track_files.load(
-                filename,
-                calendar=track_calendar,
-                variable_names=variable_names,
-            )
+            tracks = track_files.load(filename, variable_names=variable_names)
         elif source == "track.tilt":
-            tracks = track_files.load_tilts(
-                filename,
-                calendar=track_calendar,
-            )
+            tracks = track_files.load_tilts(filename)
         elif source in ["csv", "uz"]:
             tracks = _csv.load(filename, **kwargs)
         elif source in ["te", "tempest", "tempestextremes"]:
@@ -288,48 +281,7 @@ def load(
         tracks = tracks.rename(rename)
 
     # Time attribute
-    if "time" in tracks:
-        if isinstance(tracks.time.values[0], str):
-            # This may still break at this point with older versions of xarray
-            # attempting to convert back to "ns" precision
-            try:
-                time = tracks.time.astype("datetime64")
-
-                if (
-                    tracks["time"].astype("datetime64[Y]").dt.year != time.dt.year
-                ).any():
-                    raise OutOfBoundsDatetime
-
-                tracks["time"] = time
-            except OutOfBoundsDatetime:
-                warnings.warn(
-                    "Converting out of bounds np.datetime64 to cftime.datetime. Update"
-                    " to xarray>=2025.01.2 to remove this warning and use lower"
-                    " precision np.datetime64 instead"
-                )
-                time = [parse(t) for t in tracks.time.values]
-                time = [
-                    cftime.datetime(
-                        t.year,
-                        t.month,
-                        t.day,
-                        t.hour,
-                        t.minute,
-                        t.second,
-                        t.microsecond,
-                    )
-                    for t in time
-                ]
-                tracks["time"] = ("record", time)
-
-    else:
-        # Combine separate year/month/day etc. values into a time, and drop those
-        # variables from the dataframe
-        time_vars = {
-            var: tracks[var].values for var in tracks if var in pandas_valid_time_labels
-        }
-        tracks["time"] = ("record", pd.to_datetime(time_vars))
-        tracks = tracks.drop_vars(list(time_vars.keys()))
+    tracks = _parse_dates(tracks, calendar=track_calendar)
 
     # Convert any variables that are objects to explicit string objects.
     # This can cause strings stored as "NA", such as for basin to be converted to NaNs
@@ -357,3 +309,92 @@ def load(
     tracks.track_id.attrs["cf_role"] = "trajectory_id"
 
     return tracks
+
+
+def _parse_dates(tracks, calendar):
+    if "time" in tracks:
+        time = tracks.time
+        # If the time has already been correctly parsed just return the tracks as is
+        if np.issubdtype(time.dtype, np.datetime64):
+            return tracks
+
+        # Track YYYYMMDDHH format not interpreted automatically. Change to str with
+        # isoformat
+        if (
+            np.issubdtype(time.dtype, np.int_)
+            and (time.astype(str).str.len() == 10).all()
+            or np.issubdtype(time.dtype, np.str_)
+            and (time.str.len() == 10).all()
+        ):
+            time = tracks.time.astype(str)
+            time = (
+                time.str.slice(0, 4)
+                + "-"
+                + time.str.slice(4, 6)
+                + "-"
+                + time.str.slice(6, 8)
+                + " "
+                + time.str.slice(8, 10)
+                + ":00"
+            )
+
+        if isinstance(calendar, (tuple, list)):
+            # Time is integer timesteps
+            initial_date = np.datetime64(calendar[0])
+            timestep = calendar[1]
+            if not isinstance(timestep, np.timedelta64):
+                timestep = np.timedelta64(timestep, "h")
+            return tracks.assign(time=initial_date + (time - 1) * timestep)
+
+        elif isinstance(calendar, str):
+            # cftime calendar
+            default = cftime.datetime(1, 1, 1, calendar=calendar)
+            time = [parse(t, default=default) for t in time.values]
+            return tracks.assign(time=("record", time))
+
+        # Convert strings to np.datetime64, but allow for varying precision for possible
+        # out of bounds times
+        elif isinstance(time.values[0], str):
+            # This may still break at this point with older versions of xarray
+            # attempting to convert back to "ns" precision
+            try:
+                newtime = time.astype("datetime64")
+
+                if (time.astype("datetime64[Y]").dt.year != newtime.dt.year).any():
+                    raise OutOfBoundsDatetime
+
+                return tracks.assign(time=newtime)
+            except OutOfBoundsDatetime:
+                warnings.warn(
+                    "Converting out of bounds np.datetime64 to cftime.datetime. Update"
+                    " to xarray>=2025.01.2 to remove this warning and use lower"
+                    " precision np.datetime64 instead"
+                )
+                time = [parse(t) for t in time.values]
+                time = [
+                    cftime.datetime(
+                        t.year,
+                        t.month,
+                        t.day,
+                        t.hour,
+                        t.minute,
+                        t.second,
+                        t.microsecond,
+                    )
+                    for t in time
+                ]
+                return tracks.assign(time=("record", time))
+
+        else:
+            # Not interpretable as datetime, just return as is
+            return tracks
+
+    else:
+        # Combine separate year/month/day etc. values into a time, and drop those
+        # variables from the Dataset
+        time_vars = {
+            var: tracks[var].values for var in tracks if var in pandas_valid_time_labels
+        }
+        return tracks.assign(time=("record", pd.to_datetime(time_vars))).drop_vars(
+            list(time_vars.keys())
+        )
