@@ -233,7 +233,7 @@ def load(
         elif extension == "parquet":
             tracks = _csv.load(filename, load_function=pd.read_parquet, **kwargs)
         elif filename.split(".")[-1] == "nc":
-            tracks = _netcdf.load(filename, rename, **kwargs)
+            tracks = _netcdf.load(filename, **kwargs)
         else:
             raise ValueError("Source is set to None and file type is not detected")
 
@@ -258,7 +258,7 @@ def load(
         elif source == "ibtracs":
             tracks = ibtracs.load(ibtracs_subset, filename, **kwargs)
         elif source == "netcdf":
-            tracks = _netcdf.load(filename, rename, **kwargs)
+            tracks = _netcdf.load(filename, **kwargs)
         elif source in [
             "old_hurdat",
             "ecmwf",
@@ -321,7 +321,7 @@ def _parse_dates(tracks, calendar):
         # Track YYYYMMDDHH format not interpreted automatically. Change to str with
         # isoformat
         if (
-            np.issubdtype(time.dtype, np.int_)
+            np.issubdtype(time.dtype, np.integer)
             and (time.astype(str).str.len() == 10).all()
             or np.issubdtype(time.dtype, np.str_)
             and (time.str.len() == 10).all()

@@ -34,6 +34,7 @@ __all__ = [
     "example_STORM_file",
     "example_IRIS_file",
     "_test_ibtracs_netcdf_file",
+    "_test_non_ragged_netcdf_file",
     "_accessor",
 ]
 
@@ -56,6 +57,7 @@ from ._data import (
     example_STORM_file,
     example_IRIS_file,
     _test_ibtracs_netcdf_file,
+    _test_non_ragged_netcdf_file,
 )
 from ._basins import basins
 from ._interp import interp_time

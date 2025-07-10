@@ -126,6 +126,7 @@ import huracanpy
             True,
         ),
         (huracanpy._test_ibtracs_netcdf_file, dict(), 149, 3, 72, 2, True),
+        (huracanpy._test_non_ragged_netcdf_file, dict(), 9, 0, 99, 3, True),
     ],
 )
 def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks, isdatetime64):

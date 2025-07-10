@@ -19,6 +19,7 @@ __all__ = [
     "example_STORM_file",
     "example_IRIS_file",
     "_test_ibtracs_netcdf_file",
+    "_test_non_ragged_netcdf_file",
 ]
 
 import pathlib
@@ -65,3 +66,5 @@ example_STORM_file = str(testdata_dir / "STORM_DATA_NA_10_YEARS_0.txt")
 example_IRIS_file = str(testdata_dir / "IRIS_NI_1000Y_n6.txt")
 
 _test_ibtracs_netcdf_file = str(testdata_dir / "IBTrACS.last3years.v04r00_2_storms.nc")
+
+_test_non_ragged_netcdf_file = str(testdata_dir / "sample_csv_as_non_ragged_netcdf.nc")

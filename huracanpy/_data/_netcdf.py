@@ -11,28 +11,35 @@ import xarray as xr
 # trajectories to allow us to use groupby() and sel() with track_id to work by
 # individual tracks. So we need to replace the "track_id" or equivalent variable when
 # loading or saving the data
-def load(filename, rename, **kwargs):
+def load(filename, **kwargs):
     dataset = xr.open_dataset(filename, **kwargs)
 
-    # xarray.Dataset.rename only accepts keys that are actually in the dataset
-    # Also, don't rename to a variable that already exists
-    rename = {
-        key: rename[key]
-        for key in rename
-        if (key in dataset and rename[key] not in dataset)
-        or (key in dataset.dims and rename[key] not in dataset.dims)
-    }
-    if len(rename) > 0:
-        dataset = dataset.rename(rename)
+    # Check which type of netCDF we have (2d, ragged, or CSV-like)
+    track_id = _find_trajectory_id(dataset)
+    time = dataset.time
 
-    # Assume ragged array. If the CF trajectory_id and sample dimension can't be found
-    # try reshaping from a 2d array
-    try:
-        dataset = stretch_trid(dataset)
-    except ValueError:
-        dataset = as1d(dataset)
+    if time.dims != track_id.dims:
+        # If time and track_id don't have the same dimension it could be 2d or ragged
+        # Track ID should always be 1d
+        if track_id.ndim != 1:
+            raise ValueError(
+                f"File has a track ID with {track_id.ndim} dimensions. Should be 1d"
+            )
+        dims = [track_id.dims[0]] + [
+            dim for dim in time.dims if dim not in track_id.dims
+        ]
+        # If any variables have a time and track_id dimension it is 2d
+        vars_2d = [var for var in dataset if sorted(dims) == sorted(dataset[var].dims)]
 
-    return dataset
+        if len(vars_2d) > 0:
+            return as1d(dataset, dims, track_id, vars_2d)
+        else:
+            # Otherwise ragged array
+            return stretch_trid(dataset, track_id)
+    else:
+        # Otherwise it is in the CSV format used by huracanpy, so just return the
+        # dataset
+        return dataset
 
 
 def save(dataset, filename):
@@ -68,9 +75,8 @@ def save(dataset, filename):
     dataset.to_netcdf(filename)
 
 
-def stretch_trid(dataset):
+def stretch_trid(dataset, trajectory_id):
     # Find the trajectory_id and rowSize variables from their CF labels
-    trajectory_id = _find_trajectory_id(dataset)
     rowsize = _find_rowsize(dataset)
     sample_dimension = rowsize.attrs["sample_dimension"]
 
@@ -88,9 +94,8 @@ def stretch_trid(dataset):
     return dataset
 
 
-def as1d(dataset):
+def as1d(dataset, dims, track_id, vars_2d):
     # Stack 2d dimensions into a record dimension
-    dims = dataset.lon.dims
     dataset = dataset.stack(record=dims)
 
     # Record only as an index, not a coordinate
@@ -103,14 +108,18 @@ def as1d(dataset):
         dataset[dim] = ("record", record[dim].values)
 
     # Remove data that is only nans
-    dataset = dataset.isel(record=np.where(~np.isnan(dataset.lon))[0])
+    # Use the combination of floating point variables
+    vars_2d_floats = [
+        var for var in vars_2d if np.issubdtype(dataset[var].dtype, np.floating)
+    ]
+    nans = np.array([np.isnan(dataset[var]) for var in vars_2d_floats]).all(axis=0)
+    dataset = dataset.isel(record=np.where(~nans)[0])
 
     # Add cf role to track_id
-    track_id = _find_trajectory_id(dataset)
     if track_id.name != "track_id":
         dataset = dataset.rename({track_id.name: "track_id"})
 
-    return dataset.sortby(["track_id", "time"])
+    return dataset
 
 
 _trajectory_id_names = [
@@ -140,7 +149,7 @@ def _find_trajectory_id(dataset):
         return trajectory_id[0]
     else:
         for name in _trajectory_id_names:
-            if name in dataset:
+            if name in dataset or name in dataset.dims:
                 trajectory_id = dataset[name]
                 trajectory_id.attrs["cf_role"] = "trajectory_id"
                 return trajectory_id
