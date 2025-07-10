@@ -42,7 +42,7 @@ def load(filename, **kwargs):
         return dataset
 
 
-def save(dataset, filename):
+def save(dataset, filename, **kwargs):
     # Find the variable with cf_role=trajectory_id
     trajectory_id = _find_trajectory_id(dataset)
 
@@ -72,7 +72,7 @@ def save(dataset, filename):
     dataset["rowSize"] = ("trajectory", rowsize)
     dataset["rowSize"].attrs["sample_dimension"] = sample_dimension
 
-    dataset.to_netcdf(filename)
+    dataset.to_netcdf(filename, **kwargs)
 
 
 def stretch_trid(dataset, trajectory_id):
