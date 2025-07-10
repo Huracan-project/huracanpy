@@ -9,6 +9,7 @@ __all__ = [
     "assess",
     "info",
     "tc",
+    "convert",
     # Functions
     "load",
     "save",
@@ -59,6 +60,6 @@ from ._basins import basins
 from ._interp import interp_time
 from ._concat import concat_tracks
 from ._subset import sel_id, trackswhere
-from . import calc, plot, assess, info, tc
+from . import calc, plot, assess, info, tc, convert
 
 from . import _accessor

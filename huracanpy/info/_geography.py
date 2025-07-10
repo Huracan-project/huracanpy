@@ -3,17 +3,15 @@ Utils related to geographical attributes
 """
 
 import warnings
+
+from cartopy.io.shapereader import natural_earth
+import geopandas as gpd
+from metpy.xarray import preprocess_and_wrap
+import numpy as np
 from pint.errors import UnitStrippedWarning
 
-import numpy as np
-import pandas as pd
-from shapely.geometry import Point
-import geopandas as gpd
-from cartopy.io.shapereader import natural_earth
-from metpy.xarray import preprocess_and_wrap
-from cartopy.crs import Geodetic, PlateCarree
-
 from .._basins import basins
+from ..convert import to_geodataframe
 
 
 @preprocess_and_wrap(wrap_like="lat")
@@ -96,8 +94,7 @@ _natural_earth_feature_cache = {
 }
 
 
-@preprocess_and_wrap(wrap_like="lon")
-def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, crs=None):
+def _cache_natural_earth_feature(feature, category, name, resolution):
     key = f"{category}_{name}_{resolution}_{feature}"
     if key in _natural_earth_feature_cache:
         df = _natural_earth_feature_cache[key]
@@ -107,6 +104,21 @@ def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, cr
         df = df[["geometry", feature]]
         _natural_earth_feature_cache[key] = df
 
+    return df
+
+
+@preprocess_and_wrap(wrap_like="lon")
+def _get_natural_earth_feature(
+    lon,
+    lat,
+    feature,
+    category,
+    name,
+    resolution,
+    predicate="contains",
+    track_id=None,
+    crs=None,
+):
     # The metpy wrapper converting to pint causes errors, but I'm still going to use it
     # because it lets me pass different array_like types for lon/lat without writing
     # our own wrapper. For now, just convert anything not a numpy array to a numpy array
@@ -116,17 +128,15 @@ def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, cr
             lon = np.asarray(lon)
             lat = np.asarray(lat)
 
-    if crs is None:
-        crs = Geodetic()
-    xyz = PlateCarree().transform_points(crs, lon, lat)
+            if track_id is not None:
+                track_id = np.asarray(track_id)
 
-    # Create dataframe of points coordinates
-    points = pd.DataFrame(dict(coords=list(xyz[:, :2])))
-    # Transform into Points within a GeoDataFrame
-    points = gpd.GeoDataFrame(points.coords.apply(Point), geometry="coords", crs=df.crs)
+    df = _cache_natural_earth_feature(feature, category, name, resolution)
+
+    tracks = to_geodataframe(lon, lat, track_id, crs=crs).to_crs(df.crs)
 
     result = np.asarray(
-        gpd.tools.sjoin(df, points, how="right", predicate="contains")[feature]
+        gpd.tools.sjoin(df, tracks, how="right", predicate=predicate)[feature]
     ).astype(str)
 
     # Set "nan" as empty
