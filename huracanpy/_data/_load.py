@@ -327,15 +327,14 @@ def _parse_dates(tracks, calendar):
             and (time.str.len() == 10).all()
         ):
             time = tracks.time.astype(str)
-            time = (
-                time.str.slice(0, 4)
-                + "-"
-                + time.str.slice(4, 6)
-                + "-"
-                + time.str.slice(6, 8)
-                + " "
-                + time.str.slice(8, 10)
-                + ":00"
+            time = time.str.slice(0, 4).str.cat(
+                "-",
+                time.str.slice(4, 6),
+                "-",
+                time.str.slice(6, 8),
+                " ",
+                time.str.slice(8, 10),
+                ":00",
             )
 
         if isinstance(calendar, (tuple, list)):
