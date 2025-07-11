@@ -7,7 +7,16 @@ import numpy as np
 import pandas as pd
 from pandas.errors import OutOfBoundsDatetime
 
-from . import _csv, track_files, _netcdf, _tempestextremes, witrack, old_hurdat, iris_tc
+from . import (
+    _csv,
+    track_files,
+    _netcdf,
+    _tempestextremes,
+    witrack,
+    old_hurdat,
+    iris_tc,
+    superbt,
+)
 from . import ibtracs
 from .._concat import concat_tracks
 
@@ -23,6 +32,12 @@ rename_defaults = dict(
     # Possible time names
     iso_time="time",
     isotime="time",
+    # SuperBT
+    stmid="track_id",
+    dtg="time",
+    rlon="lon",
+    rlat="lat",
+    sname="name",
 )
 
 pandas_valid_time_labels = [
@@ -93,6 +108,7 @@ def load(
           appropriate variable_names)
         * **old_hurdat**, **ecmwf**
         * **iris**
+        * **superbt*
 
     variable_names : list of str, optional
           When loading data from an ASCII file (TRACK or TempestExtremes), specify the
@@ -268,6 +284,9 @@ def load(
             tracks = old_hurdat.load(filename)
         elif source == "iris":
             tracks = iris_tc.load(filename, iris_timestep, **kwargs)
+        elif source == "superbt":
+            # superbt.load call
+            tracks = superbt.load()
         else:
             raise ValueError(f"Source {source} unsupported or misspelled")
 
