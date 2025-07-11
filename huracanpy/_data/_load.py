@@ -13,6 +13,8 @@ from .._concat import concat_tracks
 
 
 rename_defaults = dict(
+    id="track_id",
+    sid="track_id",
     longitude="lon",
     latitude="lat",
     # Names for MIT netCDF
