@@ -1,3 +1,5 @@
+from importlib.metadata import version
+
 import pytest
 import numpy as np
 
@@ -114,7 +116,15 @@ import huracanpy
             134,
             True,
         ),
-        (huracanpy.example_IRIS_file, dict(source="iris"), 10, 0, 40, 2, True),
+        (
+            huracanpy.example_IRIS_file,
+            dict(source="iris"),
+            10,
+            0,
+            40,
+            2,
+            True if version("xarray") >= "2025.01.2" else False,
+        ),
         # Two csv file that should load with the same options
         (
             [huracanpy.example_csv_file, huracanpy.example_year_file],
