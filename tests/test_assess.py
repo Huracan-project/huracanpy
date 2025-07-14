@@ -38,6 +38,21 @@ def test_match(tracks1_is_ref):
     assert (m_not1, m_not2, m_not3, m_all) == (1, 1, 1, 3)
 
 
+@pytest.mark.parametrize("distance_method", ["haversine", "geodesic"])
+@pytest.mark.parametrize("shift, n_matches", [(1, 3), (4, 0)])
+def test_match_shifted(tracks_csv, distance_method, shift, n_matches):
+    tracks_shifted = tracks_csv.copy()
+    tracks_shifted["lat"] = tracks_shifted.lat + shift
+
+    matches = huracanpy.assess.match(
+        [tracks_csv, tracks_shifted],
+        ["a", "b"],
+        distance_method=distance_method,
+    )
+
+    assert len(matches) == n_matches
+
+
 def test_match_pair_empty(tracks_csv, tracks_year):
     matches = huracanpy.assess.match([tracks_csv, tracks_year], ["a", "b"])
     assert matches.size == 0

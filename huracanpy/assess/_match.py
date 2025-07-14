@@ -2,12 +2,18 @@
 
 import pandas as pd
 import numpy as np
-from haversine import haversine_vector, Unit
 from itertools import combinations
+
+from ..calc import distance
 
 
 def match(
-    tracksets, names=["1", "2"], max_dist=300, min_overlap=0, tracks1_is_ref=False
+    tracksets,
+    names=["1", "2"],
+    max_dist=300,
+    min_overlap=0,
+    tracks1_is_ref=False,
+    distance_method="haversine",
 ):
     """
     Match the provided track sets between them.
@@ -23,6 +29,10 @@ def match(
         Threshold for maximum distance between two tracks. The default is 300.
     min_overlap : int, optional
         Minimum number of overlapping time steps for matching. The default is 0.
+    tracks1_is_ref: bool, optional
+    distance_method: str, optional
+        The method to use to calculate distance between track points.
+        One of "haversine", "geod"
 
     Returns
     -------
@@ -44,10 +54,14 @@ def match(
 
     # Two track sets
     if len(tracksets) == 2:
-        return _match_pair(*tracksets, *names, max_dist, min_overlap, tracks1_is_ref)
+        return _match_pair(
+            *tracksets, *names, max_dist, min_overlap, tracks1_is_ref, distance_method
+        )
     # More than two track sets
     else:
-        return _match_multiple(tracksets, names, max_dist, min_overlap, tracks1_is_ref)
+        return _match_multiple(
+            tracksets, names, max_dist, min_overlap, tracks1_is_ref, distance_method
+        )
 
 
 def _match_pair(
@@ -58,6 +72,7 @@ def _match_pair(
     max_dist=300,
     min_overlap=0,
     tracks1_is_ref=False,
+    distance_method="haversine",
 ):
     """
 
@@ -69,6 +84,9 @@ def _match_pair(
     name2 (str): Suffix for the second dataframe
     max_dist (float) : Threshold for maximum distance between two tracks
     min_overlap (int) : Minimum number of overlapping time steps for matching
+    tracks1_is_ref (bool):
+    distance_method (str): The method to use to calculate distance between track points.
+        One of "haversine", "geod"
 
     Returns
     -------
@@ -91,9 +109,16 @@ def _match_pair(
     merged = pd.merge(tracks1, tracks2, on="time")
 
     if len(merged) > 0:  # if there exist matching points, continue
-        x = np.concatenate([[merged.lat_x], [merged.lon_x]]).T
-        y = np.concatenate([[merged.lat_y], [merged.lon_y]]).T
-        merged["dist"] = haversine_vector(x, y, unit=Unit.KILOMETERS)
+        merged["dist"] = (
+            distance(
+                merged.lon_x,
+                merged.lat_x,
+                merged.lon_y,
+                merged.lat_y,
+                method=distance_method,
+            )
+            * 1e-3
+        )
         merged = merged[merged.dist <= max_dist]
         # Compute temporal overlap
         temp = (
@@ -139,6 +164,7 @@ def _match_multiple(
     max_dist=300,
     min_overlap=0,
     tracks1_is_ref=False,
+    distance_method="haversine",
 ):
     """
     Function to match any number of tracks sets
@@ -175,6 +201,7 @@ def _match_multiple(
             max_dist,
             min_overlap,
             tracks1_is_ref=tracks1_is_ref * (names_pair[0] == names[0]),
+            distance_method=distance_method,
         )
         if len(m) == 0:
             raise NotImplementedError(

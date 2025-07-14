@@ -112,8 +112,8 @@ def distance(lon, lat, *args, track_id=None, method="geod", ellps="WGS84"):
             wind speed locations
     track_id : array_like, optional
     method : str, optional
-        The method of computing distances, either geodesic (`"geod"`) or haversine
-        (`"haversine"`)
+        The method of computing distances, either geodesic (`"geod"`/`"geodesic"`) or
+        haversine (`"haversine"`)
     ellps : str, optional
         The definition of the globe to use for the geodesic calculation (see
         `pyproj.Geod`). Default is "WGS84".
@@ -154,7 +154,7 @@ def distance(lon, lat, *args, track_id=None, method="geod", ellps="WGS84"):
             "Distance either takes 2 arrays (lon/lat) or 4 arrays 2x(lon/lat)"
         )
 
-    if method == "geod":
+    if method in ["geod", "geodesic"]:
         dist, _ = _get_distance_azimuth_geod(lon1, lat1, lon2, lat2, ellps=ellps)
     elif method == "haversine":
         dist = _get_distance_haversine(lon1, lat1, lon2, lat2)
