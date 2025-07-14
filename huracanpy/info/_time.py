@@ -12,6 +12,41 @@ import pandas as pd
 from ._geography import hemisphere
 
 
+def timestep(time, track_id=None):
+    """Infer the timestep given a set of times (and optionally track IDs)
+
+    Parameters
+    ----------
+    time : array_like
+    track_id : array_like
+
+    Returns
+    -------
+    scalar
+        The timestep inferred from time. Will be the same type as time
+
+    """
+    step = np.diff(time)
+
+    if track_id is not None:
+        # Ignore where the track_id changes
+        track_id = np.asarray(track_id)
+        step = step[track_id[1:] == track_id[:-1]]
+
+    steps, counts = np.unique(step, return_counts=True)
+
+    if len(steps) == 1:
+        return steps[0]
+    else:
+        warnings.warn(
+            "Found multiple different timesteps within the tracks\n"
+            + ", ".join([str(step) for step in steps])
+            + "\n"
+            + "Returning the most common one."
+        )
+        return steps[counts.argmax()]
+
+
 def time_components(time, components=("year", "month", "day", "hour")):
     """
     Expand the time variable into year/month/day/hour

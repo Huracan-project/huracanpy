@@ -1,13 +1,22 @@
 """Matching functions"""
 
-import pandas as pd
+from itertools import combinations, groupby
+
 import numpy as np
-from haversine import haversine_vector, Unit
-from itertools import combinations
+import pandas as pd
+
+from ..info import timestep
+from ..calc import distance
 
 
 def match(
-    tracksets, names=["1", "2"], max_dist=300, min_overlap=0, tracks1_is_ref=False
+    tracksets,
+    names=["1", "2"],
+    max_dist=300,
+    min_overlap=0,
+    consecutive_overlap=False,
+    tracks1_is_ref=False,
+    distance_method="haversine",
 ):
     """
     Match the provided track sets between them.
@@ -23,6 +32,12 @@ def match(
         Threshold for maximum distance between two tracks. The default is 300.
     min_overlap : int, optional
         Minimum number of overlapping time steps for matching. The default is 0.
+    consecutive_overlap: bool, optional
+        If min_overlap > 1, require that min_overlap points also need to be consective
+    tracks1_is_ref: bool, optional
+    distance_method: str, optional
+        The method to use to calculate distance between track points.
+        One of "haversine", "geod"
 
     Returns
     -------
@@ -44,10 +59,26 @@ def match(
 
     # Two track sets
     if len(tracksets) == 2:
-        return _match_pair(*tracksets, *names, max_dist, min_overlap, tracks1_is_ref)
+        return _match_pair(
+            *tracksets,
+            *names,
+            max_dist,
+            min_overlap,
+            consecutive_overlap,
+            tracks1_is_ref,
+            distance_method,
+        )
     # More than two track sets
     else:
-        return _match_multiple(tracksets, names, max_dist, min_overlap, tracks1_is_ref)
+        return _match_multiple(
+            tracksets,
+            names,
+            max_dist,
+            min_overlap,
+            consecutive_overlap,
+            tracks1_is_ref,
+            distance_method,
+        )
 
 
 def _match_pair(
@@ -57,7 +88,9 @@ def _match_pair(
     name2="2",
     max_dist=300,
     min_overlap=0,
+    consecutive_overlap=False,
     tracks1_is_ref=False,
+    distance_method="haversine",
 ):
     """
 
@@ -69,6 +102,9 @@ def _match_pair(
     name2 (str): Suffix for the second dataframe
     max_dist (float) : Threshold for maximum distance between two tracks
     min_overlap (int) : Minimum number of overlapping time steps for matching
+    tracks1_is_ref (bool):
+    distance_method (str): The method to use to calculate distance between track points.
+        One of "haversine", "geod"
 
     Returns
     -------
@@ -90,47 +126,86 @@ def _match_pair(
     # Find corresponding points (same time step, less than max_dist km)
     merged = pd.merge(tracks1, tracks2, on="time")
 
-    if len(merged) > 0:  # if there exist matching points, continue
-        x = np.concatenate([[merged.lat_x], [merged.lon_x]]).T
-        y = np.concatenate([[merged.lat_y], [merged.lon_y]]).T
-        merged["dist"] = haversine_vector(x, y, unit=Unit.KILOMETERS)
-        merged = merged[merged.dist <= max_dist]
-        # Compute temporal overlap
-        temp = (
-            merged.groupby(["track_id_x", "track_id_y"])[["dist"]]
-            .count()
-            .rename(columns={"dist": "temp"})
-        )
-        # Build a table of all pairs of tracks sharing at least one point
-        matches = (
-            merged[["track_id_x", "track_id_y"]]
-            .drop_duplicates()
-            .join(temp, on=["track_id_x", "track_id_y"])
-        )
-        matches = matches[matches.temp >= min_overlap]
-        dist = merged.groupby(["track_id_x", "track_id_y"])[["dist"]].mean()
-        matches = matches.merge(dist, on=["track_id_x", "track_id_y"])
-
-        # Treat duplicates if required
-        if tracks1_is_ref:
-            # Treat the duplicates where one tracks2 track has several corresponding
-            # tracks1:
-            # Keep the couple with the longest overlap
-            matches = (
-                matches.sort_values("temp", ascending=False)
-                .groupby("track_id_y")
-                .first()
-                .reset_index()
-            )
-
-        # Rename columns before output
-        matches = matches.rename(
-            columns={"track_id_x": "id_" + name1, "track_id_y": "id_" + name2}
-        )
-        return matches
-
-    else:  # if there exist no matching points, return empty dataframe
+    if len(merged) == 0:
+        # if there exist no matching points, return empty dataframe
         return pd.DataFrame(columns=["id_" + name1, "id_" + name2, "temp", "dist"])
+
+    # if there exist matching points, continue
+    # Calculate the distance between all points paired in time and subset points
+    # that are within the threshold distance specified
+    merged["dist"] = (
+        distance(
+            merged.lon_x,
+            merged.lat_x,
+            merged.lon_y,
+            merged.lat_y,
+            method=distance_method,
+        )
+        * 1e-3
+    )
+    merged = merged[merged.dist <= max_dist]
+
+    # Precompute groupby
+    track_groups = merged.groupby(["track_id_x", "track_id_y"])
+
+    # Compute temporal overlap
+    temp = track_groups[["dist"]].count().rename(columns={"dist": "temp"})
+
+    if min_overlap >= 2:
+        if consecutive_overlap:
+            # Replace temporal overlap with longest consecutive set of merged points
+            # for each track
+            dt = timestep(tracks1.time, tracks1.track_id)
+
+            for (track_id_x, track_id_y), track in track_groups:
+                if len(track) >= min_overlap:
+                    nconsecutive = (
+                        max(
+                            [
+                                sum([1 for _ in grouper]) if value else 0
+                                for value, grouper in groupby(np.diff(track.time) == dt)
+                            ]
+                        )
+                        + 1
+                    )
+
+                    temp.loc[(track_id_x, track_id_y)].temp = nconsecutive
+
+        # Subset by tracks sharing min_overlap points
+        temp = temp[temp.temp >= min_overlap]
+
+    # if there exist no matching points, return empty dataframe
+    if len(temp) == 0:
+        return pd.DataFrame(columns=["id_" + name1, "id_" + name2, "temp", "dist"])
+
+    # Build a table of all pairs of tracks still present in temp
+    matches = (
+        merged[["track_id_x", "track_id_y"]]
+        .drop_duplicates()
+        .join(temp, on=["track_id_x", "track_id_y"])
+    ).dropna()
+
+    # Add average distance to the output
+    dist = track_groups[["dist"]].mean()
+    matches = matches.merge(dist, on=["track_id_x", "track_id_y"])
+
+    # Treat duplicates if required
+    if tracks1_is_ref:
+        # Treat the duplicates where one tracks2 track has several corresponding
+        # tracks1:
+        # Keep the couple with the longest overlap
+        matches = (
+            matches.sort_values("temp", ascending=False)
+            .groupby("track_id_y")
+            .first()
+            .reset_index()
+        )
+
+    # Rename columns before output
+    matches = matches.rename(
+        columns={"track_id_x": "id_" + name1, "track_id_y": "id_" + name2}
+    )
+    return matches
 
 
 def _match_multiple(
@@ -138,7 +213,9 @@ def _match_multiple(
     names,
     max_dist=300,
     min_overlap=0,
+    consecutive_overlap=False,
     tracks1_is_ref=False,
+    distance_method="haversine",
 ):
     """
     Function to match any number of tracks sets
@@ -174,7 +251,9 @@ def _match_multiple(
             *names_pair,
             max_dist,
             min_overlap,
+            consecutive_overlap,
             tracks1_is_ref=tracks1_is_ref * (names_pair[0] == names[0]),
+            distance_method=distance_method,
         )
         if len(m) == 0:
             raise NotImplementedError(

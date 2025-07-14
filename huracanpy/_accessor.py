@@ -219,6 +219,9 @@ class HuracanPyDatasetAccessor:
         return self._dataset, model
 
     # ---- time
+    def get_timestep(self, time_name="time", track_id_name="track_id"):
+        return info.timestep(self._dataset[time_name], self._dataset[track_id_name])
+
     def get_time_components(self, time_name="time"):
         """
         Expand the time variable into year, month, day, and hour.
