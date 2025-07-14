@@ -4,8 +4,8 @@ from itertools import combinations, groupby
 
 import numpy as np
 import pandas as pd
-from scipy.stats import mode
 
+from ..info import timestep
 from ..calc import distance
 
 
@@ -155,17 +155,15 @@ def _match_pair(
         if consecutive_overlap:
             # Replace temporal overlap with longest consecutive set of merged points
             # for each track
-            timestep = mode(np.diff(tracks1.time)).mode
+            dt = timestep(tracks1.time, tracks1.track_id)
 
             for (track_id_x, track_id_y), track in track_groups:
-                if (track_id_x, track_id_y) in temp.index:
+                if len(track) >= min_overlap:
                     nconsecutive = (
                         max(
                             [
                                 sum([1 for _ in grouper]) if value else 0
-                                for value, grouper in groupby(
-                                    np.diff(track.time) == timestep
-                                )
+                                for value, grouper in groupby(np.diff(track.time) == dt)
                             ]
                         )
                         + 1
@@ -185,7 +183,7 @@ def _match_pair(
         merged[["track_id_x", "track_id_y"]]
         .drop_duplicates()
         .join(temp, on=["track_id_x", "track_id_y"])
-    )
+    ).dropna()
 
     # Add average distance to the output
     dist = track_groups[["dist"]].mean()
