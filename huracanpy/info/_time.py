@@ -30,6 +30,7 @@ def timestep(time, track_id=None):
 
     if track_id is not None:
         # Ignore where the track_id changes
+        track_id = np.asarray(track_id)
         step = step[track_id[1:] == track_id[:-1]]
 
     steps, counts = np.unique(step, return_counts=True)
@@ -39,7 +40,7 @@ def timestep(time, track_id=None):
     else:
         warnings.warn(
             "Found multiple different timesteps within the tracks\n"
-            + ", ".join(steps)
+            + ", ".join([str(step) for step in steps])
             + "\n"
             + "Returning the most common one."
         )
