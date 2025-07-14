@@ -38,7 +38,7 @@ class HuracanPyDatasetAccessor:
         self._dataset = dataset
 
     # %% Save
-    def save(self, filename):
+    def save(self, filename, **kwargs):
         """
         Save dataset as filename.
         The file type (NetCDF or csv supported) is detected based on filename extension.
@@ -54,7 +54,7 @@ class HuracanPyDatasetAccessor:
 
         """
 
-        save(self._dataset, filename)
+        save(self._dataset, filename, **kwargs)
 
     def sel_id(self, track_id, track_id_name="track_id"):
         return sel_id(self._dataset, self._dataset[track_id_name], track_id)
