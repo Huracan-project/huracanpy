@@ -14,6 +14,42 @@ def test_azimuth():
     np.testing.assert_approx_equal(az.mean(), 28.99955985, significant=6)
 
 
+@pytest.mark.parametrize("centering", ["centre", "adaptive"])
+def test_azimuth_centred(centering):
+    # Centred averaging of angles needs to account for circular nature
+    # Use tracks that switch across -180/+180 to test the averaging
+    lats = np.array(list(range(85, -91, -5)) + list(range(-85, 91, 5)))
+    lons = np.array([-5, 5] * 17 + [-5, 0, 175] + [-175, 175] * 17 + [0])
+    track_ids = np.zeros_like(lons)
+
+    angles = huracanpy.calc.azimuth(
+        lons, lats, track_ids, centering=centering
+    ).magnitude
+
+    # First angle south is the forward azimuth
+    if centering == "centre":
+        assert np.isnan(angles[0])
+    else:
+        np.testing.assert_approx_equal(angles[0], 160.365645)
+
+    # Average direct south
+    # TODO One angle is -180, which is equivalent to 180 but annoying that it is
+    #  different
+    # (5, -80) -> (0, -90)
+    assert (np.abs(angles[1:36]) == 180).all()
+
+    # First point after South pole points (from pole to point)
+    assert angles[36] == -175
+
+    # Average direct north
+    assert (angles[37:-1] == 0).all()
+
+    if centering == "centre":
+        assert np.isnan(angles[-1])
+    else:
+        assert angles[-1] == 0
+
+
 def test_azimuth_warns(tracks_csv):
     with pytest.warns(UserWarning, match="track_id is not provided"):
         huracanpy.calc.azimuth(tracks_csv.lon, tracks_csv.lat)

@@ -29,7 +29,7 @@ def _get_distance_azimuth_geod(lon1, lat1, lon2, lat2, ellps="WGS84"):
         )
         fwd_azimuth, back_azimuth, dist = geodesic.inv(lon1, lat1, lon2, lat2)
 
-    return dist, fwd_azimuth
+    return dist * units("m"), fwd_azimuth * units("degrees")
 
 
 def _get_distance_haversine(lon1, lat1, lon2, lat2):
@@ -46,9 +46,10 @@ def _get_distance_haversine(lon1, lat1, lon2, lat2):
         yx1 = np.asarray([lat1, lon1]).T
         yx2 = np.asarray([lat2, lon2]).T
 
-    return haversine_vector(yx1, yx2, unit="m")
+    return haversine_vector(yx1, yx2, unit="m") * units("m")
 
 
+@dequantify_results
 @preprocess_and_wrap(wrap_like="lon")
 def azimuth(lon, lat, track_id=None, ellps="WGS84", centering="forward"):
     """Compute azimuth between points using geodesic calculation.
@@ -89,7 +90,17 @@ def azimuth(lon, lat, track_id=None, ellps="WGS84", centering="forward"):
         lon[:-1], lat[:-1], lon[1:], lat[1:], ellps=ellps
     )
 
-    return _align_array(fwd_azimuth, track_id, centering)
+    if centering in ["forward", "backward"]:
+        return _align_array(fwd_azimuth, track_id, centering)
+
+    else:
+        # Compute angle in steps of two
+        _, centred_azimuth = _get_distance_azimuth_geod(
+            lon[:-2], lat[:-2], lon[2:], lat[2:], ellps=ellps
+        )
+        centred_azimuth[track_id[2:] != track_id[:-2]] = np.nan * centred_azimuth[0]
+
+        return _align_array(fwd_azimuth, track_id, centering, centred_azimuth)
 
 
 @dequantify_results
@@ -184,7 +195,7 @@ def distance(
     if len(args) < 2 and track_id is not None:
         dist = _align_array(dist, track_id, centering)
 
-    return dist * units("m")
+    return dist
 
 
 @dequantify_results
