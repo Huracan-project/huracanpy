@@ -49,8 +49,31 @@ def test_get_delta(tracks_csv, var, track_id, expected, unit, centering):
         )
 
 
+def test_delta_centred(tracks_csv):
+    diff_fwd = huracanpy.calc.delta(
+        tracks_csv.wind10, tracks_csv.track_id, centering="forward"
+    )
+    diff_bwd = huracanpy.calc.delta(
+        tracks_csv.wind10, tracks_csv.track_id, centering="backward"
+    )
+    diff_cntr = huracanpy.calc.delta(
+        tracks_csv.wind10, tracks_csv.track_id, centering="centre"
+    )
+    diff_adpt = huracanpy.calc.delta(
+        tracks_csv.wind10, tracks_csv.track_id, centering="adaptive"
+    )
+
+    np.testing.assert_array_equal(diff_fwd[:-1], diff_bwd[1:])
+    np.testing.assert_array_equal(0.5 * (diff_fwd + diff_bwd), diff_cntr)
+
+    diff_cntr[[30, 50, 98]] = diff_bwd[[30, 50, 98]]
+    diff_cntr[[0, 31, 51]] = diff_fwd[[0, 31, 51]]
+
+    np.testing.assert_array_equal(diff_cntr, diff_adpt)
+
+
 def test_delta_fails(tracks_csv):
-    with pytest.raises(ValueError, match="centering must be one of"):
+    with pytest.raises(ValueError, match="Option align='nonsense'"):
         huracanpy.calc.delta(
             tracks_csv.wind10, tracks_csv.track_id, centering="nonsense"
         )
