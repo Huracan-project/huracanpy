@@ -108,7 +108,7 @@ def rate(var, time, track_ids=None, centering="forward"):
     return dx / dt
 
 
-def _align_array(array, track_id, centering):
+def _align_array(array, track_id, centering, centred=None):
     # Index n, where the track ID changes between n and n+1
     # array is already a difference. So index n in array
     transition_points = np.where(track_id[1:] != track_id[:-1])[0]
@@ -119,7 +119,9 @@ def _align_array(array, track_id, centering):
     array[transition_points] = np.nan * array[0]
 
     if centering in ["centre", "center", "adaptive"]:
-        centred = 0.5 * (array[1:] + array[:-1])
+        if centred is None:
+            centred = 0.5 * (array[1:] + array[:-1])
+
         centred = np.concatenate([[np.nan * array[0]], centred, [np.nan * array[0]]])
 
         if centering in ["centre", "center"]:
