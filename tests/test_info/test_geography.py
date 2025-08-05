@@ -16,7 +16,7 @@ import huracanpy
 def test_hemisphere(data, expected, request):
     data = request.getfixturevalue(data)
     result = huracanpy.info.hemisphere(data.lat)
-    assert (result == expected).all()
+    np.testing.assert_equal(result, expected)
 
 
 @pytest.mark.parametrize(
@@ -25,28 +25,47 @@ def test_hemisphere(data, expected, request):
         (
             "tracks_minus180_plus180",
             np.asarray(
-                ["SP"] * 8 + ["SA"] * 4 + ["MED"] * 2 + ["NI"] * 4 + ["WNP"] * 6
+                [""]
+                + ["SP"] * 7
+                + ["SA"] * 4
+                + ["MED"] * 2
+                + ["NI"] * 4
+                + ["WNP"] * 5
+                + [""]
             ),
         ),
         (
             "tracks_0_360",
             np.asarray(
-                ["SP"] * 8 + ["SA"] * 4 + ["MED"] * 2 + ["NI"] * 4 + ["WNP"] * 6
+                [""]
+                + ["SP"] * 7
+                + ["SA"] * 4
+                + ["MED"] * 2
+                + ["NI"] * 4
+                + ["WNP"] * 5
+                + [""]
             ),
         ),
-        ("tracks_csv", np.asarray(["AUS"] * 51 + ["SI"] * 48)),
+        (
+            "tracks_csv",
+            np.asarray(["AUS"] * 37 + [""] * 3 + ["AUS"] * 11 + ["SI"] * 48),
+        ),
     ],
 )
 def test_basin(data, expected, request):
     data = request.getfixturevalue(data)
     result = huracanpy.info.basin(data.lon, data.lat)
-    assert (result == expected).all()
+
+    np.testing.assert_equal(result, expected)
 
 
 @pytest.mark.parametrize(
     "convention, expected",
     [
-        ("Sainsbury2022JCLI", ["WEST"] + ["SUB", "MDR"] * 6 + ["SUB"] + [""] * 6),
+        (
+            "Sainsbury2022JCLI",
+            ["WEST", "SUB", ""] + ["SUB", "MDR"] * 5 + ["SUB"] + [""] * 6,
+        ),
         (
             "Sainsbury2022MWR",
             [""] * 3 + ["NoEurope", ""] * 6 + ["Europe", ""] * 2 + ["Europe"],
@@ -58,7 +77,7 @@ def test_basin_definition(convention, expected):
     lat = np.asarray([15, 45] * 10)
     result = huracanpy.info.basin(lon, lat, convention=convention)
 
-    np.testing.assert_array_equal(result, expected)
+    np.testing.assert_equal(result, expected)
 
 
 @pytest.mark.parametrize(
@@ -74,7 +93,8 @@ def test_basin_definition(convention, expected):
                 + [False]
                 + [True]
                 + [False] * 6
-                + [True] * 3
+                + [True] * 2
+                + [False]
             ),
         ),
         (
@@ -87,7 +107,8 @@ def test_basin_definition(convention, expected):
                 + [False]
                 + [True]
                 + [False] * 6
-                + [True] * 3
+                + [True] * 2
+                + [False]
             ),
         ),
         ("tracks_csv", np.asarray([True] * 15 + [False] * 15 + [True] * 69)),
@@ -108,7 +129,7 @@ def test_get_land_ocean(data, expected, request):
         (
             "tracks_minus180_plus180",
             np.asarray(
-                ["Antarctica"]
+                [""]
                 + [""] * 6
                 + ["Argentina"] * 2
                 + [""] * 4
@@ -125,7 +146,7 @@ def test_get_land_ocean(data, expected, request):
         (
             "tracks_0_360",
             np.asarray(
-                ["Antarctica"]
+                [""]
                 + [""] * 6
                 + ["Argentina"] * 2
                 + [""] * 4
@@ -145,7 +166,7 @@ def test_get_land_ocean(data, expected, request):
 def test_get_country(data, expected, request):
     data = request.getfixturevalue(data)
     result = huracanpy.info.country(data.lon, data.lat)
-    assert (result == expected).all()
+    np.testing.assert_equal(result, expected)
 
 
 @pytest.mark.parametrize(
@@ -154,7 +175,7 @@ def test_get_country(data, expected, request):
         (
             "tracks_minus180_plus180",
             np.asarray(
-                ["Antarctica"]
+                [""]
                 + [""] * 6
                 + ["South America"] * 2
                 + [""] * 4
@@ -168,7 +189,7 @@ def test_get_country(data, expected, request):
         (
             "tracks_0_360",
             np.asarray(
-                ["Antarctica"]
+                [""]
                 + [""] * 6
                 + ["South America"] * 2
                 + [""] * 4
@@ -185,4 +206,4 @@ def test_get_country(data, expected, request):
 def test_get_continent(data, expected, request):
     data = request.getfixturevalue(data)
     result = huracanpy.info.continent(data.lon, data.lat)
-    assert (result == expected).all()
+    np.testing.assert_equal(result, expected)
