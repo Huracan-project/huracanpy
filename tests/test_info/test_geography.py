@@ -1,8 +1,13 @@
-import pytest
+import pathlib
 
 import numpy as np
+import pytest
+import xarray as xr
 
 import huracanpy
+
+
+data_path = pathlib.Path(__file__).parent.parent / "saved_results"
 
 
 @pytest.mark.parametrize(
@@ -207,3 +212,27 @@ def test_get_continent(data, expected, request):
     data = request.getfixturevalue(data)
     result = huracanpy.info.continent(data.lon, data.lat)
     np.testing.assert_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    "data, expected",
+    [
+        (
+            "tracks_minus180_plus180",
+            xr.open_dataset(str(data_path / "landfall_points_tracks_0_360_result.nc")),
+        ),
+        (
+            "tracks_0_360",
+            xr.open_dataset(str(data_path / "landfall_points_tracks_0_360_result.nc")),
+        ),
+        (
+            "tracks_csv",
+            xr.open_dataset(str(data_path / "landfall_points_tracks_csv_result.nc")),
+        ),
+    ],
+)
+def test_landfall_points(data, expected, request):
+    data = request.getfixturevalue(data)
+    result = huracanpy.info.landfall_points(data.lon, data.lat, data.track_id)
+
+    xr.testing.assert_identical(result, expected)

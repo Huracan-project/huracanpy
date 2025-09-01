@@ -16,6 +16,7 @@ def to_geodataframe(lon, lat, track_id=None, *, crs=None):
         tracks_dict = dict(geometry=[Point(xy) for xy in xyz[:, :2]])
 
     else:
+        track_id = np.asarray(track_id)
         track_id, index, npoints = np.unique(
             track_id, return_index=True, return_counts=True
         )

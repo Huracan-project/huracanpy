@@ -9,6 +9,7 @@ import geopandas as gpd
 from metpy.xarray import preprocess_and_wrap
 import numpy as np
 from pint.errors import UnitStrippedWarning
+import xarray as xr
 
 from .._basins import basins
 from ..convert import to_geodataframe
@@ -41,9 +42,9 @@ def basin(lon, lat, convention="WMO-TC", crs=None):
 
     Parameters
     ----------
-    lon : xarray.DataArray
+    lon : float or array_like
         Longitude series
-    lat : xarray.DataArray
+    lat : float or array_like
         Latitude series
     convention : str
         Name of the basin convention you want to use.
@@ -282,4 +283,59 @@ def continent(lon, lat, resolution="10m", crs=None):
         name="admin_0_countries",
         resolution=resolution,
         crs=crs,
+    )
+
+
+@preprocess_and_wrap()
+def landfall_points(lon, lat, track_id=None, *, resolution="10m", crs=None):
+    """Find the points where the tracks intersect with a coastline
+
+    Parameters
+    ----------
+    lon, lat : float or array_like
+    track_id : float or array_like, optional
+    resolution : str
+        The resolution of the Land/Sea outlines dataset to use. One of
+
+        * 10m (1:10,000,000)
+        * 50m (1:50,000,000)
+        * 110m (1:110,000,000)
+
+        Default is "10m"
+    crs : cartopy.crs.CRS
+        The coordinate system that the input lon/lat points are in. Default is None,
+        which assumes Geodesic with Earth radius.
+
+    Returns
+    -------
+    xarray.Dataset
+
+    """
+    df = _cache_natural_earth_feature("featurecla", "physical", "coastline", resolution)
+
+    tracks = to_geodataframe(lon, lat, track_id, crs=crs).to_crs(df.crs)
+
+    # Get the combinations of track_id / coastline that have intersections
+    result = gpd.tools.sjoin(tracks, df, predicate="intersects")
+
+    # For each combination of track_id / coastline get the exact point(s) that they
+    # intersect and save as a set of tracks in the same record, track_id format
+    points = []
+    for n, row in result.iterrows():
+        track_id = tracks.loc[n].track_id
+        track = gpd.GeoSeries(tracks.loc[n].geometry, crs=tracks.crs)
+        coastline = gpd.GeoSeries(df.loc[row.index_right].geometry, crs=df.crs)
+
+        points += [
+            (track_id, p.x, p.y) for p in track.intersection(coastline).explode()
+        ]
+
+    points = np.asarray(points)
+
+    return xr.Dataset(
+        data_vars=dict(
+            track_id=("record", points[:, 0]),
+            lon=("record", points[:, 1]),
+            lat=("record", points[:, 2]),
+        )
     )
