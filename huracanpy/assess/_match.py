@@ -11,7 +11,7 @@ from ..calc import distance
 
 def match(
     tracksets,
-    names=["1", "2"],
+    names=None,
     max_dist=300,
     min_overlap=0,
     consecutive_overlap=False,
@@ -27,7 +27,7 @@ def match(
         list of track datasets to match together. Must be of length two or more.
     names : list, optional
         list of track datasets names. Must be the same size as tracksets. The default is
-        ['1','2'].
+        ['1','2', ...].
     max_dist : float, optional
         Threshold for maximum distance between two tracks. The default is 300.
     min_overlap : int, optional
@@ -52,6 +52,8 @@ def match(
     # Check input
     if len(tracksets) < 2:
         raise ValueError("You must provide at least two datasets to match")
+    if names is None:
+        names = [str(n) for n in range(1, len(tracksets) + 1)]
     if len(names) != len(tracksets):
         raise ValueError(
             "Number of names provided do not correspond to the number of track sets"
