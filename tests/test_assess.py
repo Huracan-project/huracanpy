@@ -100,16 +100,19 @@ def test_match_multiple_empty(tracks_year):
         NotImplementedError,
         match="For the moment, the case where two datasets have no match is not",
     ):
-        huracanpy.assess.match(tracks, ["a", "b", "c"])
+        huracanpy.assess.match(tracks)
 
 
 @pytest.mark.parametrize(
-    "tracksets, message",
-    [([], "You must provide at least two"), ([1, 2, 3], "Number of names provided")],
+    "tracksets, names, message",
+    [
+        ([], [], "You must provide at least two"),
+        ([1, 2, 3], ["1", "2"], "Number of names provided"),
+    ],
 )
-def test_match_fails(tracksets, message):
+def test_match_fails(tracksets, names, message):
     with pytest.raises(ValueError, match=message):
-        huracanpy.assess.match(tracksets)
+        huracanpy.assess.match(tracksets, names)
 
 
 def test_scores():
