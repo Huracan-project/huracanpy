@@ -2,6 +2,7 @@ import re
 from urllib.request import urlretrieve
 
 import pandas as pd
+import xarray as xr
 
 from . import _csv
 
@@ -13,7 +14,7 @@ path = "https://raw.githubusercontent.com/tenkiman/superBT-V04/refs/heads/v04/da
 # Use the all file for now
 # TODO add options for different files/time periods
 meta_fname = "h-meta-md3-vars.csv"
-tracks_fname = "all-md3-2007-2022-MRG.csv"
+tracks_fname = "all-md3-{year}-MRG.csv"
 units_rename = dict(degN="degrees_north", degE="degrees_east")
 
 
@@ -26,8 +27,12 @@ def load():
     )
     meta.details = meta.details.apply(lambda x: x.split("'")[1])
 
-    filename, _ = urlretrieve(path + tracks_fname, None)  # noqa: S310
-    tracks = _csv.load(filename).drop_vars("unnamed: 33")
+    tracks = []
+    for year in range(2007, 2024 + 1):
+        filename, _ = urlretrieve(path + tracks_fname.format(year=year), None)  # noqa: S310
+        tracks.append(_csv.load(filename).drop_vars("unnamed: 33"))
+
+    tracks = xr.concat(tracks, dim="record")
 
     for n, row in meta.iterrows():
         varname = row.varname
