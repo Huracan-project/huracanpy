@@ -202,7 +202,8 @@ def test_load_ibtracs_online_removes_nan_variables(monkeypatch):
     assert len(preserved_useful_vars) > 0, "No useful data variables were preserved"
     
     # Basic data integrity checks
-    assert len(tracks.time) == 2  # 2 time steps after skipping header (IBTrACS skips row 1)
+    # 2 time steps after skipping header (IBTrACS skips row 1)
+    assert len(tracks.time) == 2
     assert len(tracks.groupby("sid")) == 1  # 1 track in our mock data
     assert "record" not in tracks.coords
 
