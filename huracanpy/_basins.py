@@ -62,3 +62,33 @@ B = dict(
     NoEurope=Polygon([(-70, 36), (-10, 36), (-10, 70), (-70, 70)]),
 )
 basins["Sainsbury2022MWR"] = gpd.GeoDataFrame(index=B.keys(), geometry=list(B.values()))
+
+# Knutson et al. (2020)
+# Tropical Cyclones and Climate Change Assessment: Part II: Projected Response to
+# Anthropogenic Warming
+# https://doi.org/10.1175/BAMS-D-18-0194.1
+# Basin definitions from the paper:
+# North Atlantic: 0°–90°N, ~265°–360°E (converted: -95°–0°E)
+# Northeast Pacific: 0°–90°N, 180°–~265°E (converted: -180°–-95°E)
+# Northwest Pacific: 0°–90°N, 100°–180°E
+# North Indian: 0°–90°N, 30°–100°E
+# South Indian: 90°S–0°, 20°–135°E (converted: -90°–0°, 20°–135°E)
+# Southwest Pacific: 90°S–0°, 135°–295°E (converted: -90°–0°, 135°E–-65°E)
+# South Atlantic: 90°S–0°, South America to Africa (~-65°–20°E)
+# *The North Atlantic–northeast Pacific boundary is on a diagonal tracing a path
+# through Mexico and Central America (approximated here similar to WMO convention).
+B = dict(
+    NATL=Polygon(((-95, 90), (0, 90), (0, 0), (-95, 0))),
+    ENP=Polygon(((-180, 0), (-180, 90), (-95, 90), (-95, 0))),
+    WNP=Polygon(((100, 0), (100, 90), (180, 90), (180, 0))),
+    NI=Polygon(((30, 0), (30, 90), (100, 90), (100, 0))),
+    SI=Polygon(((20, -90), (20, 0), (135, 0), (135, -90))),
+    SP=MultiPolygon(
+        [
+            Polygon([(135, 0), (135, -90), (180, -90), (180, 0)]),
+            Polygon(((-180, 0), (-180, -90), (-65, -90), (-65, 0))),
+        ]
+    ),
+    SA=Polygon(((-65, -90), (-65, 0), (20, 0), (20, -90))),
+)
+basins["Knutson2020"] = gpd.GeoDataFrame(index=B.keys(), geometry=list(B.values()))
