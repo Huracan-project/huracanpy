@@ -51,11 +51,28 @@ def test_basin(data, expected, request):
             "Sainsbury2022MWR",
             [""] * 3 + ["NoEurope", ""] * 6 + ["Europe", ""] * 2 + ["Europe"],
         ),
+        (
+            "Knutson2020",
+            [
+                "NATL",
+                "ENP",
+                "WNP",
+                "NI",
+                "SI",
+                "SP",
+                "SA",
+            ],
+        ),
     ],
 )
 def test_basin_definition(convention, expected):
-    lon = np.arange(-80, 20, 5)
-    lat = np.asarray([15, 45] * 10)
+    if convention == "Knutson2020":
+        # Test specific coordinates for each Knutson2020 basin
+        lon = np.array([-50, -120, 140, 70, 80, 160, -10])
+        lat = np.array([30, 20, 25, 15, -20, -15, -25])
+    else:
+        lon = np.arange(-80, 20, 5)
+        lat = np.asarray([15, 45] * 10)
     result = huracanpy.info.basin(lon, lat, convention=convention)
 
     np.testing.assert_array_equal(result, expected)
