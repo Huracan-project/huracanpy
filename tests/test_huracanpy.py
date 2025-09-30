@@ -104,11 +104,11 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
             assert name in data
 
 
-def test_load_ibtracs_online(): 
+def test_load_ibtracs_online():
     # Including NaN removal tests
     tracks = huracanpy.load(source="ibtracs", ibtracs_subset="last3years")
     assert len(tracks.record) > 0
-    
+
     # Check that no variables are all NaNs
     nan_only_vars = [var for var in tracks.data_vars if tracks[var].isnull().all()]
     assert len(nan_only_vars) == 0, (
