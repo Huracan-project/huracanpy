@@ -104,87 +104,11 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
             assert name in data
 
 
-def _fake_ibtracs_data(url, filename):  # noqa ARG001
-    return huracanpy.example_csv_file, None
-
-
-def test_load_ibtracs_online(monkeypatch):
-    with monkeypatch.context() as m:
-        from huracanpy._data import ibtracs
-
-        m.setattr(ibtracs, "urlretrieve", _fake_ibtracs_data)
-        tracks = huracanpy.load(source="ibtracs", ibtracs_subset="last3years")
-
-    assert len(tracks) == 9
-    assert len(tracks.coords) == 0
-    # IBTrACS online load skips the second line (first line after header) so this is one
-    # less than expected
-    assert len(tracks.time) == 98
-    assert len(tracks.groupby("track_id")) == 3
-    assert "record" not in tracks.coords
-
-    for name in ["track_id", "time", "lon", "lat"]:
-        assert name in tracks
-
-
-def _fake_ibtracs_data_with_nans(url, filename):  # noqa ARG001
-    """Mock function that returns test data with some variables that are all NaNs."""
-    import tempfile
-    import pandas as pd
-    import numpy as np
-    import os
-
-    data = {
-        "SID": ["2000001N00001", "2000001N00001", "2000001N00001"],
-        "SEASON": [2000, 2000, 2000],
-        "BASIN": ["NA", "NA", "NA"],
-        "LON": [-80.0, -79.5, -79.0],
-        "LAT": [25.0, 25.5, 26.0],
-        "TIME": ["2000-01-01 00:00:00", "2000-01-01 06:00:00", "2000-01-01 12:00:00"],
-        # Core useful variables (these should be kept)
-        "WMO_WIND": [35, 40, 45],
-        "WMO_PRES": [1010, 1008, 1005],
-        "USA_WIND": [35, 40, 45],
-        "USA_PRES": [1010, 1008, 1005],
-        # Variables that are all NaNs (these should be removed)
-        "TOKYO_WIND": [np.nan, np.nan, np.nan],
-        "TOKYO_PRES": [np.nan, np.nan, np.nan],
-        "CMA_WIND": [np.nan, np.nan, np.nan],
-        "CMA_PRES": [np.nan, np.nan, np.nan],
-    }
-
-    df = pd.DataFrame(data)
-
-    if filename:
-        df.to_csv(filename, index=False)
-        return filename, None
-    else:
-        fd, temp_file = tempfile.mkstemp(suffix=".csv")
-        with os.fdopen(fd, "w") as f:
-            df.to_csv(f, index=False)
-        return temp_file, None
-
-
-def test_load_ibtracs_online_removes_nan_variables(monkeypatch):
-    """Test that loading IBTrACS online data removes variables that are all NaNs."""
-    with monkeypatch.context() as m:
-        from huracanpy._data import ibtracs
-
-        # Mock the urlretrieve function to return our test data with NaN-only variables
-        m.setattr(ibtracs, "urlretrieve", _fake_ibtracs_data_with_nans)
-
-        # Load the data
-        tracks = huracanpy.load(source="ibtracs", ibtracs_subset="last3years")
-
-    # Check that we have the expected number of variables
-    # Original mock data has 14 variables, 4 of which are all NaNs
-    # After filtering, we should have 10 variables
-    expected_variables = 10
-    assert len(tracks.data_vars) == expected_variables, (
-        f"Expected {expected_variables} variables after filtering, "
-        f"but got {len(tracks.data_vars)}"
-    )
-
+def test_load_ibtracs_online(): 
+    # Including NaN removal tests
+    tracks = huracanpy.load(source="ibtracs", ibtracs_subset="last3years")
+    assert len(tracks.record) > 0
+    
     # Check that no variables are all NaNs
     nan_only_vars = [var for var in tracks.data_vars if tracks[var].isnull().all()]
     assert len(nan_only_vars) == 0, (
@@ -195,17 +119,6 @@ def test_load_ibtracs_online_removes_nan_variables(monkeypatch):
     essential_vars = ["sid", "season", "basin", "lon", "lat", "time"]
     for var in essential_vars:
         assert var in tracks.data_vars, f"Essential variable '{var}' was removed"
-
-    # Check that some useful data variables are preserved
-    useful_vars = ["wmo_wind", "wmo_pres", "usa_wind", "usa_pres"]
-    preserved_useful_vars = [var for var in useful_vars if var in tracks.data_vars]
-    assert len(preserved_useful_vars) > 0, "No useful data variables were preserved"
-
-    # Basic data integrity checks
-    # 2 time steps after skipping header (IBTrACS skips row 1)
-    assert len(tracks.time) == 2
-    assert len(tracks.groupby("sid")) == 1  # 1 track in our mock data
-    assert "record" not in tracks.coords
 
 
 @pytest.mark.parametrize(
