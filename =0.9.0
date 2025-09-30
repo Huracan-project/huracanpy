@@ -1,0 +1,8 @@
+Defaulting to user installation because normal site-packages is not writeable
+Collecting ruff
+  Downloading ruff-0.13.2-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata
+     - 25.8 kB 148.5 MB/s 0:00:00
+Downloading ruff-0.13.2-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+   | 13.4 MB 197.6 MB/s 0:00:00
+Installing collected packages: ruff
+Successfully installed ruff-0.13.2

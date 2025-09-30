@@ -74,17 +74,17 @@ def online(subset, filename=None, **kwargs):
     filename, _ = urlretrieve(url, filename)  # noqa: S310
 
     tracks = _csv.load(filename, **kwargs)
-    
+
     # Remove variables that are all NaNs to reduce unnecessary data
     variables_to_keep = []
     for var in tracks.data_vars:
         if not tracks[var].isnull().all():
             variables_to_keep.append(var)
-    
+
     # Only filter if we're actually removing variables to avoid unnecessary operations
     if len(variables_to_keep) < len(tracks.data_vars):
         tracks = tracks[variables_to_keep]
-    
+
     return tracks
 
 
