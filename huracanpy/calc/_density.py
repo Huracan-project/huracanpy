@@ -9,7 +9,16 @@ from scipy.stats import gaussian_kde
 import warnings
 
 
-def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=dict()):
+def density(
+    lon,
+    lat,
+    method="histogram",
+    bin_size=5,
+    lon_range=None,
+    lat_range=(-90, 90),
+    crop=False,
+    function_kws=dict(),
+):
     """Function to compute the track density, based on a simple 2D histogram.
 
     Parameters
@@ -23,9 +32,18 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
         gives a 2d histogram using `np.histogram2d`
     bin_size : int or float, default=5
         When using histogram, defines the size (in degrees) of the bins.
-    n_seasons : int, optional
-        Number of season (will be used to divide the final results, so that is
-        represents points/year). The default is 1.
+    lon_range : tuple, default
+        The maximum and minimum longitude to calculate the density over. If None, then
+        it is set to global: (-180, 180) or (0, 360) depending on the input data
+    lat_range : tuple, default=(-90, 90)
+        The maximum and minimum latitude to calculate the density over.
+    crop : bool, default=False
+        If True crop the result to remove any outer bounds that only have zero density
+    function_kws : dict
+        Keyword arguments passed to the function used for calculating density
+
+        * If method="histogram", `numpy.histogram2d`
+        * If method="kde", `scipy.stats.gaussian_kde`
 
     Raises
     ------
@@ -39,12 +57,14 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
 
     """
     # Define coordinates for mapping
-    if lon.min() < 0:
-        lon_range = (-180, 180)
-    else:
-        lon_range = (0, 360)
+    if lon_range is None:
+        if lon.min() < 0:
+            lon_range = (-180, 180)
+        else:
+            lon_range = (0, 360)
+
     x_edge = np.arange(lon_range[0], lon_range[1] + bin_size, bin_size)
-    y_edge = np.arange(-90, 90 + bin_size, bin_size)
+    y_edge = np.arange(lat_range[0], lat_range[1] + bin_size, bin_size)
     x_mid, y_mid = (x_edge[1:] + x_edge[:-1]) / 2, (y_edge[1:] + y_edge[:-1]) / 2
 
     # Compute density
@@ -69,34 +89,12 @@ def density(lon, lat, method="histogram", bin_size=5, crop=False, function_kws=d
         has_data = da > 0
 
         # Keep the band of latitudes between first and lat non-empty row
+        # and longitudes between first and lat empty column
         idx_lat = np.where(has_data.any(dim="lon"))[0]
         da = da.isel(lat=slice(idx_lat[0], idx_lat[-1] + 1))
 
-        # Remove the longest band of consecutively empty longitudes and roll the
-        # longitude coordinate to start just after this band
         idx_lon = np.where(has_data.any(dim="lat"))[0]
-
-        biggest_gap = np.diff(idx_lon).max()
-
-        # Account for a gap that wraps around
-        outer_gap = idx_lon[0] + len(da.lon) - idx_lon[-1] - 1
-
-        if outer_gap > biggest_gap:
-            da = da.isel(lon=slice(idx_lon[0], idx_lon[-1] + 1))
-        else:
-            idx_gap = np.diff(idx_lon).argmax()
-            # Leftmost point to start of gap
-            da_1 = da.isel(lon=slice(0, idx_lon[idx_gap] + 1))
-            # End of gap to rightmost point
-            da_2 = da.isel(lon=slice(idx_lon[idx_gap + 1], None))
-
-            # Stick the second set of data in from of the first set
-            if lon_range == (-180, 180):
-                da_1 = da_1.assign_coords(lon=da_1.lon + 360)
-            else:
-                da_2 = da_2.assign_coords(lon=da_2.lon - 360)
-
-            da = xr.concat([da_2, da_1], dim="lon")
+        da = da.isel(lon=slice(idx_lon[0], idx_lon[-1] + 1))
 
         return da
     else:
