@@ -2,11 +2,10 @@
 Module containing function to compute track densities
 """
 
+from metpy.constants import earth_avg_radius
 import numpy as np
+from sklearn.neighbors import KernelDensity
 import xarray as xr
-from scipy.stats import gaussian_kde
-
-import warnings
 
 
 def density(
@@ -43,7 +42,8 @@ def density(
         Keyword arguments passed to the function used for calculating density
 
         * If method="histogram", `numpy.histogram2d`
-        * If method="kde", `scipy.stats.gaussian_kde`
+        * If method="kde", `sklearn.neighbors.KernelDensity`. Note that the bandwidth
+          argument is set to `"scott"` rather than the default of `1.0`
 
     Raises
     ------
@@ -70,6 +70,12 @@ def density(
     # Compute density
     if method == "histogram":
         h = _histogram(lon, lat, x_edge, y_edge, function_kws)
+
+        area = (earth_avg_radius**2) * np.outer(
+            np.diff(np.sin(np.deg2rad(y_edge))), np.diff(np.deg2rad(x_edge))
+        )
+
+        h = h / area
     elif method == "kde":
         h = _kde(lon, lat, x_mid, y_mid, function_kws)
     else:
@@ -108,16 +114,16 @@ def _histogram(lon, lat, x_edge, y_edge, function_kws):
 
 
 def _kde(lon, lat, x_mid, y_mid, function_kws):
+    if "bandwidth" not in function_kws:
+        function_kws["bandwidth"] = "scott"
+
     # engineer positions array for kernel estimation computation
-    positions = np.reshape(np.meshgrid(x_mid, y_mid), (2, len(x_mid) * len(y_mid)))
+    x_grid, y_grid = np.meshgrid(x_mid, y_mid)
+    grid_positions = np.deg2rad(np.array([y_grid.flatten(), x_grid.flatten()]).T)
+    track_positions = np.deg2rad([lat, lon]).T
+
     # Compute kernel density estimate
-    kernel = gaussian_kde([lon, lat], **function_kws)
+    kde = KernelDensity(**function_kws).fit(track_positions)
+
     # Evaluation kernel along positions
-    h = np.reshape(kernel(positions), (len(y_mid), len(x_mid)))
-    # Account for cell area differences
-    warnings.warn(
-        "The kde function does not currently take into account the spherical "
-        "geometry of the Earth."
-    )
-    # Normalize so that H integrates to the total number of points
-    return h * len(lon) / h.sum()
+    return np.exp(kde.score_samples(grid_positions)).reshape(len(y_mid), len(x_mid))
