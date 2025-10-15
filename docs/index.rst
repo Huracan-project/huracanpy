@@ -15,6 +15,8 @@
   :width: 800
   :alt: HuracanPy logo, a yellow and blue python spiralling as a cyclone.
 
+.. title:: huracanpy
+
 *A python package for working with various forms of feature tracking data, including but not restricted to cyclone tracks.*
 
 **Why HuracanPy?**
