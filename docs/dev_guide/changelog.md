@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## v1.4.0
+### Added
+- Load SuperBT from github file
+- Load IBTrACS from a netCDF file
+- Allow `huracanpy.load` to load non-ragged netCDF files. Essentially just calls `xarray.load` without modification
+- Add optional keywords to `huracanpy.save` to allow them to be passed to pandas `to_csv` or xarray `to_netcdf`
+- Add option to `assess.match` to only match tracks if the number of matching points needed are consecutive 
+- `assess.match` now uses `calc.distance` for the separation distance, so can use geodesic distance (as well as haversine)
+- `info.timestep` gives the best guess of timestep given a set of tracks
+- Centring options for delta-like functions (`delta`, `rate`, `azimuth`, `distance`, `translation_speed`)
+  - `centering="centre"` - Centred difference, NaN at the start and end of tracks
+  - `centering="adaptive"` - Centered difference. Forward difference at the start of tracks. Backward difference at the end of tracks
+- Basin definitions from [Knutson et al. (2020)](https://doi.org/10.1175/BAMS-D-18-0194.1) (`"Knutson2020"`)
+
+### Changed
+- Speed up `huracanpy.save` for netCDF files
+- Remove NaN only variables when loading online IBTrACS data. 
+
+## v1.3.1
+### Fixed
+- `calc.density` with `crop=True` no longer removes empty rows/columns inside the bounds of the data. 
+
 ## v1.3.0
 ### Added
 - Include missing accessor functions
