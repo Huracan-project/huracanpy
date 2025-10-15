@@ -38,7 +38,7 @@ class HuracanPyDatasetAccessor:
         self._dataset = dataset
 
     # %% Save
-    def save(self, filename):
+    def save(self, filename, **kwargs):
         """
         Save dataset as filename.
         The file type (NetCDF or csv supported) is detected based on filename extension.
@@ -54,7 +54,7 @@ class HuracanPyDatasetAccessor:
 
         """
 
-        save(self._dataset, filename)
+        save(self._dataset, filename, **kwargs)
 
     def sel_id(self, track_id, track_id_name="track_id"):
         return sel_id(self._dataset, self._dataset[track_id_name], track_id)
@@ -219,6 +219,9 @@ class HuracanPyDatasetAccessor:
         return self._dataset, model
 
     # ---- time
+    def get_timestep(self, time_name="time", track_id_name="track_id"):
+        return info.timestep(self._dataset[time_name], self._dataset[track_id_name])
+
     def get_time_components(self, time_name="time"):
         """
         Expand the time variable into year, month, day, and hour.
@@ -373,6 +376,7 @@ class HuracanPyDatasetAccessor:
         lat_name="lat",
         track_id_name="track_id",
         ellps="WGS84",
+        centering="forward",
     ):
         """
         Compute the azimuth between points along a track
@@ -383,6 +387,7 @@ class HuracanPyDatasetAccessor:
                 self._dataset[lat_name],
                 track_id=self._dataset[track_id_name],
                 ellps=ellps,
+                centering=centering,
             )
         if (track_id_name is None) or (
             track_id_name not in list(self._dataset.variables)
@@ -392,6 +397,7 @@ class HuracanPyDatasetAccessor:
                 self._dataset[lat_name],
                 track_id=None,
                 ellps=ellps,
+                centering=centering,
             )
 
     def add_azimuth(
@@ -400,12 +406,13 @@ class HuracanPyDatasetAccessor:
         lat_name="lat",
         track_id_name="track_id",
         ellps="WGS84",
+        centering="forward",
     ):
         """
         Add the azimuth calculation to the dataset.
         """
         self._dataset["azimuth"] = self.get_azimuth(
-            lon_name, lat_name, track_id_name, ellps
+            lon_name, lat_name, track_id_name, ellps, centering
         )
         return self._dataset
 
@@ -416,6 +423,7 @@ class HuracanPyDatasetAccessor:
         track_id_name="track_id",
         method="geod",
         ellps="WGS84",
+        centering="forward",
     ):
         """
         Compute the distance between points along a track.
@@ -427,6 +435,7 @@ class HuracanPyDatasetAccessor:
                 track_id=self._dataset[track_id_name],
                 method=method,
                 ellps=ellps,
+                centering=centering,
             )
         if (track_id_name is None) or (
             track_id_name not in list(self._dataset.variables)
@@ -437,6 +446,7 @@ class HuracanPyDatasetAccessor:
                 track_id=None,
                 method=method,
                 ellps=ellps,
+                centering=centering,
             )
 
     def add_distance(
@@ -446,12 +456,13 @@ class HuracanPyDatasetAccessor:
         track_id_name="track_id",
         method="geod",
         ellps="WGS84",
+        centering="forward",
     ):
         """
         Add the distance calculation to the dataset.
         """
         self._dataset["distance"] = self.get_distance(
-            lon_name, lat_name, track_id_name, method, ellps
+            lon_name, lat_name, track_id_name, method, ellps, centering
         )
         return self._dataset
 
@@ -463,6 +474,7 @@ class HuracanPyDatasetAccessor:
         track_id_name="track_id",
         method="geod",
         ellps="WGS84",
+        centering="forward",
     ):
         """
         Compute the translation speed along tracks.
@@ -475,6 +487,7 @@ class HuracanPyDatasetAccessor:
                 track_id=self._dataset[track_id_name],
                 method=method,
                 ellps=ellps,
+                centering=centering,
             )
         if (track_id_name is None) or (
             track_id_name not in list(self._dataset.variables)
@@ -486,6 +499,7 @@ class HuracanPyDatasetAccessor:
                 track_id=None,
                 method=method,
                 ellps=ellps,
+                centering=centering,
             )
 
     def add_translation_speed(
@@ -496,12 +510,19 @@ class HuracanPyDatasetAccessor:
         track_id_name="track_id",
         method="geod",
         ellps="WGS84",
+        centering="forward",
     ):
         """
         Add the translation speed calculation to the dataset.
         """
         self._dataset["translation_speed"] = self.get_translation_speed(
-            lon_name, lat_name, time_name, track_id_name, method, ellps
+            lon_name,
+            lat_name,
+            time_name,
+            track_id_name,
+            method,
+            ellps,
+            centering,
         )
         return self._dataset
 

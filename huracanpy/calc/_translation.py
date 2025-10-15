@@ -12,7 +12,7 @@ from pint.errors import UnitStrippedWarning
 import pyproj
 
 
-from ._rates import delta, _dummy_track_id
+from ._rates import delta, _dummy_track_id, _align_array
 from .._metpy import dequantify_results
 
 
@@ -29,7 +29,7 @@ def _get_distance_azimuth_geod(lon1, lat1, lon2, lat2, ellps="WGS84"):
         )
         fwd_azimuth, back_azimuth, dist = geodesic.inv(lon1, lat1, lon2, lat2)
 
-    return dist, fwd_azimuth
+    return dist * units("m"), fwd_azimuth * units("degrees")
 
 
 def _get_distance_haversine(lon1, lat1, lon2, lat2):
@@ -46,11 +46,12 @@ def _get_distance_haversine(lon1, lat1, lon2, lat2):
         yx1 = np.asarray([lat1, lon1]).T
         yx2 = np.asarray([lat2, lon2]).T
 
-    return haversine_vector(yx1, yx2, unit="m")
+    return haversine_vector(yx1, yx2, unit="m") * units("m")
 
 
+@dequantify_results
 @preprocess_and_wrap(wrap_like="lon")
-def azimuth(lon, lat, track_id=None, ellps="WGS84"):
+def azimuth(lon, lat, track_id=None, ellps="WGS84", centering="forward"):
     """Compute azimuth between points using geodesic calculation.
 
     Parameters
@@ -61,6 +62,17 @@ def azimuth(lon, lat, track_id=None, ellps="WGS84"):
     ellps : str, optional
         The definition of the globe to use for the geodesic calculation (see
         `pyproj.Geod`). Default is "WGS84".
+    centering: str, optional
+        - "forward" gives the angle based on the track point and the following track
+          point. The last point of each track will be NaN
+        - "backward" gives the angle based on the track point and the previous track
+          point. The first point of each track will be NaN
+        - "centre" gives the angle based on the centred difference of track points. The
+          first and last points of each track will be NaN
+        - "adaptive" gives the same as centred, but fills in the first point of each
+          track with the forward difference, and the last point of each track with the
+          backward difference
+
     Returns
     -------
     xarray.DataArray
@@ -74,20 +86,28 @@ def azimuth(lon, lat, track_id=None, ellps="WGS84"):
         track_id = _dummy_track_id(lon)
 
     # Compute azimuth
-    _, azimuth = _get_distance_azimuth_geod(
+    _, fwd_azimuth = _get_distance_azimuth_geod(
         lon[:-1], lat[:-1], lon[1:], lat[1:], ellps=ellps
     )
 
-    # Mask track transition points
-    azimuth[track_id[1:] != track_id[:-1]] = np.nan * azimuth[0]
-    azimuth = np.concatenate([azimuth, [np.nan * azimuth[0]]])
+    if centering in ["forward", "backward"]:
+        return _align_array(fwd_azimuth, track_id, centering)
 
-    return azimuth
+    else:
+        # Compute angle in steps of two
+        _, centred_azimuth = _get_distance_azimuth_geod(
+            lon[:-2], lat[:-2], lon[2:], lat[2:], ellps=ellps
+        )
+        centred_azimuth[track_id[2:] != track_id[:-2]] = np.nan * centred_azimuth[0]
+
+        return _align_array(fwd_azimuth, track_id, centering, centred_azimuth)
 
 
 @dequantify_results
 @preprocess_and_wrap(wrap_like="lon")
-def distance(lon, lat, *args, track_id=None, method="geod", ellps="WGS84"):
+def distance(
+    lon, lat, *args, track_id=None, method="geod", ellps="WGS84", centering="forward"
+):
     """Compute distance between longitude/latitude coordinates using
     geodesic or haversine calculation
 
@@ -112,19 +132,27 @@ def distance(lon, lat, *args, track_id=None, method="geod", ellps="WGS84"):
             wind speed locations
     track_id : array_like, optional
     method : str, optional
-        The method of computing distances, either geodesic (`"geod"`) or haversine
-        (`"haversine"`)
+        The method of computing distances, either geodesic (`"geod"`/`"geodesic"`) or
+        haversine (`"haversine"`)
     ellps : str, optional
         The definition of the globe to use for the geodesic calculation (see
         `pyproj.Geod`). Default is "WGS84".
+    centering: str, optional
+        - "forward" gives the distance based on the track point and the following track
+          point. The last point of each track will be NaN
+        - "backward" gives the distance based on the track point and the previous track
+          point. The first point of each track will be NaN
+        - "centre" gives the distance based on the centred difference of track points.
+          The first and last points of each track will be NaN
+        - "adaptive" gives the same as centred, but fills in the first point of each
+          track with the forward difference, and the last point of each track with the
+          backward difference
 
     Returns
     -------
     xarray.DataArray
 
     """
-    # TODO: Provide option for centering forward, backwards, centered
-
     # Curate input
     # If track_id is not provided, all points are considered to belong to the same track
     if len(args) < 2:
@@ -154,26 +182,27 @@ def distance(lon, lat, *args, track_id=None, method="geod", ellps="WGS84"):
             "Distance either takes 2 arrays (lon/lat) or 4 arrays 2x(lon/lat)"
         )
 
-    if method == "geod":
+    if method in ["geod", "geodesic"]:
         dist, _ = _get_distance_azimuth_geod(lon1, lat1, lon2, lat2, ellps=ellps)
     elif method == "haversine":
         dist = _get_distance_haversine(lon1, lat1, lon2, lat2)
     else:
         raise ValueError(
             f"Method {method} for distance calculation not recognised, use one of"
-            f"('geod', 'haversince')"
+            f"('geod', 'haversine')"
         )
 
     if len(args) < 2 and track_id is not None:
-        dist[track_id[1:] != track_id[:-1]] = np.nan * dist[0]
-        dist = np.concatenate([dist, [np.nan * dist[0]]])
+        dist = _align_array(dist, track_id, centering)
 
-    return dist * units("m")
+    return dist
 
 
 @dequantify_results
 @preprocess_and_wrap(wrap_like="lon")
-def translation_speed(lon, lat, time, track_id=None, method="geod", ellps="WGS84"):
+def translation_speed(
+    lon, lat, time, track_id=None, method="geod", ellps="WGS84", centering="forward"
+):
     """
     Compute translation speed along tracks
 
@@ -189,24 +218,33 @@ def translation_speed(lon, lat, time, track_id=None, method="geod", ellps="WGS84
     ellps : str, optional
         The definition of the globe to use for the geodesic calculation (see
         `pyproj.Geod`). Default is "WGS84".
-
+    centering: str, optional
+        - "forward" gives the speed based on the track point and the following track
+          point. The last point of each track will be NaN
+        - "backward" gives the speed based on the track point and the previous track
+          point. The first point of each track will be NaN
+        - "centre" gives the speed based on the centred difference of track points. The
+          first and last points of each track will be NaN
+        - "adaptive" gives the same as centred, but fills in the first point of each
+          track with the forward difference, and the last point of each track with the
+          backward difference
 
     Returns
     -------
     xarray.DataArray
 
     """
-    # TODO: Provide option for centering forward, backwards, centered
-
     # Curate input
     # If track_id is not provided, all points are considered to belong to the same track
     if track_id is None:
         track_id = _dummy_track_id(lon)
 
     # Distance between each points
-    dx = distance(lon, lat, track_id=track_id, method=method, ellps=ellps)
+    dx = distance(
+        lon, lat, track_id=track_id, method=method, ellps=ellps, centering=centering
+    )
 
     # time between each points
-    dt = delta(time, track_id)
+    dt = delta(time, track_id, centering=centering)
 
     return dx / dt

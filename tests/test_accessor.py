@@ -18,6 +18,7 @@ _intentionally_missing = [
     "add_gen_vals",
     "add_density",
     "add_track_duration",
+    "add_timestep",
     # plot_ functions that are for multiple datasets
     "plot_doughnut",
     "plot_venn",
@@ -57,6 +58,7 @@ def test_nunique():
             {"var_name": "wind10", "bins": [0, 10, 20, 30], "labels": [0, 1, 2]},
         ),
         (huracanpy.info.season, ["track_id", "lat", "time"], {}),
+        (huracanpy.info.timestep, ["time", "track_id"], {}),
         (huracanpy.info.time_components, ["time"], {}),
         (huracanpy.calc.density, ["lon", "lat"], {}),
         (huracanpy.calc.track_duration, ["time", "track_id"], {}),
