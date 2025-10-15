@@ -40,7 +40,7 @@ intersphinx_mapping = {
     "matplotlib": ("https://matplotlib.org/stable/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
     "xarray": ("https://docs.xarray.dev/en/stable/", None),
-    "cartopy": ("https://scitools.org.uk/cartopy/docs/latest", None),
+    "cartopy": ("https://cartopy.readthedocs.io/stable/", None),
     "cftime": ("https://unidata.github.io/cftime/", None),
     "metpy": ("https://unidata.github.io/MetPy/latest/", None),
 }
