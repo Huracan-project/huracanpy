@@ -1,13 +1,14 @@
 import gzip
+from io import StringIO
 
-import datetime
 import warnings
 
-import cftime
 import numpy as np
 import xarray as xr
 
 from parse import parse
+
+from . import _csv
 
 # Use align specifications (^, <, >) to allow variable whitespace in headers
 # Left aligned (<) for "nvars" so nfields takes all whitespace between in case there is
@@ -33,35 +34,12 @@ def _parse(fmt, string, **kwargs):
     return result
 
 
-def parse_date(date, calendar=None):
-    if isinstance(calendar, (tuple, list)):
-        initial_date = np.datetime64(calendar[0])
-        timestep = calendar[1]
-        if not isinstance(timestep, np.timedelta64):
-            timestep = np.timedelta64(timestep, "h")
-        return initial_date + (int(date) - 1) * timestep
-
-    elif len(date) == 10:  # i.e., YYYYMMDDHH
-        if calendar is not None:
-            yr = int(date[0:4])
-            mn = int(date[4:6])
-            dy = int(date[6:8])
-            hr = int(date[8:10])
-            return cftime.datetime(yr, mn, dy, hr, calendar=calendar)
-        else:
-            return datetime.datetime.strptime(date.strip(), "%Y%m%d%H")
-
-    else:
-        return int(date)
-
-
-def load(filename, calendar=None, variable_names=None):
+def load(filename, variable_names=None):
     """Load ASCII TRACK data as an xarray.Dataset
 
     Parameters
     ----------
     filename: str
-    calendar : optional
     variable_names : list of str, optional
         TRACK
 
@@ -74,9 +52,6 @@ def load(filename, calendar=None, variable_names=None):
     else:
         open_func = open
 
-    output = list()
-    track_id = list()
-    times = list()
     with open_func(filename, "rt") as f:
         # The first lines can contain extra information bounded by two extra lines
         # Just skip to the main header line for now
@@ -114,7 +89,7 @@ def load(filename, calendar=None, variable_names=None):
 
         # Create a list of variables stored in each track
         # Generic names for variables as there is currently no information otherwise
-        var_labels = ["lon", "lat", "vorticity"]
+        var_labels = ["track_id", "time", "lon", "lat", "vorticity"]
         if variable_names is None:
             variable_names = [f"feature_{n}" for n in range(nfields)]
         else:
@@ -130,6 +105,7 @@ def load(filename, calendar=None, variable_names=None):
             var_labels.append(variable_name)
 
         # Read in each track as an xarray dataset with time as the coordinate
+        output = [",".join(var_labels)]
         for n in range(ntracks):
             # Read individual track header (two lines)
             line = f.readline().strip()
@@ -142,25 +118,15 @@ def load(filename, calendar=None, variable_names=None):
                 line = f.readline().strip()
                 npoints = _parse(track_info_fmt, line)["npoints"]
 
-                # Generate arrays for time coordinate and variables
-                # Time is a list because it will hold datetime or cftime objects
-                # Other variables are a dictionary mapping variable name to a tuple of
-                # (time, data_array) as this is what is passed to xarray.Dataset
-
-                # Add track ID as a variable along the record dimension so that it can
-                # be used for groupby
-                track_id.extend([track_info["track_id"]] * npoints)
-
                 # Populate time and data line by line
                 for m in range(npoints):
                     line = f.readline().strip()
-                    times.append(
-                        parse_date(
-                            line.split(" ")[0],
-                            calendar=calendar,
+                    output.append(
+                        ",".join(
+                            [str(track_info["track_id"])]
+                            + line.replace("&", " ").split()
                         )
                     )
-                    output.append(line.replace("&", " "))
             else:
                 warnings.warn(
                     "Parsed line is empty. It is possible this problem arrises because"
@@ -168,27 +134,10 @@ def load(filename, calendar=None, variable_names=None):
                     "file."
                 )
 
-    output = np.genfromtxt(output)
-    data_vars = {
-        varname: ("record", output[:, i])
-        for i, varname in enumerate(var_labels, start=1)
-    }
-    data_vars["track_id"] = ("record", track_id)
-    data_vars["time"] = ("record", times)
-
-    with warnings.catch_warnings():
-        warnings.filterwarnings(
-            "ignore",
-            category=UserWarning,
-            message="Converting non-nanosecond precision datetime values to nanosecond",
-        )
-        ds = xr.Dataset(data_vars=data_vars)
-    ds.track_id.attrs["cf_role"] = "trajectory_id"
-
-    return ds
+    return _csv.load(StringIO("\n".join(output)), index_col=False)
 
 
-def load_tilts(filename, calendar=None, nans=1e25):
+def load_tilts(filename, nans=1e25):
     output = list()
     track_id = list()
     times = list()
@@ -214,7 +163,7 @@ def load_tilts(filename, calendar=None, nans=1e25):
             # Populate time and data line by line
             for m in range(npoints):
                 line = f.readline().strip()
-                times.append(parse_date(line.split(" ")[0], calendar=calendar))
+                times.append(line.split(" ")[0])
                 output.append(line)
 
     output = np.genfromtxt(output)

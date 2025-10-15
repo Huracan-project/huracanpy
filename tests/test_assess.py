@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import xarray as xr
 
 import huracanpy
 
@@ -38,6 +39,49 @@ def test_match(tracks1_is_ref):
     assert (m_not1, m_not2, m_not3, m_all) == (1, 1, 1, 3)
 
 
+def test_match_consecutive():
+    # Two sets of tracks with 10 matching points, but none consecutively matching
+    tracks_a = xr.Dataset(
+        data_vars=dict(
+            track_id=("record", np.zeros(20)),
+            time=("record", range(20)),
+            lon=("record", np.zeros(20)),
+            lat=("record", np.zeros(20)),
+        )
+    )
+
+    tracks_b = xr.Dataset(
+        data_vars=dict(
+            track_id=("record", np.ones(20)),
+            time=("record", range(20)),
+            lon=("record", [0, 180] * 10),
+            lat=("record", np.zeros(20)),
+        )
+    )
+    m1 = huracanpy.assess.match([tracks_a, tracks_b], min_overlap=4)
+    m2 = huracanpy.assess.match(
+        [tracks_a, tracks_b], min_overlap=4, consecutive_overlap=True
+    )
+
+    assert len(m1) == 1
+    assert len(m2) == 0
+
+
+@pytest.mark.parametrize("distance_method", ["haversine", "geodesic"])
+@pytest.mark.parametrize("shift, n_matches", [(1, 3), (4, 0)])
+def test_match_shifted(tracks_csv, distance_method, shift, n_matches):
+    tracks_shifted = tracks_csv.copy()
+    tracks_shifted["lat"] = tracks_shifted.lat + shift
+
+    matches = huracanpy.assess.match(
+        [tracks_csv, tracks_shifted],
+        ["a", "b"],
+        distance_method=distance_method,
+    )
+
+    assert len(matches) == n_matches
+
+
 def test_match_pair_empty(tracks_csv, tracks_year):
     matches = huracanpy.assess.match([tracks_csv, tracks_year], ["a", "b"])
     assert matches.size == 0
@@ -56,16 +100,19 @@ def test_match_multiple_empty(tracks_year):
         NotImplementedError,
         match="For the moment, the case where two datasets have no match is not",
     ):
-        huracanpy.assess.match(tracks, ["a", "b", "c"])
+        huracanpy.assess.match(tracks)
 
 
 @pytest.mark.parametrize(
-    "tracksets, message",
-    [([], "You must provide at least two"), ([1, 2, 3], "Number of names provided")],
+    "tracksets, names, message",
+    [
+        ([], [], "You must provide at least two"),
+        ([1, 2, 3], ["1", "2"], "Number of names provided"),
+    ],
 )
-def test_match_fails(tracksets, message):
+def test_match_fails(tracksets, names, message):
     with pytest.raises(ValueError, match=message):
-        huracanpy.assess.match(tracksets)
+        huracanpy.assess.match(tracksets, names)
 
 
 def test_scores():
