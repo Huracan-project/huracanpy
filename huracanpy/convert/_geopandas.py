@@ -10,6 +10,10 @@ def to_geodataframe(lon, lat, track_id=None, *, crs=None):
 
     xyz = Geodetic().transform_points(crs, lon, lat)
 
+    # Geodetic transform treats -180 as different to 180 which can lead to a wrap around
+    # the globe when it should be not moving. Use -180 as an arbitrary convention
+    xyz[:, 0][xyz[:, 0] == 180] = -180
+
     # Convert tracks to a dictionary with lon, lat points as a geometry
     # Create the Shapely geometry from lon, lat points
     if track_id is None:
