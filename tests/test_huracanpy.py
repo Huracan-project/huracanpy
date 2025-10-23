@@ -1,3 +1,5 @@
+from importlib.metadata import version
+
 import pytest
 import numpy as np
 
@@ -5,15 +7,39 @@ import huracanpy
 
 
 @pytest.mark.parametrize(
-    "filename, kwargs, nvars, ncoords, npoints, ntracks",
+    "filename, kwargs, nvars, ncoords, npoints, ntracks, isdatetime64",
     [
-        (huracanpy.example_TRACK_file, dict(source="TRACK"), 35, 0, 46, 2),
-        (huracanpy.example_TRACK_tilt_file, dict(source="TRACK.tilt"), 3, 1, 46, 2),
-        (huracanpy.example_csv_file, dict(), 9, 0, 99, 3),
-        (huracanpy.example_parquet_file, dict(), 9, 0, 99, 3),
-        (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86),
-        (huracanpy.example_TRACK_netcdf_file, dict(source="netcdf"), 20, 17, 4580, 86),
-        (huracanpy.example_TRACK_timestep_file, dict(source="TRACK"), 38, 0, 416, 19),
+        (huracanpy.example_TRACK_file, dict(source="TRACK"), 35, 0, 46, 2, True),
+        (
+            huracanpy.example_TRACK_tilt_file,
+            dict(source="TRACK.tilt"),
+            3,
+            1,
+            46,
+            2,
+            True,
+        ),
+        (huracanpy.example_csv_file, dict(), 9, 0, 99, 3, True),
+        (huracanpy.example_parquet_file, dict(), 9, 0, 99, 3, True),
+        (huracanpy.example_TRACK_netcdf_file, dict(), 20, 17, 4580, 86, True),
+        (
+            huracanpy.example_TRACK_netcdf_file,
+            dict(source="netcdf"),
+            20,
+            17,
+            4580,
+            86,
+            True,
+        ),
+        (
+            huracanpy.example_TRACK_timestep_file,
+            dict(source="TRACK"),
+            38,
+            0,
+            416,
+            19,
+            False,
+        ),
         (
             huracanpy.example_TRACK_timestep_file,
             dict(source="TRACK", track_calendar=("1940-01-01", 6)),
@@ -21,6 +47,7 @@ import huracanpy
             0,
             416,
             19,
+            True,
         ),
         (
             huracanpy.example_TRACK_timestep_file,
@@ -35,8 +62,9 @@ import huracanpy
             0,
             416,
             19,
+            True,
         ),
-        (huracanpy.example_TE_file, dict(source="tempestextremes"), 8, 0, 210, 8),
+        (huracanpy.example_TE_file, dict(source="tempestextremes"), 8, 0, 210, 8, True),
         (
             huracanpy.example_TE_file,
             dict(source="tempestextremes", variable_names=["slp", "wind"]),
@@ -44,13 +72,22 @@ import huracanpy
             0,
             210,
             8,
+            True,
         ),
-        (huracanpy.example_CHAZ_file, dict(), 11, 0, 1078, 20),
-        (huracanpy.example_MIT_file, dict(), 10, 1, 2138, 11),
-        (huracanpy.example_WiTRACK_file, dict(source="witrack"), 14, 0, 3194, 268),
-        (None, dict(source="ibtracs", ibtracs_subset="wmo"), 8, 0, 143287, 4540),
-        (None, dict(source="ibtracs", ibtracs_subset="usa"), 10, 0, 121806, 4170),
-        (huracanpy.example_old_HURDAT_file, dict(source="ecmwf"), 8, 0, 183, 29),
+        (huracanpy.example_CHAZ_file, dict(), 11, 0, 1078, 20, True),
+        (huracanpy.example_MIT_file, dict(), 10, 1, 2138, 11, False),
+        (
+            huracanpy.example_WiTRACK_file,
+            dict(source="witrack"),
+            14,
+            0,
+            3194,
+            268,
+            True,
+        ),
+        (None, dict(source="ibtracs", ibtracs_subset="wmo"), 8, 0, 143287, 4540, True),
+        (None, dict(source="ibtracs", ibtracs_subset="usa"), 10, 0, 121806, 4170, True),
+        (huracanpy.example_old_HURDAT_file, dict(source="ecmwf"), 8, 0, 183, 29, True),
         (
             huracanpy.example_STORM_file,
             dict(
@@ -77,8 +114,17 @@ import huracanpy
             0,
             3909,
             134,
+            True,
         ),
-        (huracanpy.example_IRIS_file, dict(source="iris"), 10, 0, 40, 2),
+        (
+            huracanpy.example_IRIS_file,
+            dict(source="iris"),
+            10,
+            0,
+            40,
+            2,
+            True if version("xarray") >= "2025.01.2" else False,
+        ),
         # Two csv file that should load with the same options
         (
             [huracanpy.example_csv_file, huracanpy.example_year_file],
@@ -87,10 +133,13 @@ import huracanpy
             0,
             2373,
             92,
+            True,
         ),
+        (huracanpy._test_ibtracs_netcdf_file, dict(), 149, 3, 72, 2, True),
+        (huracanpy._test_non_ragged_netcdf_file, dict(), 9, 0, 99, 3, True),
     ],
 )
-def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
+def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks, isdatetime64):
     data = _load_with_checked_warnings(filename, **kwargs)
 
     assert len(data) == nvars
@@ -98,6 +147,15 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks):
     assert len(data.time) == npoints
     assert len(data.groupby("track_id")) == ntracks
     assert "record" not in data.coords
+    assert data.track_id.attrs["cf_role"] == "trajectory_id"
+    assert np.issubdtype(data.time, np.datetime64) == isdatetime64
+    if isdatetime64:
+        if filename == huracanpy.example_IRIS_file:
+            assert data.time.dt.year.min() == 6000
+            assert data.time.dt.year.max() == 6001
+        else:
+            assert data.time.dt.year.min() >= 1940
+            assert data.time.dt.year.max() <= 2025
 
     if filename != huracanpy.example_TRACK_tilt_file:
         for name in ["track_id", "time", "lon", "lat"]:

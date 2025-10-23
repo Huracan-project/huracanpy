@@ -95,10 +95,14 @@ def _reset_track_id(tracks, track_ids, start=0, *, keep_original=False):
         keep_original = "track_id_original"
 
     if isinstance(keep_original, str):
-        tracks = tracks.assign(**{keep_original: (track_ids.dims[0], track_ids.values)})
+        tracks = tracks.assign(**{keep_original: track_ids})
+        if "cf_role" in tracks[keep_original].attrs:
+            del tracks[keep_original].attrs["cf_role"]
 
     tracks = tracks.assign(
         **{track_ids.name: (track_ids.dims[0], start + new_track_ids)}
     )
+
+    tracks.track_id.attrs["cf_role"] = "trajectory_id"
 
     return tracks

@@ -63,6 +63,17 @@ def basin(lon, lat, convention="WMO-TC", crs=None):
                 * Europe
                 * NoEurope
 
+            * **Knutson2020** - Definitions from
+                (https://doi.org/10.1175/BAMS-D-18-0194.1). Global basins:
+
+                * NATL (North Atlantic)
+                * ENP (Northeast Pacific)
+                * WNP (Northwest Pacific)
+                * NI (North Indian)
+                * SI (South Indian)
+                * SP (Southwest Pacific)
+                * SA (South Atlantic)
+
     crs : cartopy.crs.CRS, optional
         The coordinate reference system of the lon, lat inputs. The basins are defined
         in PlateCarree (-180, 180), so this will transform lon/lat to this projection
