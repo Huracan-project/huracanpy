@@ -358,12 +358,10 @@ def landfall_points(lon, lat, track_id=None, *, resolution="10m", crs=None):
             (track_id, p.x, p.y) for p in track.intersection(coastline).explode()
         ]
 
-    points = np.asarray(points)
-
     return xr.Dataset(
         data_vars=dict(
-            track_id=("record", points[:, 0]),
-            lon=("record", points[:, 1]),
-            lat=("record", points[:, 2]),
+            track_id=("record", [p[0] for p in points]),
+            lon=("record", [p[1] for p in points]),
+            lat=("record", [p[2] for p in points]),
         )
     )
