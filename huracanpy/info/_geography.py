@@ -2,6 +2,7 @@
 Utils related to geographical attributes
 """
 
+from collections import Counter
 import warnings
 
 from cartopy.io.shapereader import natural_earth
@@ -127,7 +128,7 @@ def _get_natural_earth_feature(
     category,
     name,
     resolution,
-    predicate="contains",
+    predicate="intersects",
     track_id=None,
     crs=None,
 ):
@@ -147,9 +148,25 @@ def _get_natural_earth_feature(
 
     tracks = to_geodataframe(lon, lat, track_id, crs=crs).to_crs(df.crs)
 
-    result = np.asarray(
-        gpd.tools.sjoin(df, tracks, how="right", predicate=predicate)[feature]
-    ).astype(str)
+    result = gpd.tools.sjoin(df, tracks, how="right", predicate=predicate)
+
+    # Select first result when a point returns two results
+    # e.g. exactly on the dividing line of two basins
+    # Gives an Nx2 array with first column the index in the result, and the second
+    # column the number of times that index is repeated
+    counts = np.asarray(list(Counter(result.index).items()))
+
+    # Subset to only repeated indices
+    counts = counts[counts[:, 1] > 1]
+
+    iloc_indices = list(range(len(result)))
+    offset = 1
+    for idx, count in counts:
+        for n in range(1, count):
+            iloc_indices.remove(idx + offset)
+            offset += 1
+
+    result = result.iloc[iloc_indices][feature].to_numpy().astype(str)
 
     # Set "nan" as empty
     result[result == "nan"] = ""

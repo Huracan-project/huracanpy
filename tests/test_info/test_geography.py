@@ -30,30 +30,18 @@ def test_hemisphere(data, expected, request):
         (
             "tracks_minus180_plus180",
             np.asarray(
-                [""]
-                + ["SP"] * 7
-                + ["SA"] * 4
-                + ["MED"] * 2
-                + ["NI"] * 4
-                + ["WNP"] * 5
-                + [""]
+                ["SP"] * 8 + ["SA"] * 4 + ["MED"] * 2 + ["NI"] * 4 + ["WNP"] * 6
             ),
         ),
         (
             "tracks_0_360",
             np.asarray(
-                [""]
-                + ["SP"] * 7
-                + ["SA"] * 4
-                + ["MED"] * 2
-                + ["NI"] * 4
-                + ["WNP"] * 5
-                + [""]
+                ["SP"] * 8 + ["SA"] * 4 + ["MED"] * 2 + ["NI"] * 4 + ["WNP"] * 6
             ),
         ),
         (
             "tracks_csv",
-            np.asarray(["AUS"] * 37 + [""] * 3 + ["AUS"] * 11 + ["SI"] * 48),
+            np.asarray(["AUS"] * 51 + ["SI"] * 48),
         ),
     ],
 )
@@ -69,7 +57,7 @@ def test_basin(data, expected, request):
     [
         (
             "Sainsbury2022JCLI",
-            ["WEST", "SUB", ""] + ["SUB", "MDR"] * 5 + ["SUB"] + [""] * 6,
+            ["WEST"] + ["SUB", "MDR"] * 7 + [""] * 5,
         ),
         (
             "Sainsbury2022MWR",
@@ -116,7 +104,7 @@ def test_basin_definition(convention, expected):
                 + [True]
                 + [False] * 6
                 + [True] * 2
-                + [False]
+                + [True]
             ),
         ),
         (
@@ -130,7 +118,7 @@ def test_basin_definition(convention, expected):
                 + [True]
                 + [False] * 6
                 + [True] * 2
-                + [False]
+                + [True]
             ),
         ),
         ("tracks_csv", np.asarray([True] * 15 + [False] * 15 + [True] * 69)),
