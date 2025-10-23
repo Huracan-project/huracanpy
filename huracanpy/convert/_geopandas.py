@@ -21,15 +21,52 @@ def to_geodataframe(lon, lat, track_id=None, *, crs=None):
 
     else:
         track_id = np.asarray(track_id)
-        track_id, index, npoints = np.unique(
-            track_id, return_index=True, return_counts=True
+
+        # Split dateline crossings into two lines
+        dateline_crossing = np.where(
+            (np.abs(np.diff(xyz[:, 0])) > 180) & (track_id[1:] == track_id[:-1])
+        )[0]
+
+        # Track offset as elements get input into the array
+        for offset, idx in enumerate(dateline_crossing):
+            # np.insert puts the new value in front of the index so add 1
+            loc = idx + 2 * offset + 1
+            track_id = np.insert(track_id, loc, track_id[loc])
+            track_id = np.insert(track_id, loc, track_id[loc + 1])
+
+            y_mid = 0.5 * (xyz[loc - 1, 1] + xyz[loc, 1])
+
+            # Order of insertion depends on direction of dateline crossing
+            if xyz[loc - 1, 0] > 0:
+                xyz = np.insert(xyz, loc, np.array([180 - 1e-7, y_mid, 0]), axis=0)
+                xyz = np.insert(xyz, loc + 1, np.array([-180, y_mid, 0]), axis=0)
+            else:
+                xyz = np.insert(xyz, loc, np.array([-180, y_mid, 0]), axis=0)
+                xyz = np.insert(xyz, loc + 1, np.array([180 - 1e-7, y_mid, 0]), axis=0)
+
+            # Update the location of the dateline crossing to account for the inserted
+            # points
+            dateline_crossing[offset] = loc
+
+        # All the indices for the start of distinct linestrings
+        # Include the start and end indices
+        indices = np.sort(
+            np.concatenate(
+                [
+                    dateline_crossing + 1,
+                    np.where(track_id[1:] != track_id[:-1])[0] + 1,
+                    [0, len(track_id)],
+                ]
+            )
         )
 
         tracks_dict = dict(
-            track_id=track_id,
+            track_id=track_id[indices[:-1]],
             geometry=[
-                LineString(xyz[idx : idx + n, :2]) if n > 1 else Point(xyz[idx, :2])
-                for idx, n in zip(index, npoints)
+                LineString(xyz[indices[n] : indices[n + 1], :2])
+                if (indices[n + 1] - indices[n]) > 1
+                else Point(xyz[indices[n], :2])
+                for n in range(len(indices) - 1)
             ],
         )
 
