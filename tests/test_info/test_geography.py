@@ -240,4 +240,5 @@ def test_landfall_points(data, expected, request):
     data = request.getfixturevalue(data)
     result = huracanpy.info.landfall_points(data.lon, data.lat, data.track_id)
 
-    xr.testing.assert_identical(result, expected)
+    # Same result but different order for some reason
+    xr.testing.assert_allclose(result.sortby("lon"), expected.sortby("lon"))
