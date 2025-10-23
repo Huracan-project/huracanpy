@@ -24,10 +24,12 @@ def to_geodataframe(lon, lat, track_id=None, *, crs=None):
         track_id, index, npoints = np.unique(
             track_id, return_index=True, return_counts=True
         )
+
         tracks_dict = dict(
             track_id=track_id,
             geometry=[
-                LineString(xyz[idx : idx + n, :2]) for idx, n in zip(index, npoints)
+                LineString(xyz[idx : idx + n, :2]) if n > 1 else Point(xyz[idx, :2])
+                for idx, n in zip(index, npoints)
             ],
         )
 
