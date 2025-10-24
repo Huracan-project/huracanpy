@@ -19,10 +19,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `centering="centre"` - Centred difference, NaN at the start and end of tracks
   - `centering="adaptive"` - Centered difference. Forward difference at the start of tracks. Backward difference at the end of tracks
 - Basin definitions from [Knutson et al. (2020)](https://doi.org/10.1175/BAMS-D-18-0194.1) (`"Knutson2020"`)
+- Add `spherical` option to `calc.density`. Divides by area of gridboxes for `method="histogram"` and implements haversine weighting with scikit-learn for `method="kde"
+- Add `info.landfall_points` which returns each point where a track crosses a coastline
+- New module `convert` and function `convert.to_geodataframe` to convert tracks to a geodataframe of points or linestrings (if track_id is given)
 
 ### Changed
 - Speed up `huracanpy.save` for netCDF files
-- Remove NaN only variables when loading online IBTrACS data. 
+- Remove NaN only variables when loading online IBTrACS data.
+- Add a cyclic point when using `plot.density` so that the dateline doesn't show up as empty
+
+### Fixed
+- -180 and 180 no longer treated as different longitudes. -180 is always used instead
+- When a point is exactly on the boundary of basin, give the first basin in the list rather than no basin
 
 ## v1.3.1
 ### Fixed
