@@ -43,6 +43,9 @@ intersphinx_mapping = {
     "cartopy": ("https://cartopy.readthedocs.io/stable/", None),
     "cftime": ("https://unidata.github.io/cftime/", None),
     "metpy": ("https://unidata.github.io/MetPy/latest/", None),
+    "shapely": ("https://shapely.readthedocs.io/en/stable/", None),
+    "geopandas": ("https://geopandas.org/en/stable/", None),
+    "sklearn": ("https://scikit-learn.org/stable/", None),
 }
 
 # myst parser (markdown)
