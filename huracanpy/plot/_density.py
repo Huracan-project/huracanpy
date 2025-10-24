@@ -4,9 +4,12 @@ Functions to plot track/genesis/whatever density
 To compute the density, see huracanpy.diags.track_density
 """
 
-import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 from cartopy.mpl.geoaxes import GeoAxes
+from cartopy.util import add_cyclic
+import matplotlib.pyplot as plt
+import numpy as np
+import xarray as xr
 
 
 def density(
@@ -50,6 +53,16 @@ def density(
             contourf_kws["transform"] = ccrs.PlateCarree()
         ax.coastlines()
         ax.gridlines(draw_labels=True)
+
+    # Add extra cyclic point so contourf doesn't show an empty column
+    # Only apply for global data
+    dlon = np.diff(d.lon)
+    if np.allclose(dlon.sum() + dlon[0], 360):
+        d, lons, lats = add_cyclic(d, x=d.lon, y=d.lat)
+
+        d = xr.DataArray(
+            d, dims=("lat", "lon"), coords={"lat": lats, "lon": lons}, name="density"
+        )
 
     d.plot.contourf(ax=ax, cbar_kwargs=cbar_kwargs, **contourf_kws)
 
