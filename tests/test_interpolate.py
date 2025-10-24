@@ -6,7 +6,7 @@ import xarray as xr
 import huracanpy
 
 
-data_path = pathlib.Path(__file__).parent / "data_interpolate"
+data_path = pathlib.Path(__file__).parent / "saved_results"
 
 
 @pytest.mark.parametrize("prog_bar", [(True,), (False,)])

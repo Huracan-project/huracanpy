@@ -1,5 +1,8 @@
+from cartopy.crs import Geodetic
 from shapely.geometry import Polygon, MultiPolygon
 import geopandas as gpd
+
+geodetic = Geodetic()
 
 # %% Basins
 
@@ -28,7 +31,9 @@ SA = Polygon(((-65, -90), (-65, 0), (20, 0), (20, -90)))
 SH = {"SI": SI, "AUS": AUS, "SP": SP, "SA": SA}
 
 B = dict(SH, **NH)
-basins["WMO-TC"] = gpd.GeoDataFrame(index=B.keys(), geometry=list(B.values()))
+basins["WMO-TC"] = gpd.GeoDataFrame(
+    index=B.keys(), geometry=list(B.values()), crs=geodetic
+)
 
 ibtracs = dict(
     NI=Polygon(((30, 0), (30, 90), (100, 90), (100, 0))),
@@ -45,7 +50,7 @@ ibtracs = dict(
     SA=Polygon(((-65, -90), (-65, 0), (20, 0), (20, -90))),
 )
 basins["ibtracs"] = gpd.GeoDataFrame(
-    index=ibtracs.keys(), geometry=list(ibtracs.values())
+    index=ibtracs.keys(), geometry=list(ibtracs.values()), crs=geodetic
 )
 
 # Sainsbury et. al. (2022)
@@ -69,7 +74,7 @@ B = dict(
     ),
 )
 basins["Sainsbury2022JCLI"] = gpd.GeoDataFrame(
-    index=B.keys(), geometry=list(B.values())
+    index=B.keys(), geometry=list(B.values()), crs=geodetic
 )
 
 # Sainsbury et. al. (2022)
@@ -79,7 +84,9 @@ B = dict(
     Europe=Polygon([(-10, 36), (30, 36), (30, 70), (-10, 70)]),
     NoEurope=Polygon([(-70, 36), (-10, 36), (-10, 70), (-70, 70)]),
 )
-basins["Sainsbury2022MWR"] = gpd.GeoDataFrame(index=B.keys(), geometry=list(B.values()))
+basins["Sainsbury2022MWR"] = gpd.GeoDataFrame(
+    index=B.keys(), geometry=list(B.values()), crs=geodetic
+)
 
 # Knutson et al. (2020)
 # Tropical Cyclones and Climate Change Assessment: Part II: Projected Response to
@@ -99,4 +106,6 @@ B = dict(
     ),
     SA=Polygon(((-65, -90), (-65, 0), (20, 0), (20, -90))),
 )
-basins["Knutson2020"] = gpd.GeoDataFrame(index=B.keys(), geometry=list(B.values()))
+basins["Knutson2020"] = gpd.GeoDataFrame(
+    index=B.keys(), geometry=list(B.values()), crs=geodetic
+)

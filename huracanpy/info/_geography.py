@@ -2,18 +2,34 @@
 Utils related to geographical attributes
 """
 
+from collections import Counter
 import warnings
-from pint.errors import UnitStrippedWarning
 
-import numpy as np
-import pandas as pd
-from shapely.geometry import Point
-import geopandas as gpd
 from cartopy.io.shapereader import natural_earth
+import geopandas as gpd
 from metpy.xarray import preprocess_and_wrap
-from cartopy.crs import Geodetic, PlateCarree
+import numpy as np
+from pint.errors import UnitStrippedWarning
+import xarray as xr
 
 from .._basins import basins
+from ..convert import to_geodataframe
+
+
+def _wrap_arrays(*args):
+    # The metpy wrapper converting to pint causes errors, but I'm still going to use it
+    # because it lets me pass different array_like types for lon/lat without writing
+    # our own wrapper. For now, just convert anything not a numpy array to a numpy array
+    arrays = []
+    for array in args:
+        if array is not None and not isinstance(array, np.ndarray):
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=UnitStrippedWarning)
+                arrays.append(np.asarray(array))
+        else:
+            arrays.append(array)
+
+    return arrays
 
 
 @preprocess_and_wrap(wrap_like="lat")
@@ -43,9 +59,9 @@ def basin(lon, lat, convention="WMO-TC", crs=None):
 
     Parameters
     ----------
-    lon : xarray.DataArray
+    lon : float or array_like
         Longitude series
-    lat : xarray.DataArray
+    lat : float or array_like
         Latitude series
     convention : str
         Name of the basin convention you want to use.
@@ -107,8 +123,7 @@ _natural_earth_feature_cache = {
 }
 
 
-@preprocess_and_wrap(wrap_like="lon")
-def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, crs=None):
+def _cache_natural_earth_feature(feature, category, name, resolution):
     key = f"{category}_{name}_{resolution}_{feature}"
     if key in _natural_earth_feature_cache:
         df = _natural_earth_feature_cache[key]
@@ -118,27 +133,46 @@ def _get_natural_earth_feature(lon, lat, feature, category, name, resolution, cr
         df = df[["geometry", feature]]
         _natural_earth_feature_cache[key] = df
 
-    # The metpy wrapper converting to pint causes errors, but I'm still going to use it
-    # because it lets me pass different array_like types for lon/lat without writing
-    # our own wrapper. For now, just convert anything not a numpy array to a numpy array
-    if not isinstance(lon, np.ndarray):
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=UnitStrippedWarning)
-            lon = np.asarray(lon)
-            lat = np.asarray(lat)
+    return df
 
-    if crs is None:
-        crs = Geodetic()
-    xyz = PlateCarree().transform_points(crs, lon, lat)
 
-    # Create dataframe of points coordinates
-    points = pd.DataFrame(dict(coords=list(xyz[:, :2])))
-    # Transform into Points within a GeoDataFrame
-    points = gpd.GeoDataFrame(points.coords.apply(Point), geometry="coords", crs=df.crs)
+@preprocess_and_wrap(wrap_like="lon")
+def _get_natural_earth_feature(
+    lon,
+    lat,
+    feature,
+    category,
+    name,
+    resolution,
+    predicate="intersects",
+    track_id=None,
+    crs=None,
+):
+    lon, lat, track_id = _wrap_arrays(lon, lat, track_id)
 
-    result = np.asarray(
-        gpd.tools.sjoin(df, points, how="right", predicate="contains")[feature]
-    ).astype(str)
+    df = _cache_natural_earth_feature(feature, category, name, resolution)
+
+    tracks = to_geodataframe(lon, lat, track_id, crs=crs).to_crs(df.crs)
+
+    result = gpd.tools.sjoin(df, tracks, how="right", predicate=predicate)
+
+    # Select first result when a point returns two results
+    # e.g. exactly on the dividing line of two basins
+    # Gives an Nx2 array with first column the index in the result, and the second
+    # column the number of times that index is repeated
+    counts = np.asarray(list(Counter(result.index).items()))
+
+    # Subset to only repeated indices
+    counts = counts[counts[:, 1] > 1]
+
+    iloc_indices = list(range(len(result)))
+    offset = 1
+    for idx, count in counts:
+        for n in range(1, count):
+            iloc_indices.remove(idx + offset)
+            offset += 1
+
+    result = result.iloc[iloc_indices][feature].to_numpy().astype(str)
 
     # Set "nan" as empty
     result[result == "nan"] = ""
@@ -283,4 +317,59 @@ def continent(lon, lat, resolution="10m", crs=None):
         name="admin_0_countries",
         resolution=resolution,
         crs=crs,
+    )
+
+
+@preprocess_and_wrap()
+def landfall_points(lon, lat, track_id=None, *, resolution="10m", crs=None):
+    """Find the points where the tracks intersect with a coastline
+
+    Parameters
+    ----------
+    lon, lat : float or array_like
+    track_id : float or array_like, optional
+    resolution : str
+        The resolution of the Land/Sea outlines dataset to use. One of
+
+        * 10m (1:10,000,000)
+        * 50m (1:50,000,000)
+        * 110m (1:110,000,000)
+
+        Default is "10m"
+    crs : cartopy.crs.CRS
+        The coordinate system that the input lon/lat points are in. Default is None,
+        which assumes Geodesic with Earth radius.
+
+    Returns
+    -------
+    xarray.Dataset
+
+    """
+    lon, lat, track_id = _wrap_arrays(lon, lat, track_id)
+
+    df = _cache_natural_earth_feature("featurecla", "physical", "coastline", resolution)
+
+    tracks = to_geodataframe(lon, lat, track_id, crs=crs).to_crs(df.crs)
+
+    # Get the combinations of track_id / coastline that have intersections
+    result = gpd.tools.sjoin(tracks, df, predicate="intersects")
+
+    # For each combination of track_id / coastline get the exact point(s) that they
+    # intersect and save as a set of tracks in the same record, track_id format
+    points = []
+    for n, row in result.iterrows():
+        track_id = tracks.loc[n].track_id
+        track = gpd.GeoSeries(tracks.loc[n].geometry, crs=tracks.crs)
+        coastline = gpd.GeoSeries(df.loc[row.index_right].geometry, crs=df.crs)
+
+        points += [
+            (track_id, p.x, p.y) for p in track.intersection(coastline).explode()
+        ]
+
+    return xr.Dataset(
+        data_vars=dict(
+            track_id=("record", [p[0] for p in points]),
+            lon=("record", [p[1] for p in points]),
+            lat=("record", [p[2] for p in points]),
+        )
     )
