@@ -13,6 +13,12 @@ import xarray as xr
 from .._metpy import dequantify_results
 
 
+def _area(x_edge, y_edge):
+    return (earth_avg_radius**2) * np.outer(
+        np.diff(np.sin(np.deg2rad(y_edge))), np.diff(np.deg2rad(x_edge))
+    )
+
+
 @dequantify_results
 def density(
     lon,
@@ -96,14 +102,13 @@ def density(
         h = _histogram(lon, lat, x_edge, y_edge, function_kws)
 
         if spherical:
-            area = (earth_avg_radius**2) * np.outer(
-                np.diff(np.sin(np.deg2rad(y_edge))), np.diff(np.deg2rad(x_edge))
-            )
-
-            h = h / area
+            h = h / _area(x_edge, y_edge)
     elif method == "kde":
         if spherical:
             h = _spherical_kde(lon, lat, x_mid, y_mid, function_kws)
+
+            # Normalise so that the area integral is the number of points
+            h = h * len(lon) / (h * _area(x_edge, y_edge)).sum()
         else:
             h = _kde(lon, lat, x_mid, y_mid, function_kws)
     else:
