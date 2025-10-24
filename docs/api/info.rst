@@ -18,6 +18,7 @@ Geographic
     is_ocean
     country
     continent
+    landfall_points
 
 Categorisation
 --------------

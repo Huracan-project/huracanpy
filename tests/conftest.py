@@ -59,26 +59,24 @@ def tracks_year_cftime():
 
 @pytest.fixture()
 def tracks_minus180_plus180():
-    return xr.Dataset(
+    tracks = xr.Dataset(
         dict(
-            track_id=np.zeros(24),
-            time=[datetime.datetime(2000, 1, 1, n) for n in range(24)],
-            lon=np.linspace(-180, 180, 24),
-            lat=np.linspace(-90, 90, 24),
+            track_id=("record", np.zeros(24)),
+            time=("record", [datetime.datetime(2000, 1, 1, n) for n in range(24)]),
+            lon=("record", np.linspace(-180, 180, 24)),
+            lat=("record", np.linspace(-90, 90, 24)),
         )
     )
+
+    return tracks
 
 
 @pytest.fixture()
-def tracks_0_360():
-    return xr.Dataset(
-        dict(
-            track_id=np.zeros(24),
-            time=[datetime.datetime(2000, 1, 1, n) for n in range(24)],
-            lon=np.linspace(-180, 180, 24) % 360,
-            lat=np.linspace(-90, 90, 24),
-        )
-    )
+def tracks_0_360(tracks_minus180_plus180):
+    tracks = tracks_minus180_plus180.copy()
+    tracks.lon.values[:] = tracks.lon.values % 360
+
+    return tracks
 
 
 coords = namedtuple("coords", ["lon", "lat"])

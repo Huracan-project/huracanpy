@@ -7,6 +7,7 @@ __all__ = [
     "continent",
     "is_land",
     "is_ocean",
+    "landfall_points",
     "category",
     "timestep",
     "time_components",
@@ -21,6 +22,7 @@ from ._geography import (
     continent,
     is_land,
     is_ocean,
+    landfall_points,
 )
 from ._category import category
 from ._time import timestep, time_components, season

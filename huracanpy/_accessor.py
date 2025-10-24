@@ -135,6 +135,22 @@ class HuracanPyDatasetAccessor:
         )
         return self._dataset
 
+    def get_landfall_points(
+        self,
+        lon_name="lon",
+        lat_name="lat",
+        track_id_name="track_id",
+        resolution="10m",
+        crs=None,
+    ):
+        return info.landfall_points(
+            self._dataset[lon_name],
+            self._dataset[lat_name],
+            self._dataset[track_id_name],
+            resolution=resolution,
+            crs=crs,
+        )
+
     # ---- ACE & PACE
     def get_ace(
         self,
