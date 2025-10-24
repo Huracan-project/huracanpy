@@ -242,3 +242,19 @@ def test_landfall_points(data, expected, request):
 
     # Same result but different order for some reason
     xr.testing.assert_allclose(result.sortby("lon"), expected.sortby("lon"))
+
+
+def test_landfall_dateline():
+    # This would previous give multiple landfall points because geopandas doesn't
+    # account for dateline crossing. Now it is split into multiple lines instead
+    result = huracanpy.info.landfall_points(
+        np.array([179, -179]), np.array([0, 0]), np.array([0, 0, 0])
+    )
+    assert len(result.record) == 0
+
+    # Test the equivalent line that does go round the equator
+    result = huracanpy.info.landfall_points(
+        np.array([179, 0, -179]), np.array([0, 0, 0]), np.array([0, 0, 0])
+    )
+    assert len(result.record) == 36
+    assert (result.lat == 0).all()
