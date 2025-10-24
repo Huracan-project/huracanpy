@@ -11,13 +11,13 @@ def overlap(tracks1, tracks2, matches=None):
     ----------
     tracks1 : xarray.Dataset
     tracks2 : xarray.Dataset
-    matches : pandas.Dataframe
+    matches : pandas.DataFrame
         The output from match_tracks on tracks1 and tracks2.
         If None, match_tracks is run on tracks1 and tracks2.
 
     Returns
     -------
-    pd.Dataframe
+    pandas.DataFrame
         Match dataset with added deltas in days
     """
     if matches is None:

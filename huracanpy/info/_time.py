@@ -57,7 +57,8 @@ def time_components(time, components=("year", "month", "day", "hour")):
         The time series
     components : iterable[str], optional
         The time components of `time` to return. Can include any valid attribute of
-        `xarray.core.accessor_dt.DatetimeAccessor`. Default is year, month, day, hour
+        :obj:`xarray.core.accessor_dt.DatetimeAccessor`. Default is year, month, day,
+        hour
 
     Returns
     -------

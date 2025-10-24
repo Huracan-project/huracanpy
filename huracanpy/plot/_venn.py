@@ -12,8 +12,8 @@ def venn(datasets, match, labels, colors=None, circle_color="k"):
     ----------
     datasets : list of xr.dataset
         list of the datasets compared.
-    match : pd.DataFrame
-        match dataframe issued from match_pair or match_multiple.
+    match : pandas.DataFrame
+        match dataframe issued from :func:`huracanpy.assess.match`.
     labels : list of str
         labels of the datasets.
     colors : list of str, optional

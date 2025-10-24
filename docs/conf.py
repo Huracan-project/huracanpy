@@ -46,6 +46,9 @@ intersphinx_mapping = {
     "shapely": ("https://shapely.readthedocs.io/en/stable/", None),
     "geopandas": ("https://geopandas.org/en/stable/", None),
     "sklearn": ("https://scikit-learn.org/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+    "pyproj": ("https://pyproj4.github.io/pyproj/stable/", None),
+    "seaborn": ("https://seaborn.pydata.org/", None),
 }
 
 # myst parser (markdown)

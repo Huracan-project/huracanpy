@@ -10,7 +10,7 @@ def pod(matches, ref, ref_name):
     ----------
     matches : pandas.DataFrame
         The result from matching tracks to a reference dataset output from
-        `huracanpy.assess.match`
+        :func:`huracanpy.assess.match`
     ref : xarray.Dataset
         The original reference dataset before matching
     ref_name : str
@@ -31,9 +31,9 @@ def far(matches, detected, detected_name):
 
     Parameters
     ----------
-    matches : pandas.Dataframe
+    matches : pandas.DataFrame
         The result from matching tracks to a reference dataset output from
-        `huracanpy.assess.match`
+        :func:`huracanpy.assess.match`
     detected : xarray.Dataset
         The original dataset that was being matched to the reference
     detected_name : str

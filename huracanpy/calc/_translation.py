@@ -124,12 +124,12 @@ def distance(
     lon : xarray.DataArray
     lat : xarray.DataArray
     *args : xarray.DataArray
-        * 0 arguments. Leave empty to calculate distance between successive points
-        * 1 argument, track_id. Same as 0 arguments but inserts NaNs where successive
-            points are from different tracks
-        * 2 arguments, lon and lat arrays. Calculate distances between two tracks,
-            e.g. radius of maximum wind speed, using storm centre locations and maximum
-            wind speed locations
+        - 0 arguments. Leave empty to calculate distance between successive points
+        - 1 argument, track_id. Same as 0 arguments but inserts NaNs where successive
+          points are from different tracks
+        - 2 arguments, lon and lat arrays. Calculate distances between two tracks,
+          e.g. radius of maximum wind speed, using storm centre locations and maximum
+          wind speed locations
     track_id : array_like, optional
     method : str, optional
         The method of computing distances, either geodesic (`"geod"`/`"geodesic"`) or

@@ -74,7 +74,7 @@ def apex_vals(tracks, variable, track_id, stat="max"):
 
     Parameters
     ----------
-    tracks : xarray.DataSet
+    tracks : xarray.Dataset
     variable : array_like
         The extremum variable
     track_id : xarray.DataArray

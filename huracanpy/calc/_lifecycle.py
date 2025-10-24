@@ -11,8 +11,8 @@ def time_from_genesis(time, track_ids):
 
     Parameters
     ----------
-    time: xr.DataArray
-    track_ids: xr.DataArray
+    time: xarray.DataArray
+    track_ids: xarray.DataArray
 
     Returns
     -------
