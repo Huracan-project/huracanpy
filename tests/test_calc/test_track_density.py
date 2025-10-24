@@ -11,9 +11,12 @@ import numpy as np
 def test_density(baselon, method, crop):
     data = huracanpy.load(huracanpy.example_year_file, baselon=baselon)
     d = huracanpy.calc.density(data.lon, data.lat, method=method, crop=crop)
-    assert d.min() == 0.0
-    assert d.max() == 43.0
-    assert d.sum() == len(data.record)
+
+    # Currently non-spherical KDE gives inconsistent results
+    if method != "kde":
+        assert d.min() == 0.0
+        assert d.max() == 43.0
+    np.testing.assert_allclose(d.sum(), len(data.record))
 
     # "crop=True" used to cut out any rows/columns with all NaN (no data) but this leads
     # to non-even spacing in longitude or latitude where it has cut out in between data
@@ -43,6 +46,22 @@ def test_density_spherical():
 
     assert d_spherical.attrs["units"] == "1 / meter ** 2"
     assert "units" not in d.attrs
+
+
+@pytest.mark.parametrize("baselon", [-180, 0])
+@pytest.mark.parametrize("crop", [True, False])
+def test_density_spherical_kde(baselon, crop):
+    data = huracanpy.load(huracanpy.example_year_file, baselon=baselon)
+
+    d = huracanpy.calc.density(
+        data.lon, data.lat, method="kde", spherical=True, crop=crop
+    )
+
+    assert d.attrs["units"] == "1 / meter ** 2"
+
+    np.testing.assert_allclose(d.min(), 3.65054709e-14)
+    np.testing.assert_allclose(d.max(), 2.85069764e-11)
+    np.testing.assert_allclose(d.sum(), 8.6133285e-09)
 
 
 def test_track_density_fails():

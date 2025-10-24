@@ -161,6 +161,8 @@ def _kde(lon, lat, x_mid, y_mid, function_kws):
 def _spherical_kde(lon, lat, x_mid, y_mid, function_kws):
     if "bandwidth" not in function_kws:
         function_kws["bandwidth"] = "scott"
+    if "metric" not in function_kws:
+        function_kws["metric"] = "haversine"
     # engineer positions array for kernel estimation computation
     x_grid, y_grid = np.meshgrid(x_mid, y_mid)
     grid_positions = np.deg2rad(np.array([y_grid.flatten(), x_grid.flatten()]).T)
