@@ -10,7 +10,12 @@ import numpy as np
 @pytest.mark.parametrize("crop", [True, False])
 def test_density(baselon, method, crop):
     data = huracanpy.load(huracanpy.example_year_file, baselon=baselon)
-    d = huracanpy.calc.density(data.lon, data.lat, method=method, crop=crop)
+
+    with pytest.warns(
+        UserWarning,
+        match="By default density does not take into account the spherical geometry",
+    ):
+        d = huracanpy.calc.density(data.lon, data.lat, method=method, crop=crop)
 
     # Currently non-spherical KDE gives inconsistent results
     if method != "kde":
@@ -28,7 +33,11 @@ def test_density(baselon, method, crop):
 def test_density_spherical():
     data = huracanpy.load(huracanpy.example_year_file)
 
-    d = huracanpy.calc.density(data.lon, data.lat)
+    with pytest.warns(
+        UserWarning,
+        match="By default density does not take into account the spherical geometry",
+    ):
+        d = huracanpy.calc.density(data.lon, data.lat)
     d_spherical = huracanpy.calc.density(data.lon, data.lat, spherical=True)
 
     dlon = d.lon[1] - d.lon[0]
@@ -66,5 +75,12 @@ def test_density_spherical_kde(baselon, crop):
 
 def test_track_density_fails():
     data = huracanpy.load(huracanpy.example_year_file)
-    with pytest.raises(NotImplementedError, match="Method nonsense not implemented"):
+    with (
+        pytest.raises(NotImplementedError, match="Method nonsense not implemented"),
+        pytest.warns(
+            UserWarning,
+            match="By default density does not take into account the spherical"
+            " geometry",
+        ),
+    ):
         huracanpy.calc.density(data.lon, data.lat, method="nonsense")
