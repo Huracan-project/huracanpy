@@ -24,20 +24,22 @@ def test_hemisphere(data, expected, request):
     np.testing.assert_equal(result, expected)
 
 
+# Same answer for -180-180 and 0-360
+_expected = np.asarray(
+    ["SP"] * 8 + ["SA"] * 4 + ["MED"] * 2 + ["NI"] * 4 + ["WNP"] * 5 + ["CP"]
+)
+
+
 @pytest.mark.parametrize(
     "data, expected",
     [
         (
             "tracks_minus180_plus180",
-            np.asarray(
-                ["SP"] * 8 + ["SA"] * 4 + ["MED"] * 2 + ["NI"] * 4 + ["WNP"] * 6
-            ),
+            _expected,
         ),
         (
             "tracks_0_360",
-            np.asarray(
-                ["SP"] * 8 + ["SA"] * 4 + ["MED"] * 2 + ["NI"] * 4 + ["WNP"] * 6
-            ),
+            _expected,
         ),
         (
             "tracks_csv",
@@ -90,36 +92,30 @@ def test_basin_definition(convention, expected):
     np.testing.assert_equal(result, expected)
 
 
+# Same answer for -180-180 and 0-360
+_expected = np.asarray(
+    [False]
+    + [True] * 6
+    + [False] * 2
+    + [True] * 4
+    + [False]
+    + [True]
+    + [False] * 6
+    + [True] * 2
+    + [False]
+)
+
+
 @pytest.mark.parametrize(
     "data, expected",
     [
         (
             "tracks_minus180_plus180",
-            np.asarray(
-                [False]
-                + [True] * 6
-                + [False] * 2
-                + [True] * 4
-                + [False]
-                + [True]
-                + [False] * 6
-                + [True] * 2
-                + [True]
-            ),
+            _expected,
         ),
         (
             "tracks_0_360",
-            np.asarray(
-                [False]
-                + [True] * 6
-                + [False] * 2
-                + [True] * 4
-                + [False]
-                + [True]
-                + [False] * 6
-                + [True] * 2
-                + [True]
-            ),
+            _expected,
         ),
         ("tracks_csv", np.asarray([True] * 15 + [False] * 15 + [True] * 69)),
     ],
@@ -133,42 +129,33 @@ def test_get_land_ocean(data, expected, request):
     np.testing.assert_equal(~result_land, expected)
 
 
+# Same answer for -180-180 and 0-360
+_expected = np.asarray(
+    [""]
+    + [""] * 6
+    + ["Argentina"] * 2
+    + [""] * 4
+    + ["Sudan"]
+    + [""]
+    + ["Iran"]
+    + ["Afghanistan"]
+    + ["China"]
+    + ["Mongolia"]
+    + ["Russia"] * 2
+    + [""] * 3
+)
+
+
 @pytest.mark.parametrize(
     "data, expected",
     [
         (
             "tracks_minus180_plus180",
-            np.asarray(
-                [""]
-                + [""] * 6
-                + ["Argentina"] * 2
-                + [""] * 4
-                + ["Sudan"]
-                + [""]
-                + ["Iran"]
-                + ["Afghanistan"]
-                + ["China"]
-                + ["Mongolia"]
-                + ["Russia"] * 2
-                + [""] * 3
-            ),
+            _expected,
         ),
         (
             "tracks_0_360",
-            np.asarray(
-                [""]
-                + [""] * 6
-                + ["Argentina"] * 2
-                + [""] * 4
-                + ["Sudan"]
-                + [""]
-                + ["Iran"]
-                + ["Afghanistan"]
-                + ["China"]
-                + ["Mongolia"]
-                + ["Russia"] * 2
-                + [""] * 3
-            ),
+            _expected,
         ),
         ("tracks_csv", np.asarray([""] * 15 + ["Australia"] * 15 + [""] * 69)),
     ],
@@ -179,36 +166,29 @@ def test_get_country(data, expected, request):
     np.testing.assert_equal(result, expected)
 
 
+# Same answer for -180-180 and 0-360
+_expected = np.asarray(
+    [""] * 7
+    + ["South America"] * 2
+    + [""] * 4
+    + ["Africa"]
+    + [""]
+    + ["Asia"] * 4
+    + ["Europe"] * 2
+    + [""] * 3
+)
+
+
 @pytest.mark.parametrize(
     "data, expected",
     [
         (
             "tracks_minus180_plus180",
-            np.asarray(
-                [""]
-                + [""] * 6
-                + ["South America"] * 2
-                + [""] * 4
-                + ["Africa"]
-                + [""]
-                + ["Asia"] * 4
-                + ["Europe"] * 2
-                + [""] * 3
-            ),
+            _expected,
         ),
         (
             "tracks_0_360",
-            np.asarray(
-                [""]
-                + [""] * 6
-                + ["South America"] * 2
-                + [""] * 4
-                + ["Africa"]
-                + [""]
-                + ["Asia"] * 4
-                + ["Europe"] * 2
-                + [""] * 3
-            ),
+            _expected,
         ),
         ("tracks_csv", np.asarray([""] * 15 + ["Oceania"] * 15 + [""] * 69)),
     ],
@@ -248,7 +228,7 @@ def test_landfall_dateline():
     # This would previous give multiple landfall points because geopandas doesn't
     # account for dateline crossing. Now it is split into multiple lines instead
     result = huracanpy.info.landfall_points(
-        np.array([179, -179]), np.array([0, 0]), np.array([0, 0, 0])
+        np.array([179, -179]), np.array([0, 0]), np.array([0, 0])
     )
     assert len(result.record) == 0
 

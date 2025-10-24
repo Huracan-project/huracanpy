@@ -16,6 +16,22 @@ from .._basins import basins
 from ..convert import to_geodataframe
 
 
+def _wrap_arrays(*args):
+    # The metpy wrapper converting to pint causes errors, but I'm still going to use it
+    # because it lets me pass different array_like types for lon/lat without writing
+    # our own wrapper. For now, just convert anything not a numpy array to a numpy array
+    arrays = []
+    for array in args:
+        if array is not None and not isinstance(array, np.ndarray):
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=UnitStrippedWarning)
+                arrays.append(np.asarray(array))
+        else:
+            arrays.append(array)
+
+    return arrays
+
+
 @preprocess_and_wrap(wrap_like="lat")
 def hemisphere(lat):
     """
@@ -132,17 +148,7 @@ def _get_natural_earth_feature(
     track_id=None,
     crs=None,
 ):
-    # The metpy wrapper converting to pint causes errors, but I'm still going to use it
-    # because it lets me pass different array_like types for lon/lat without writing
-    # our own wrapper. For now, just convert anything not a numpy array to a numpy array
-    if not isinstance(lon, np.ndarray):
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=UnitStrippedWarning)
-            lon = np.asarray(lon)
-            lat = np.asarray(lat)
-
-            if track_id is not None:
-                track_id = np.asarray(track_id)
+    lon, lat, track_id = _wrap_arrays(lon, lat, track_id)
 
     df = _cache_natural_earth_feature(feature, category, name, resolution)
 
@@ -339,6 +345,8 @@ def landfall_points(lon, lat, track_id=None, *, resolution="10m", crs=None):
     xarray.Dataset
 
     """
+    lon, lat, track_id = _wrap_arrays(lon, lat, track_id)
+
     df = _cache_natural_earth_feature("featurecla", "physical", "coastline", resolution)
 
     tracks = to_geodataframe(lon, lat, track_id, crs=crs).to_crs(df.crs)

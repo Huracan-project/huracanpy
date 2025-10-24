@@ -14,6 +14,7 @@ _intentionally_missing = [
     "load",
     "concat_tracks",
     # add_ functions that would have output with a different shape
+    "add_landfall_points",
     "add_apex_vals",
     "add_gen_vals",
     "add_density",
