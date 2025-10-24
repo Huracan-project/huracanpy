@@ -5,6 +5,25 @@ from shapely.geometry import Point, LineString
 
 
 def to_geodataframe(lon, lat, track_id=None, *, crs=None):
+    """convert track data to a :class:`geopandas.GeoDataFrame` of geometries
+
+    Parameters
+    ----------
+    lon : array_like
+    lat : array_like
+    track_id : array_like, optional
+    crs : cartopy.crs.Projection, optional
+        The projection of the input data. If None, the data is assumed to be Geodetic.
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        A GeoDataFrame containing the input tracks a geometries. If track_id is not
+        given the geometries are :class:`shapely.Point`, and if track_id is
+        given the geometries are :class:`shapely.LineString` (split into
+        multiple LineStrings where tracks cross the dateline) or
+        :class:`shapely.Point` for any length-1 tracks
+    """
     if crs is None:
         crs = Geodetic()
 
