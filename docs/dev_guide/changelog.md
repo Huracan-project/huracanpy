@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Also add as an option to `huracanpy.load`
 - Can use `huracanpy.load` with a list of files
 - `huracanpy.concat_tracks` to concatenate tracks while keeping the track_id as a unique identifier
+- `huracanpy.info.beaufort_category`
 
 ### Changed
 - Reduced unnecessary warning messages

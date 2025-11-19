@@ -9,6 +9,7 @@ __all__ = [
     "is_ocean",
     "landfall_points",
     "category",
+    "beaufort_category",
     "timestep",
     "time_components",
     "season",
@@ -24,6 +25,6 @@ from ._geography import (
     is_ocean,
     landfall_points,
 )
-from ._category import category
+from ._category import category, beaufort_category
 from ._time import timestep, time_components, season
 from ._utils import inferred_track_id
