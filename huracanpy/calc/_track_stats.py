@@ -113,7 +113,10 @@ def apex_vals(tracks, variable, track_id, stat="max"):
         )
     )
     idx = np.asarray(
-        df.sort_values("var", ascending=asc).groupby("track_id").first().idx
+        df.sort_values(["var", "idx"], ascending=[asc, True])
+        .groupby("track_id")
+        .first()
+        .idx
     )
 
     dim = track_id.dims[0]

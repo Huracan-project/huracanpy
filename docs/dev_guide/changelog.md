@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.4.0
+### Added
+- `huracanpy.info.beaufort_category`
+
+### Changed
+- `huracanpy.calc.apex_vals` always gives the first point when there a multiple minima/maxima with the same values. Consistent with the behaviour of argmin/argmax
 
 ## v1.3.0
 ### Added
@@ -17,7 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Also add as an option to `huracanpy.load`
 - Can use `huracanpy.load` with a list of files
 - `huracanpy.concat_tracks` to concatenate tracks while keeping the track_id as a unique identifier
-- `huracanpy.info.beaufort_category`
 
 ### Changed
 - Reduced unnecessary warning messages
