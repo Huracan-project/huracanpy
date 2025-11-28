@@ -7,6 +7,7 @@ from math import radians, sqrt
 import warnings
 
 from haversine import haversine_vector
+from metpy.constants import earth_avg_radius
 from metpy.units import units
 from metpy.xarray import preprocess_and_wrap
 import numpy as np
@@ -316,7 +317,7 @@ def make_circle(points):
 
 
 def latlon_to_xy(lat, lon, lat0, lon0):
-    r = 6371  # Earth radius in km
+    r = earth_avg_radius.to("km").magnitude
     x = r * np.deg2rad(lon - lon0) * np.cos(radians(lat0))
     y = r * np.deg2rad(lat - lat0)
     return np.array([x, y]).T

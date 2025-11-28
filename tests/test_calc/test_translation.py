@@ -135,4 +135,4 @@ def test_corral_radius(tracks_csv):
     )
 
     expected = xr.open_dataarray(str(data_path / "corral_radius_result.nc"))
-    np.testing.assert_allclose(result, expected.values)
+    np.testing.assert_allclose(result, expected.values, rtol=1e-4)
