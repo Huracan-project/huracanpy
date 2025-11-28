@@ -1,9 +1,15 @@
+import pathlib
+
 import numpy as np
 import pint
 import pytest
 from metpy.units import units
+import xarray as xr
 
 import huracanpy
+
+
+data_path = pathlib.Path(__file__).parent.parent / "saved_results"
 
 
 def test_azimuth():
@@ -121,3 +127,12 @@ def test_translation_speed_warns(tracks_csv):
         huracanpy.calc.translation_speed(
             tracks_csv.lon, tracks_csv.lat, tracks_csv.time
         )
+
+
+def test_corral_radius(tracks_csv):
+    result = huracanpy.calc.corral_radius(
+        tracks_csv.lon, tracks_csv.lat, tracks_csv.time, tracks_csv.track_id
+    )
+
+    expected = xr.open_dataarray(str(data_path / "corral_radius_result.nc"))
+    np.testing.assert_allclose(result, expected.values)
