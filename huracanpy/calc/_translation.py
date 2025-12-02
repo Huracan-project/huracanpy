@@ -3,7 +3,7 @@ Utils related to translation distance and time
 """
 
 from datetime import timedelta
-from math import radians, sqrt
+import shapely
 import warnings
 
 from haversine import haversine_vector
@@ -272,7 +272,7 @@ def corral_radius(lon, lat, time, track_id=None, *, window_hours=36, min_points=
     Returns
     -------
     np.ndarray
-        Corral radii (NaN if not computed)
+        Corral radii in kilometres (NaN if not computed)
     """
     # Convert time to pandas
     # Comparison below fails when using xarray. It seems to interpret a numpy timedelta
@@ -295,96 +295,29 @@ def corral_radius(lon, lat, time, track_id=None, *, window_hours=36, min_points=
             ):
                 subset = np.where(np.abs(times - centre_time) <= window_hours)[0]
                 if len(subset) >= min_points:
-                    points = np.array([lat[idx + subset], lon[idx + subset]]).T
-                    radius = make_circle(points)
+                    radius = make_circle(
+                        np.asarray(lon[idx + subset]),
+                        np.asarray(lat[idx + subset]),
+                    )
                     corral_radii[idx + n] = radius
             # else: leave as np.nan
 
     return corral_radii
 
 
-def make_circle(points):
-    # Smallest enclosing circle implementation
-    # Source: https://www.nayuki.io/page/smallest-enclosing-circle
+def make_circle(lons, lats):
+    lons, lats = _latlon_to_xy(lons, lats)
+
+    line = shapely.LineString(np.array([lons, lats]).T)
+    return shapely.minimum_bounding_radius(line)
+
+
+def _latlon_to_xy(lon, lat):
     # Convert lat/lon to x/y using equirectangular projection for small areas
     # For more accuracy, use spherical geometry, but for <2000km, this is fine
     # Center for projection
-    lat0 = np.mean(points[:, 0])
-    lon0 = np.mean(points[:, 1])
-    xy_points = latlon_to_xy(points[:, 0], points[:, 1], lat0, lon0)
-
-    return _make_circle(xy_points)[2]  # Return radius in km
-
-
-def latlon_to_xy(lat, lon, lat0, lon0):
     r = earth_avg_radius.to("km").magnitude
-    x = r * np.deg2rad(lon - lon0) * np.cos(radians(lat0))
+    lon0, lat0 = np.mean(lon), np.mean(lat)
+    x = r * np.deg2rad(lon - lon0) * np.cos(np.deg2rad(lat0))
     y = r * np.deg2rad(lat - lat0)
-    return np.array([x, y]).T
-
-
-def _make_circle(points):
-    # Welzl's algorithm
-    # Trivial cases
-    if len(points) == 1:
-        return points[0][0], points[0][1], 0
-    elif len(points) == 2:
-        x0, y0 = points[0]
-        x1, y1 = points[1]
-        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
-        r = sqrt((x0 - cx) ** 2 + (y0 - cy) ** 2)
-        return cx, cy, r
-    # Check all combinations of 3 points
-    min_circle = None
-    for i in range(len(points)):
-        for j in range(i + 1, len(points)):
-            for k in range(j + 1, len(points)):
-                c = circle_from(points[i], points[j], points[k])
-                if c is None:
-                    continue
-                if all(is_in_circle(pt, c) for pt in points):
-                    if min_circle is None or c[2] < min_circle[2]:
-                        min_circle = c
-    if min_circle is not None:
-        return min_circle
-    # Otherwise, check all pairs
-    for i in range(len(points)):
-        for j in range(i + 1, len(points)):
-            c = circle_from(points[i], points[j])
-            if all(is_in_circle(pt, c) for pt in points):
-                if min_circle is None or c[2] < min_circle[2]:
-                    min_circle = c
-    return min_circle
-
-
-def circle_from(p1, p2, p3=None):
-    if p3 is None:
-        # Circle from two points
-        x0, y0 = p1
-        x1, y1 = p2
-        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
-        r = sqrt((x0 - cx) ** 2 + (y0 - cy) ** 2)
-        return cx, cy, r
-    else:
-        # Circle from three points
-        a = np.array([[p1[0], p1[1], 1], [p2[0], p2[1], 1], [p3[0], p3[1], 1]])
-        b = np.array(
-            [
-                [p1[0] ** 2 + p1[1] ** 2],
-                [p2[0] ** 2 + p2[1] ** 2],
-                [p3[0] ** 2 + p3[1] ** 2],
-            ]
-        )
-        try:
-            c = np.linalg.solve(a, b)
-            cx = 0.5 * c[0][0]
-            cy = 0.5 * c[1][0]
-            r = sqrt((p1[0] - cx) ** 2 + (p1[1] - cy) ** 2)
-            return cx, cy, r
-        except np.linalg.LinAlgError:
-            return None
-
-
-def is_in_circle(pt, circle):
-    cx, cy, r = circle
-    return sqrt((pt[0] - cx) ** 2 + (pt[1] - cy) ** 2) <= r + 1e-8
+    return x, y
