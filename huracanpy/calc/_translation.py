@@ -6,10 +6,11 @@ from datetime import timedelta
 import shapely
 import warnings
 
+from cartopy.crs import Geodetic, Orthographic
 from haversine import haversine_vector
-from metpy.constants import earth_avg_radius
 from metpy.units import units
 from metpy.xarray import preprocess_and_wrap
+import nvector
 import numpy as np
 import pandas as pd
 from pint.errors import UnitStrippedWarning
@@ -272,7 +273,7 @@ def corral_radius(lon, lat, time, track_id=None, *, window_hours=36, min_points=
     Returns
     -------
     np.ndarray
-        Corral radii in kilometres (NaN if not computed)
+        Corral radii in metres (NaN if not computed)
     """
     # Convert time to pandas
     # Comparison below fails when using xarray. It seems to interpret a numpy timedelta
@@ -306,18 +307,23 @@ def corral_radius(lon, lat, time, track_id=None, *, window_hours=36, min_points=
 
 
 def make_circle(lons, lats):
-    lons, lats = _latlon_to_xy(lons, lats)
+    xyz = _latlon_to_xy(lons, lats)
+    line = shapely.LineString(xyz[:, :2])
 
-    line = shapely.LineString(np.array([lons, lats]).T)
     return shapely.minimum_bounding_radius(line)
 
 
 def _latlon_to_xy(lon, lat):
-    # Convert lat/lon to x/y using equirectangular projection for small areas
+    # Convert lat/lon to x/y using Orthographic projection for small areas
     # For more accuracy, use spherical geometry, but for <2000km, this is fine
     # Center for projection
-    r = earth_avg_radius.to("km").magnitude
-    lon0, lat0 = np.mean(lon), np.mean(lat)
-    x = r * np.deg2rad(lon - lon0) * np.cos(np.deg2rad(lat0))
-    y = r * np.deg2rad(lat - lat0)
-    return x, y
+    lon0, lat0 = _centre_point(lon, lat)
+    projection = Orthographic(central_longitude=lon0, central_latitude=lat0)
+
+    return projection.transform_points(Geodetic(), lon, lat)
+
+
+def _centre_point(lons, lats):
+    points = nvector.GeoPoint.from_degrees(longitude=lons, latitude=lats)
+    centre = points.to_nvector().mean().to_geo_point()
+    return centre.longitude_deg, centre.latitude_deg
