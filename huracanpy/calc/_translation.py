@@ -255,16 +255,18 @@ def translation_speed(
     return dx / dt
 
 
-def corral_radius(lon, lat, time, track_id=None, *, window_hours=36, min_points=4):
+@dequantify_results
+@preprocess_and_wrap(wrap_like="lon")
+def corral_radius(lon, lat, time=None, track_id=None, *, window_hours=36, min_points=4):
     """
     Compute corral radius
 
     Parameters
     ----------
-    lon :
-    lat :
-    time :
-    track_id :
+    lon : array_like
+    lat : array_like
+    time : array_like, optional
+    track_id : array_like, optional
     window_hours : int
         Half-width of the window in hours (e.g., 36 for 72h, 24 for 48h).
     min_points : int
@@ -275,6 +277,9 @@ def corral_radius(lon, lat, time, track_id=None, *, window_hours=36, min_points=
     np.ndarray
         Corral radii in metres (NaN if not computed)
     """
+    if track_id is None:
+        track_id = _dummy_track_id(lon)
+
     # Convert time to pandas
     # Comparison below fails when using xarray. It seems to interpret a numpy timedelta
     # of zero as an integer and throws a TypeError
@@ -284,7 +289,7 @@ def corral_radius(lon, lat, time, track_id=None, *, window_hours=36, min_points=
     corral_radii = np.full(len(time), np.nan)
 
     track_id, indices, counts = np.unique(
-        track_id, return_index=True, return_counts=True
+        np.asarray(track_id), return_index=True, return_counts=True
     )
 
     for idx, count in zip(indices, counts):
@@ -303,7 +308,7 @@ def corral_radius(lon, lat, time, track_id=None, *, window_hours=36, min_points=
                     corral_radii[idx + n] = radius
             # else: leave as np.nan
 
-    return corral_radii
+    return corral_radii * units("m")
 
 
 def make_circle(lons, lats):
