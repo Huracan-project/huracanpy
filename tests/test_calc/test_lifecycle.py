@@ -1,7 +1,10 @@
 import numpy as np
 import pytest
+import xarray as xr
 
 import huracanpy
+
+from ..test_huracanpy import _load_with_checked_warnings
 
 
 def test_time_from_genesis():
@@ -25,3 +28,34 @@ def test_time_from_apex_fails(tracks_csv):
         huracanpy.calc.time_from_apex(
             tracks_csv.time, tracks_csv.track_id, tracks_csv.wind10, "nonsense"
         )
+
+
+# Example tracks where apex_vals gives a different answer to argmin
+# Multiple points with the same minimum pressure
+# - argmin always gives the first
+# - apex_vals used to give inconsistent results. Sometimes the last but also sometimes
+#   in the middle
+
+
+@pytest.mark.parametrize(
+    "track_ids, variable, stat",
+    [
+        (["1980051S12102", "1980171N06142", "1980140N16116"], "slp", "min"),
+        (["1980005S14120", "1980052S16155", "1980177N13259"], "wind", "max"),
+    ],
+)
+def test_apex_vals_first_point(track_ids, variable, stat):
+    tracks = _load_with_checked_warnings(None, source="ibtracs").hrcn.sel_id(track_ids)
+
+    apex = tracks.hrcn.get_apex_vals(variable, stat=stat)
+
+    if stat == "min":
+        apex_arg = tracks.groupby("track_id").map(
+            lambda x: x.isel(record=(x[variable].argmin())).set_coords("track_id")
+        )
+    else:
+        apex_arg = tracks.groupby("track_id").map(
+            lambda x: x.isel(record=(x[variable].argmax())).set_coords("track_id")
+        )
+
+    xr.testing.assert_identical(apex, apex_arg)

@@ -12,6 +12,7 @@ import pandas as pd
 from metpy.xarray import preprocess_and_wrap
 
 
+from ._conventions import _thresholds
 from .._metpy import validate_units
 
 
@@ -76,3 +77,29 @@ def category(variable, bins, labels=None, variable_units=None):
         result = np.asarray(pd.cut(variable, bins, labels=labels))
 
     return result
+
+
+def beaufort_category(wind, wind_units="m s-1"):
+    """Beaufort Wind Scale category
+
+    Parameters
+    ----------
+    wind : array_like
+        10-minutes averaged 10m wind
+
+    wind_units : str, default="m s-1"
+        The units of the input array if they are not already provided by the attributes
+
+    Returns
+    -------
+    array_like
+        The category series.
+        You can append it to your tracks by running
+        tracks["sshs"] = get_sshs_cat(tracks.wind)
+    """
+    return category(
+        wind,
+        bins=_thresholds["Beaufort"]["bins"],
+        labels=_thresholds["Beaufort"]["labels"],
+        variable_units=wind_units,
+    )

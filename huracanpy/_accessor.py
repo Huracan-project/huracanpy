@@ -331,6 +331,18 @@ class HuracanPyDatasetAccessor:
         )
         return self._dataset
 
+    def get_beaufort_category(self, wind_name="wind", wind_units="m s-1"):
+        return info.beaufort_category(self._dataset[wind_name], wind_units=wind_units)
+
+    def add_beaufort_category(self, wind_name="wind", wind_units="m s-1"):
+        """
+        Add the SSHS category to the dataset.
+        """
+        self._dataset["beaufort_category"] = self.get_beaufort_category(
+            wind_name, wind_units
+        )
+        return self._dataset
+
     def get_saffir_simpson_category(
         self, wind_name="wind", convention="Saffir-Simpson", wind_units="m s-1"
     ):
