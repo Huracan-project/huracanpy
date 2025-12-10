@@ -8,16 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v1.4.0
 ### Added
 - `huracanpy.info.beaufort_category`
-
-### Changed
-- `huracanpy.calc.apex_vals` always gives the first point when there a multiple minima/maxima with the same values. Consistent with the behaviour of argmin/argmax
-
-## v1.3.1
-### Fixed
-- `calc.density` with `crop=True` will only crop the region outside of where there are tracks rather than all empty longitudes/latitudes
-
-## v1.4.0
-### Added
 - Load SuperBT from github file
 - Load IBTrACS from a netCDF file
 - Allow `huracanpy.load` to load non-ragged netCDF files. Essentially just calls `xarray.load` without modification
@@ -37,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Speed up `huracanpy.save` for netCDF files
 - Remove NaN only variables when loading online IBTrACS data.
 - Add a cyclic point when using `plot.density` so that the dateline doesn't show up as empty
+- `huracanpy.calc.apex_vals` always gives the first point when there a multiple minima/maxima with the same values. Consistent with the behaviour of argmin/argmax
 
 ### Fixed
 - -180 and 180 no longer treated as different longitudes. -180 is always used instead
@@ -44,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.3.1
 ### Fixed
-- `calc.density` with `crop=True` no longer removes empty rows/columns inside the bounds of the data. 
+- `calc.density` with `crop=True` will only crop the region outside of where there are tracks rather than all empty longitudes/latitudes
 
 ## v1.3.0
 ### Added
