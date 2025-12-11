@@ -131,8 +131,26 @@ def test_translation_speed_warns(tracks_csv):
 
 def test_corral_radius(tracks_csv):
     result = huracanpy.calc.corral_radius(
-        tracks_csv.lon, tracks_csv.lat, tracks_csv.time, tracks_csv.track_id
+        tracks_csv.lon, tracks_csv.lat, tracks_csv.time, tracks_csv.track_id, window=36
     )
 
     expected = xr.open_dataarray(str(data_path / "corral_radius_result.nc"))
     np.testing.assert_allclose(result, expected.values, rtol=1e-4)
+
+
+@pytest.mark.parametrize(
+    "lons, lats, expected",
+    [
+        # Spherical cap. Tests treating distances across pole and dateline correctly
+        ([0, 90, 180, 270], [80] * 4, [1107551.86696002] * 4),
+        # Square around equator. Check dateline crossings are correct
+        ([175, -175, 175, -175], [-5, -5, 5, 5], [784654.62840337] * 4),
+        ([175, 185, 175, 185], [-5, -5, 5, 5], [784654.62840337] * 4),
+        ([355, 5, 355, 5], [-5, -5, 5, 5], [784654.62840337] * 4),
+        ([355, 365, 355, 365], [-5, -5, 5, 5], [784654.62840337] * 4),
+    ],
+)
+def test_corral_radius_spherical(lons, lats, expected):
+    result = huracanpy.calc.corral_radius(lons, lats)
+
+    np.testing.assert_allclose(result, expected)
