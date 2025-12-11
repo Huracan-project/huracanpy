@@ -554,6 +554,44 @@ class HuracanPyDatasetAccessor:
         )
         return self._dataset
 
+    def get_corral_radius(
+        self,
+        lon_name="lon",
+        lat_name="lat",
+        time_name="time",
+        track_id_name="track_id",
+        window=None,
+        min_points=None,
+    ):
+        return calc.corral_radius(
+            self._dataset[lon_name],
+            self._dataset[lat_name],
+            time=self._dataset[time_name],
+            track_id=self._dataset[track_id_name],
+            window=window,
+            min_points=min_points,
+        )
+
+    def add_corral_radius(
+        self,
+        lon_name="lon",
+        lat_name="lat",
+        time_name="time",
+        track_id_name="track_id",
+        window=None,
+        min_points=None,
+    ):
+        self._dataset["corral_radius"] = self.get_corral_radius(
+            lon_name,
+            lat_name,
+            time_name=time_name,
+            track_id_name=track_id_name,
+            window=window,
+            min_points=min_points,
+        )
+
+        return self._dataset
+
     # ---- rates
     def get_delta(self, var_name="wind10", track_id_name="track_id", **kwargs):
         if track_id_name in list(self._dataset.variables):

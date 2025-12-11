@@ -97,6 +97,7 @@ def test_nunique():
             ["lon", "lat", "time"],
             {"track_id_name": None},
         ),
+        (huracanpy.calc.corral_radius, ["lon", "lat", "time", "track_id"], {}),
         (huracanpy.tc.ace, ["wind10"], {"wind_name": "wind10"}),
         (
             huracanpy.tc.ace,
