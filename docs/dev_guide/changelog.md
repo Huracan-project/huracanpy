@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v1.4.0
 ### Added
 - `huracanpy.info.beaufort_category`
+- `huracanpy.calc.corral_radius`
 - Load SuperBT from github file
 - Load IBTrACS from a netCDF file
 - Allow `huracanpy.load` to load non-ragged netCDF files. Essentially just calls `xarray.load` without modification
@@ -19,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `centering="centre"` - Centred difference, NaN at the start and end of tracks
   - `centering="adaptive"` - Centered difference. Forward difference at the start of tracks. Backward difference at the end of tracks
 - Basin definitions from [Knutson et al. (2020)](https://doi.org/10.1175/BAMS-D-18-0194.1) (`"Knutson2020"`)
-- Add `spherical` option to `calc.density`. Divides by area of gridboxes for `method="histogram"` and implements haversine weighting with scikit-learn for `method="kde"
+- Add `spherical` option to `calc.density`. Divides by area of gridboxes for `method="histogram"` and implements haversine weighting with scikit-learn for `method="kde"`
 - Add `info.landfall_points` which returns each point where a track crosses a coastline
 - New module `convert` and function `convert.to_geodataframe` to convert tracks to a geodataframe of points or linestrings (if track_id is given)
 

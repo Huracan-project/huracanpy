@@ -51,11 +51,15 @@ def test_apex_vals_first_point(track_ids, variable, stat):
 
     if stat == "min":
         apex_arg = tracks.groupby("track_id").map(
-            lambda x: x.isel(record=(x[variable].argmin())).set_coords("track_id")
+            lambda x: x.isel(record=(x[variable].argmin(dim="record"))).set_coords(
+                "track_id"
+            )
         )
     else:
         apex_arg = tracks.groupby("track_id").map(
-            lambda x: x.isel(record=(x[variable].argmax())).set_coords("track_id")
+            lambda x: x.isel(record=(x[variable].argmax(dim="record"))).set_coords(
+                "track_id"
+            )
         )
 
     xr.testing.assert_identical(apex, apex_arg)

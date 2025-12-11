@@ -15,7 +15,7 @@ def _dummy_track_id(var):
     warnings.warn(
         "track_id is not provided, all points are considered to come from the sametrack"
     )
-    return np.zeros(var.shape)
+    return np.zeros(np.shape(var))
 
 
 @dequantify_results
