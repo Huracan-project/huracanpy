@@ -151,6 +151,7 @@ def test_corral_radius(tracks_csv):
     ],
 )
 def test_corral_radius_spherical(lons, lats, expected):
-    result = huracanpy.calc.corral_radius(lons, lats)
+    with pytest.warns(UserWarning, match="track_id is not provided"):
+        result = huracanpy.calc.corral_radius(lons, lats).magnitude
 
     np.testing.assert_allclose(result, expected)

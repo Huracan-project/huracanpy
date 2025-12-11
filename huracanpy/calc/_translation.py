@@ -306,35 +306,43 @@ def corral_radius(lon, lat, time=None, track_id=None, *, window=None, min_points
     # Comparison below fails when using xarray. It seems to interpret a numpy timedelta
     # of zero as an integer and throws a TypeError
     if time is not None:
-        time = pd.to_datetime(time)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=UnitStrippedWarning)
+            time = pd.to_datetime(time)
 
     if np.isscalar(window):
         window = timedelta(hours=window)
 
     corral_radii = np.full(len(lon), np.nan)
-    track_id, indices, counts = np.unique(
-        np.asarray(track_id), return_index=True, return_counts=True
-    )
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UnitStrippedWarning)
+        track_id, indices, counts = np.unique(
+            np.asarray(track_id), return_index=True, return_counts=True
+        )
 
-    for idx, count in zip(indices, counts):
-        if time is not None and window is not None:
-            times = time[idx : idx + count]
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UnitStrippedWarning)
+        for idx, count in zip(indices, counts):
+            if time is not None and window is not None:
+                times = time[idx : idx + count]
 
-            for n, centre_time in enumerate(times):
-                if (centre_time - times[0] >= window) and (
-                    times[-1] - centre_time >= window
-                ):
-                    subset = np.where(np.abs(times - centre_time) <= window)[0]
-                    if min_points is None or len(subset) >= min_points:
-                        radius = _make_circle(
-                            np.asarray(lon[idx + subset]), np.asarray(lat[idx + subset])
-                        )
-                        corral_radii[idx + n] = radius
-                # else: leave as np.nan
-        else:
-            corral_radii[idx : idx + count] = _make_circle(
-                np.asarray(lon[idx : idx + count]), np.asarray(lat[idx : idx + count])
-            )
+                for n, centre_time in enumerate(times):
+                    if (centre_time - times[0] >= window) and (
+                        times[-1] - centre_time >= window
+                    ):
+                        subset = np.where(np.abs(times - centre_time) <= window)[0]
+                        if min_points is None or len(subset) >= min_points:
+                            radius = _make_circle(
+                                np.asarray(lon[idx + subset]),
+                                np.asarray(lat[idx + subset]),
+                            )
+                            corral_radii[idx + n] = radius
+                    # else: leave as np.nan
+            else:
+                corral_radii[idx : idx + count] = _make_circle(
+                    np.asarray(lon[idx : idx + count]),
+                    np.asarray(lat[idx : idx + count]),
+                )
 
     return corral_radii * units("m")
 
