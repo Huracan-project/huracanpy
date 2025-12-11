@@ -31,12 +31,17 @@ info
     add_country
     get_continent
     add_continent
+    get_landfall_points
     get_category
     add_category
+    get_beaufort_category
+    add_beaufort_category
     get_season
     add_season
     get_time_components
     add_time_components
+    get_inferred_track_id
+    add_inferred_track_id
 
 calc
 ----
@@ -58,10 +63,12 @@ calc
     add_rate
     get_distance
     add_distance
-    get_translation_speed
-    add_translation_speed
     get_azimuth
     add_azimuth
+    get_translation_speed
+    add_translation_speed
+    get_corral_radius
+    add_corral_radius
 
 tc
 --
@@ -77,6 +84,8 @@ tc
     add_saffir_simpson_category
     get_pressure_category
     add_pressure_category
+    get_beta_drift
+    add_beta_drift
 
 plot
 ----
@@ -86,3 +95,4 @@ plot
 
     plot_tracks
     plot_density
+    plot_fancyline
