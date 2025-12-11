@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v1.4.0
 ### Added
 - `huracanpy.info.beaufort_category`
+- `huracanpy.calc.corral_radius`
 
 ### Changed
 - `huracanpy.calc.apex_vals` always gives the first point when there a multiple minima/maxima with the same values. Consistent with the behaviour of argmin/argmax

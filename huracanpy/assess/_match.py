@@ -1,9 +1,11 @@
 """Matching functions"""
 
 from itertools import combinations, groupby
+import warnings
 
 import numpy as np
 import pandas as pd
+from pint.errors import UnitStrippedWarning
 
 from ..info import timestep
 from ..calc import distance
@@ -135,16 +137,18 @@ def _match_pair(
     # if there exist matching points, continue
     # Calculate the distance between all points paired in time and subset points
     # that are within the threshold distance specified
-    merged["dist"] = (
-        distance(
-            merged.lon_x,
-            merged.lat_x,
-            merged.lon_y,
-            merged.lat_y,
-            method=distance_method,
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UnitStrippedWarning)
+        merged["dist"] = (
+            distance(
+                merged.lon_x,
+                merged.lat_x,
+                merged.lon_y,
+                merged.lat_y,
+                method=distance_method,
+            )
+            * 1e-3
         )
-        * 1e-3
-    )
     merged = merged[merged.dist <= max_dist]
 
     # Precompute groupby

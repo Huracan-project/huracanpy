@@ -28,6 +28,7 @@ dependencies = [
     "pyarrow",
     "pyproj",
     "scikit-learn",
+    "nvector",
 ]
 
 [project.optional-dependencies]
