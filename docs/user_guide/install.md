@@ -39,7 +39,9 @@ dependencies = [
     "metpy",
     "tqdm",
     "pyarrow",
-    "pyproj"
+    "pyproj",
+    "scikit-learn",
+    "nvector",
 ]
 ```
 
@@ -59,6 +61,8 @@ dependencies = [
 ### Geospatial
 - [**geopandas**](https://geopandas.org/en/stable/) (with [**shapely**](https://shapely.readthedocs.io/en/stable/index.html) and [**cartopy**](https://scitools.org.uk/cartopy/docs/latest/)) is used to match track points with Earth features (land, sea, country, etc.), with **shapely** used to interface with **geopandas** and **cartopy** providing a useful method for downloading and caching feature files 
 - [**pyproj**](https://pyproj4.github.io/pyproj/stable/) and [**haversine**](https://github.com/mapado/haversine) provide the distance and angle calculations
+- [**scikit-learn**](https://scikit-learn.org/stable/) performs the density calculation when using a Gaussian kernel and accounting for the spherical Earth
+- [**nvector**](https://nvector.readthedocs.io/en/latest/) is used `huracanpy.calc.corral_radius` to find the centre of a group of points while accounting for a sperical Earth
 
 ### Plotting
 - [**matplotlib**](https://matplotlib.org/stable/) is the basis for any plotting functions
