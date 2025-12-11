@@ -36,3 +36,4 @@ Deltas
     distance
     azimuth
     translation_speed
+    corral_radius
