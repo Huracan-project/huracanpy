@@ -63,6 +63,10 @@ def density(
           set to `"scott"` rather than the default of `1.0`
         * If method="kde" and spherical=`False`, :obj:`scipy.stats.gaussian_kde`
 
+    **kwargs
+        Alternative way to specify `function_kws`
+
+
     Raises
     ------
     NotImplementedError

@@ -27,7 +27,9 @@ def delta(var, track_ids=None, centering="forward"):
     Parameters
     ----------
     var : xarray.DataArray
+        The variable to calculate the delta from
     track_ids : array_like, optional
+        Track ID for each point
     centering: str, optional
         - "forward" gives the delta based on the track point and the following track
           point. The last point of each track will be NaN
@@ -72,8 +74,11 @@ def rate(var, time, track_ids=None, centering="forward"):
     Parameters
     ----------
     var : xarray.DataArray
+        The variable used to calculate the rate
     time : xarray.DataArray
+        Time at each point
     track_ids : array_like, optional
+        Track ID at each point
     centering: str, optional
         - "forward" gives the rate based on the track point and the following track
           point. The last point of each track will be NaN

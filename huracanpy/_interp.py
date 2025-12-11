@@ -22,9 +22,11 @@ def interp_time(
     tracks : xarray.Dataset
         The tracks dataset.
     track_ids : xarray.DataArray
+        The array of track_ids
     freq : str, optional
         Frequency at which you want to interpolate the data. The default is '1h'.
     prog_bar : bool, optional
+        Show a progress bar during interpolation
 
     Returns
     -------

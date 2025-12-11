@@ -9,9 +9,11 @@ def to_geodataframe(lon, lat, track_id=None, *, crs=None):
 
     Parameters
     ----------
-    lon : array_like
-    lat : array_like
+    lon, lat : array_like
+        Longitude and latitude points
     track_id : array_like, optional
+        Track ID at each point. If track ID is given, each track is treated as a
+        shapely.LineString. Otherwise, each point is a shapely.Point
     crs : cartopy.crs.Projection, optional
         The projection of the input data. If None, the data is assumed to be Geodetic.
 

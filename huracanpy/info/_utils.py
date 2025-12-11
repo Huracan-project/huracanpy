@@ -14,6 +14,7 @@ def inferred_track_id(*variables):
     Parameters
     ----------
     *variables
+        Pass a number of variables required to determine the unique track_id
 
     Returns
     -------

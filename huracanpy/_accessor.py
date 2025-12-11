@@ -42,16 +42,6 @@ class HuracanPyDatasetAccessor:
         """
         Save dataset as filename.
         The file type (NetCDF or csv supported) is detected based on filename extension.
-
-        Parameters
-        ----------
-        filename : str
-            Must end in ".nc" or ".csv"
-
-        Returns
-        -------
-        None.
-
         """
 
         save(self._dataset, filename, **kwargs)
@@ -343,24 +333,20 @@ class HuracanPyDatasetAccessor:
         )
         return self._dataset
 
-    def get_saffir_simpson_category(
-        self, wind_name="wind", convention="Saffir-Simpson", wind_units="m s-1"
-    ):
+    def get_saffir_simpson_category(self, wind_name="wind", wind_units="m s-1"):
         """
         Determine the Saffir-Simpson Hurricane Scale (SSHS) category.
         """
         return tc.saffir_simpson_category(
-            self._dataset[wind_name], convention=convention, wind_units=wind_units
+            self._dataset[wind_name], wind_units=wind_units
         )
 
-    def add_saffir_simpson_category(
-        self, wind_name="wind", convention="Saffir-Simpson", wind_units="m s-1"
-    ):
+    def add_saffir_simpson_category(self, wind_name="wind", wind_units="m s-1"):
         """
         Add the SSHS category to the dataset.
         """
         self._dataset["saffir_simpson_category"] = self.get_saffir_simpson_category(
-            wind_name, convention, wind_units
+            wind_name, wind_units
         )
         return self._dataset
 

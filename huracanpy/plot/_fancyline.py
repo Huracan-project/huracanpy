@@ -110,6 +110,7 @@ def fancyline(
         Clips values outside amin/amax to amin/amax. Unlike clip_colors, this is set to
         True by default because alphas outside the range 0-1 will raise an error
     linestyles : array_like or str, optional
+        The linestyle for each section of line. Same length as x/y
     ax : matplotlib.axes.Axes or cartopy.mpl.geoaxes.GeoAxes, optional
         The axes to add the line to. If not given, it will be added to the most recent
         axes

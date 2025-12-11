@@ -37,6 +37,8 @@ def match(
     consecutive_overlap: bool, optional
         If min_overlap > 1, require that min_overlap points also need to be consective
     tracks1_is_ref: bool, optional
+        If True, treat the first set of tracks as the reference set. If one track
+        matches multiple reference tracks, only keep the longest match
     distance_method: str, optional
         The method to use to calculate distance between track points.
         One of "haversine", "geod"
@@ -96,29 +98,6 @@ def _match_pair(
     tracks1_is_ref=False,
     distance_method="haversine",
 ):
-    """
-
-    Parameters
-    ----------
-    tracks1 (pd.DataFrame): the first track set to match
-    tracks2 (pd.DataFrame): the second tracks set to match
-    name1 (str): Suffix for the first dataframe
-    name2 (str): Suffix for the second dataframe
-    max_dist (float) : Threshold for maximum distance between two tracks
-    min_overlap (int) : Minimum number of overlapping time steps for matching
-    tracks1_is_ref (bool):
-    distance_method (str): The method to use to calculate distance between track points.
-        One of "haversine", "geod"
-
-    Returns
-    -------
-    pd.DataFrame
-        Dataframe containing the matching tracks with
-            the id from both datasets
-            the number of matching time steps
-            the distance between two tracks
-    """
-
     # Prepare data
     tracks1, tracks2 = (
         tracks1[["track_id", "lon", "lat", "time"]].to_dataframe(),
@@ -224,29 +203,7 @@ def _match_multiple(
     distance_method="haversine",
 ):
     """
-    Function to match any number of tracks sets
-
-    Parameters
-    ----------
-    datasets : list of xr.Dataset
-        list of the sets to be matched.
-    names : list of str
-        labels for the datasets. names must have the same length as datasets
-    max_dist : float
-        Threshold for maximum distance between two tracks
-    min_overlap : int
-        Minimum number of overlapping time steps for matching
-
-    Raises
-    ------
-    NotImplementedError
-        If two datasets have no match.
-
-    Returns
-    -------
-    M : pd.dataframe
-        table of matching tracks among all the datasets
-
+    match any number of tracks sets
     """
     matches = pd.DataFrame(columns=["id_" + n for n in names[:2]])
     for names_pair, dataset_pair in zip(

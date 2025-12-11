@@ -40,6 +40,7 @@ def hemisphere(lat):
     Parameters
     ----------
     lat : xarray.DataArray
+        Latitude for each point
 
     Returns
     -------
@@ -187,6 +188,7 @@ def is_ocean(lon, lat, resolution="10m", crs=None):
     Parameters
     ----------
     lon, lat : float or array_like
+        Longitude and latitude points
     resolution : str
         The resolution of the Land/Sea outlines dataset to use. One of
 
@@ -194,7 +196,10 @@ def is_ocean(lon, lat, resolution="10m", crs=None):
         * 50m (1:50,000,000)
         * 110m (1:110,000,000)
 
-    crs : cartopy.crs.CRS
+    crs : cartopy.crs.CRS, optional
+        Coordinate reference system of the input data. If None, it is assumed to be
+        Geodetic
+
 
     Returns
     -------
@@ -224,6 +229,7 @@ def is_land(lon, lat, resolution="10m", crs=None):
     Parameters
     ----------
     lon, lat : float or array_like
+        Longitude and latitude points
     resolution : str
         The resolution of the Land/Sea outlines dataset to use. One of
 
@@ -231,7 +237,9 @@ def is_land(lon, lat, resolution="10m", crs=None):
         * 50m (1:50,000,000)
         * 110m (1:110,000,000)
 
-    crs : cartopy.crs.CRS
+    crs : cartopy.crs.CRS, optional
+        Coordinate reference system of the input data. If None, it is assumed to be
+        Geodetic
 
     Returns
     -------
@@ -260,6 +268,7 @@ def country(lon, lat, resolution="10m", crs=None):
     Parameters
     ----------
     lon, lat : float or array_like
+        Longitude and latitude points
     resolution : str
         The resolution of the Land/Sea outlines dataset to use. One of
 
@@ -267,7 +276,9 @@ def country(lon, lat, resolution="10m", crs=None):
         * 50m (1:50,000,000)
         * 110m (1:110,000,000)
 
-    crs : cartopy.crs.CRS
+    crs : cartopy.crs.CRS, optional
+        Coordinate reference system of the input data. If None, it is assumed to be
+        Geodetic
 
     Returns
     -------
@@ -293,6 +304,7 @@ def continent(lon, lat, resolution="10m", crs=None):
     Parameters
     ----------
     lon, lat : float or array_like
+        Longitude and latitude points
     resolution : str
         The resolution of the Land/Sea outlines dataset to use. One of
 
@@ -300,7 +312,9 @@ def continent(lon, lat, resolution="10m", crs=None):
         * 50m (1:50,000,000)
         * 110m (1:110,000,000)
 
-    crs : cartopy.crs.CRS
+    crs : cartopy.crs.CRS, optional
+        Coordinate reference system of the input data. If None, it is assumed to be
+        Geodetic
 
     Returns
     -------
@@ -321,13 +335,15 @@ def continent(lon, lat, resolution="10m", crs=None):
 
 
 @preprocess_and_wrap()
-def landfall_points(lon, lat, track_id=None, *, resolution="10m", crs=None):
+def landfall_points(lon, lat, track_id, *, resolution="10m", crs=None):
     """Find the points where the tracks intersect with a coastline
 
     Parameters
     ----------
     lon, lat : float or array_like
-    track_id : float or array_like, optional
+        Longitude and latitude points
+    track_id : float or array_like
+        Track ID at each point
     resolution : str
         The resolution of the Land/Sea outlines dataset to use. One of
 

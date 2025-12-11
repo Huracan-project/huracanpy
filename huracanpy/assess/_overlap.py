@@ -10,7 +10,9 @@ def overlap(tracks1, tracks2, matches=None):
     Parameters
     ----------
     tracks1 : xarray.Dataset
+        First set of tracks
     tracks2 : xarray.Dataset
+        Second set of tracks
     matches : pandas.DataFrame
         The output from match_tracks on tracks1 and tracks2.
         If None, match_tracks is run on tracks1 and tracks2.

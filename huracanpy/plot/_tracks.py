@@ -22,7 +22,9 @@ def tracks(
     Parameters
     ----------
     lon : array_like
+        Longitude points
     lat : array_like
+        Latitude points
     intensity_var : array_like, optional
         Colour the individual points by
     ax :  matplotlib.axes.Axes, optional
