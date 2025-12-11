@@ -257,9 +257,31 @@ def translation_speed(
 
 @dequantify_results
 @preprocess_and_wrap(wrap_like="lon")
-def corral_radius(lon, lat, time=None, track_id=None, *, window_hours=36, min_points=4):
-    """
-    Compute corral radius
+def corral_radius(lon, lat, time=None, track_id=None, *, window=None, min_points=None):
+    """Find the minimum radius encircling a set of points
+
+    By default, calling corral radius with a set of lons/lats will return the corral
+    radius for all these points. The returned array with have the same length as
+    lons/lats, but the same value for all points
+    >>> corral_radius(lons, lats)
+
+    If you also pass a track_id, the corral radius is calculated separately for each
+    unique track. The returned array still has the same length as lons/lats so the value
+    for each track is repeated
+    >>> corral_radius(lons, lats, track_id=track_id)
+
+    Passing a time and window will calculate the corral radius in a rolling window. The
+    window is by default in hours (you can explicitly pass a datetime.timedelta to use
+    a more specific window). The code below will calculate the corral radius for each
+    lon/lat include the lons/lats withing +/- 36 hours. Points where the window is
+    outside the times are given NaNs
+    >>> corral_radius(lons, lats, time=time, window=36)
+
+    Including both a track_id and a time/window will ensure the corral radius is
+    calculated separately for each track, leaving NaNs at the start and end of each
+    track where the time window is outside the track times
+    >>> corral_radius(lons, lats, time=time, track_id=track_id, window=36)
+
 
     Parameters
     ----------
@@ -267,9 +289,9 @@ def corral_radius(lon, lat, time=None, track_id=None, *, window_hours=36, min_po
     lat : array_like
     time : array_like, optional
     track_id : array_like, optional
-    window_hours : int
-        Half-width of the window in hours (e.g., 36 for 72h, 24 for 48h).
-    min_points : int
+    window : scalar or datetime.timedelta, optional
+        Half-width of the window. i.e. include all times within +/- window
+    min_points : int, optional
         Minimum number of points required in the window.
 
     Returns
@@ -283,35 +305,41 @@ def corral_radius(lon, lat, time=None, track_id=None, *, window_hours=36, min_po
     # Convert time to pandas
     # Comparison below fails when using xarray. It seems to interpret a numpy timedelta
     # of zero as an integer and throws a TypeError
-    time = pd.to_datetime(time)
+    if time is not None:
+        time = pd.to_datetime(time)
 
-    window_hours = timedelta(hours=window_hours)
-    corral_radii = np.full(len(time), np.nan)
+    if np.isscalar(window):
+        window = timedelta(hours=window)
 
+    corral_radii = np.full(len(lon), np.nan)
     track_id, indices, counts = np.unique(
         np.asarray(track_id), return_index=True, return_counts=True
     )
 
     for idx, count in zip(indices, counts):
-        times = time[idx : idx + count]
+        if time is not None and window is not None:
+            times = time[idx : idx + count]
 
-        for n, centre_time in enumerate(times):
-            if (centre_time - times[0] >= window_hours) and (
-                times[-1] - centre_time >= window_hours
-            ):
-                subset = np.where(np.abs(times - centre_time) <= window_hours)[0]
-                if len(subset) >= min_points:
-                    radius = make_circle(
-                        np.asarray(lon[idx + subset]),
-                        np.asarray(lat[idx + subset]),
-                    )
-                    corral_radii[idx + n] = radius
-            # else: leave as np.nan
+            for n, centre_time in enumerate(times):
+                if (centre_time - times[0] >= window) and (
+                    times[-1] - centre_time >= window
+                ):
+                    subset = np.where(np.abs(times - centre_time) <= window)[0]
+                    if min_points is None or len(subset) >= min_points:
+                        radius = _make_circle(
+                            np.asarray(lon[idx + subset]), np.asarray(lat[idx + subset])
+                        )
+                        corral_radii[idx + n] = radius
+                # else: leave as np.nan
+        else:
+            corral_radii[idx : idx + count] = _make_circle(
+                np.asarray(lon[idx : idx + count]), np.asarray(lat[idx : idx + count])
+            )
 
     return corral_radii * units("m")
 
 
-def make_circle(lons, lats):
+def _make_circle(lons, lats):
     xyz = _latlon_to_xy(lons, lats)
     line = shapely.LineString(xyz[:, :2])
 
