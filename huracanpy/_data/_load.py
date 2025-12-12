@@ -108,7 +108,7 @@ def load(
           appropriate variable_names)
         * **old_hurdat**, **ecmwf**
         * **iris**
-        * **superbt*
+        * **superbt**
 
     variable_names : list of str, optional
           When loading data from an ASCII file (TRACK or TempestExtremes), specify the

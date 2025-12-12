@@ -40,8 +40,10 @@ def load(filename, variable_names=None):
     Parameters
     ----------
     filename: str
+        The file to be loaded
     variable_names : list of str, optional
-        TRACK
+        The names of variables that have been added to the files
+        (excludes time, lon, lat, vorticity) which are always included
 
     Returns
     -------

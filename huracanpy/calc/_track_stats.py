@@ -13,7 +13,9 @@ def track_duration(time, track_ids):
     Parameters
     ----------
     time : xarray.DataArray
+        Time at each point
     track_ids : array_like
+        Track ID at each point
 
     Returns
     -------
@@ -36,8 +38,11 @@ def gen_vals(tracks, time, track_id):
     Parameters
     ----------
     tracks : xarray.Dataset
+        The set of tracks
     time : array_like
+        Time at each point
     track_id : xarray.DataArray
+        Track ID at each point
 
     Returns
     -------
@@ -74,10 +79,12 @@ def apex_vals(tracks, variable, track_id, stat="max"):
 
     Parameters
     ----------
-    tracks : xarray.DataSet
+    tracks : xarray.Dataset
+        The set of tracks
     variable : array_like
         The extremum variable
     track_id : xarray.DataArray
+        Track ID at each point
     stat : str, optional
         Type of extremum. Can be "min" or "max". The default is "max".
 

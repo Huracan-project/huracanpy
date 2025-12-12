@@ -53,6 +53,9 @@ def online(subset, filename=None, **kwargs):
         file to which to save the raw data. None to use a temporary file. Default is
         None
 
+    **kwargs
+        Other keyword arguments are passed to pandas.read_csv
+
     Returns
     -------
     xarray.DataArray

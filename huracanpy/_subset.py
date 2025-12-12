@@ -10,10 +10,11 @@ def sel_id(tracks, track_ids, track_id):
     Parameters
     ----------
     tracks : xarray.Dataset
+        The tracks to subset from
     track_ids : xarray.DataArray
         The track_ids corresponding to the tracks Dataset
     track_id : Any
-        The track ID or IDs to match in track_ids.
+        The track ID or IDs to be selected from the tracks
 
     Returns
     -------
@@ -50,6 +51,7 @@ def trackswhere(tracks, track_ids, condition):
     Parameters
     ----------
     tracks : xarray.Dataset
+        The tracks to subset from
     track_ids : xarray.DataArray
         The track_ids corresponding to the tracks Dataset
     condition : callable

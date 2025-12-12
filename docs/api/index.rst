@@ -14,6 +14,7 @@ API
     tc
     assess
     plot
+    convert
 
 Modules
 -------
@@ -31,5 +32,7 @@ Modules
 :doc:`assess`    .. automodule:: huracanpy.assess
                      :no-index:
 :doc:`plot`      .. automodule:: huracanpy.plot
+                     :no-index:
+:doc:`convert`   .. automodule:: huracanpy.convert
                      :no-index:
 ================ ================================

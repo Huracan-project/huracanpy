@@ -18,7 +18,10 @@ def timestep(time, track_id=None):
     Parameters
     ----------
     time : array_like
-    track_id : array_like
+        Time at each point
+    track_id : array_like, optional
+        Track ID at each point to ignore time difference between the end of one track
+        and the start of the next
 
     Returns
     -------
@@ -57,7 +60,8 @@ def time_components(time, components=("year", "month", "day", "hour")):
         The time series
     components : iterable[str], optional
         The time components of `time` to return. Can include any valid attribute of
-        `xarray.core.accessor_dt.DatetimeAccessor`. Default is year, month, day, hour
+        :obj:`xarray.core.accessor_dt.DatetimeAccessor`. Default is year, month, day,
+        hour
 
     Returns
     -------
@@ -75,9 +79,13 @@ def season(track_id, lat, time, convention="tc-short"):
     Parameters
     ----------
     track_id : xarray.DataArray
+        Track ID at each point
     lat : xarray.DataArray
+        Latitude points
     time : xarray.DataArray
+        Time at each point
     convention : str
+        The convention for which season a track belongs to. One of
 
         * 'tc-short' : In the Northern hemisphere, the season is the same as calendar
           year. In the southern hemisphere, the season n corresponds to July n-1 to

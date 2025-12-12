@@ -15,6 +15,8 @@
   :width: 800
   :alt: HuracanPy logo, a yellow and blue python spiralling as a cyclone.
 
+.. title:: huracanpy
+
 *A python package for working with various forms of feature tracking data, including but not restricted to cyclone tracks.*
 
 **Why HuracanPy?**
@@ -28,7 +30,9 @@ Our goal is to make track data analysis more accessible, and to promote good rep
 
 * This package is distributed under the `MIT licence <https://github.com/Huracan-project/huracanpy/blob/main/LICENSE>`_.
 
-* A JOSS paper is currently being prepared. We ask that you cite it in published papers using HuracanPy. This help us get credit for the work we put in the development, and also to track how the package is used. 
+* There is a `JOSS paper`_ documenting HuracanPy. We ask that you cite it in published papers using HuracanPy. This help us get credit for the work we put in the development, and also to track how the package is used.
+
+.. _JOSS paper: https://joss.theoj.org/papers/10.21105/joss.08174
 
 .. grid:: 1 2 2 2
     :gutter: 2
@@ -71,7 +75,7 @@ Our goal is to make track data analysis more accessible, and to promote good rep
         Check out examples with code demonstrating various parts of HuracanPy's functionality.
 
 **Contact:**
-Please use GitHub's functions to communicate with HuracanPy's developers. In particular, use `Issues <https://github.com/Huracan-project/huracanpy/issues>`_ for feature requests or bug reporting; and use the `Dicussions <https://github.com/Huracan-project/huracanpy/discussions>`_ for Q&A and general feedback. Do not forget HuracanPy is an open-source project, and you can also contribute to it. 
+Please use GitHub's functions to communicate with HuracanPy's developers. In particular, use `Issues <https://github.com/Huracan-project/huracanpy/issues>`_ for feature requests or bug reporting; and use the `Discussions <https://github.com/Huracan-project/huracanpy/discussions>`_ for Q&A and general feedback. Do not forget HuracanPy is an open-source project, and you can also contribute to it.
 
 Please watch the GitHub repository to get information about HuracanPy. 
 

@@ -27,6 +27,7 @@ Categorisation
     :toctree: _autosummary
 
     category
+    beaufort_category
 
 Time
 ----

@@ -130,22 +130,38 @@ def pace(
     Parameters
     ----------
     pressure : array_like
+        Cyclone minimum sea-level pressure
     wind : array_like, optional
+        Cyclone wind. Only include if you want to train a model to fit the
+        pressure-wind relation
     model : str, class, or object, optional
+        The model to fit the pressure wind relation or a model with preset parameters to
+        derive wind from pressure. Can also be set to "z2021" or "holland" for those
+        preset models. The object must have a `fit` function that returns a trained
+        model, consistent with numpy and scikit-learn models.
+        Default is py:class:`numpy.polynomial.polynomial.Polynomial` with `deg=2`
     sum_by : array_like
         Variable to take the sum of PACE values across. Must have the same length as
         pressure/wind. For examples, see the documentation for `huracanpy.tc.ace`
     threshold_wind : scalar, optional
+        PACE is set to zero below this threshold wind speed
     threshold_pressure : scalar, optional
+        Similar to threshold wind, set PACE to zero where pressure is above this
+        threshold
     wind_units : str, default="m s-1"
+        If the units of wind are not specified in the attributes then the function will
+        assume it is in these units before converting to knots
     pressure_units : str, default="Pa"
+        If the units of pressure are not specified in the attributes then the function
+        will assume it is in these units
     **kwargs
+        Remaining keywords are passed to the `fit` function of the model
 
     Returns
     -------
-    pace_values : array_like
-
-    model : object
+    tuple (array_like, object) :
+        Array of pace_values
+        model : object
 
     """
     pace_values, model = _pace(

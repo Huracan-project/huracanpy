@@ -61,9 +61,10 @@ def azimuth(lon, lat, track_id=None, ellps="WGS84", centering="forward"):
 
     Parameters
     ----------
-    lon : xarray.DataArray
-    lat : xarray.DataArray
+    lon, lat : xarray.DataArray
+        Longitude and latitude points
     track_id : array_like, optional
+        Track ID at each point
     ellps : str, optional
         The definition of the globe to use for the geodesic calculation (see
         `pyproj.Geod`). Default is "WGS84".
@@ -126,16 +127,17 @@ def distance(
 
     Parameters
     ----------
-    lon : xarray.DataArray
-    lat : xarray.DataArray
+    lon, lat : xarray.DataArray
+        Longitude and latitude points
     *args : xarray.DataArray
-        * 0 arguments. Leave empty to calculate distance between successive points
-        * 1 argument, track_id. Same as 0 arguments but inserts NaNs where successive
-            points are from different tracks
-        * 2 arguments, lon and lat arrays. Calculate distances between two tracks,
-            e.g. radius of maximum wind speed, using storm centre locations and maximum
-            wind speed locations
+        - 0 arguments. Leave empty to calculate distance between successive points
+        - 1 argument, track_id. Same as 0 arguments but inserts NaNs where successive
+          points are from different tracks
+        - 2 arguments, lon and lat arrays. Calculate distances between two tracks,
+          e.g. radius of maximum wind speed, using storm centre locations and maximum
+          wind speed locations
     track_id : array_like, optional
+        Track ID at each point
     method : str, optional
         The method of computing distances, either geodesic (`"geod"`/`"geodesic"`) or
         haversine (`"haversine"`)
@@ -213,10 +215,12 @@ def translation_speed(
 
     Parameters
     ----------
-    lon : xarray.DataArray
-    lat : xarray.DataArray
+    lon, lat : xarray.DataArray
+        Longitude and latitude points
     time : xarray.DataArray
+        Time for each point
     track_id : array_like, optional
+        Track ID at each points
     method : str, optional
         The method of computing distances, either geodesic (`"geod"`) or haversine
         (`"haversine"`)
@@ -263,11 +267,13 @@ def corral_radius(lon, lat, time=None, track_id=None, *, window=None, min_points
     By default, calling corral radius with a set of lons/lats will return the corral
     radius for all these points. The returned array with have the same length as
     lons/lats, but the same value for all points
+
     >>> corral_radius(lons, lats)
 
     If you also pass a track_id, the corral radius is calculated separately for each
     unique track. The returned array still has the same length as lons/lats so the value
     for each track is repeated
+
     >>> corral_radius(lons, lats, track_id=track_id)
 
     Passing a time and window will calculate the corral radius in a rolling window. The
@@ -275,20 +281,24 @@ def corral_radius(lon, lat, time=None, track_id=None, *, window=None, min_points
     a more specific window). The code below will calculate the corral radius for each
     lon/lat include the lons/lats withing +/- 36 hours. Points where the window is
     outside the times are given NaNs
+
     >>> corral_radius(lons, lats, time=time, window=36)
 
     Including both a track_id and a time/window will ensure the corral radius is
     calculated separately for each track, leaving NaNs at the start and end of each
     track where the time window is outside the track times
+
     >>> corral_radius(lons, lats, time=time, track_id=track_id, window=36)
 
 
     Parameters
     ----------
-    lon : array_like
-    lat : array_like
+    lon, lat : array_like
+        Longitude and latitude points
     time : array_like, optional
+        Time at each point
     track_id : array_like, optional
+        Track ID at each point
     window : scalar or datetime.timedelta, optional
         Half-width of the window. i.e. include all times within +/- window
     min_points : int, optional

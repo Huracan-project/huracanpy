@@ -110,24 +110,26 @@ def fancyline(
         Clips values outside amin/amax to amin/amax. Unlike clip_colors, this is set to
         True by default because alphas outside the range 0-1 will raise an error
     linestyles : array_like or str, optional
+        The linestyle for each section of line. Same length as x/y
     ax : matplotlib.axes.Axes or cartopy.mpl.geoaxes.GeoAxes, optional
         The axes to add the line to. If not given, it will be added to the most recent
         axes
-    transform : cartopy coordinate reference system, optional
-        If the axes being drawn on are `GeoAxes` then the data will be converted from
-        the data coordinates, given by the transform, to the projection coordinates. If
-        a transform is not given, then `cartopy.crs.Geodetic` will be used with default
-        arguments
+    transform : cartopy.crs.Projection, optional
+        If the axes being drawn on are :class:`cartopy.mpl.geoaxes.GeoAxes` then the
+        data will be converted from the data coordinates, given by the transform, to the
+        projection coordinates. If a transform is not given, then
+        :class:`cartopy.crs.Geodetic` will be used with default arguments
     autoscale : bool, default=True
-        Determines whether to call ax.autoscale() after adding the lines to the plot
-        because the x/y limits are not automatically adjusted otherwise. If you are
-        overlaying the line on an existing plot you may want to avoid doing this by
-        setting to False.
+        Determines whether to call :obj:`matplotlib.axes.Axes.autoscale` after adding
+        the lines to the plot because the x/y limits are not automatically adjusted
+        otherwise. If you are overlaying the line on an existing plot you may want to
+        avoid doing this by setting to False.
 
     Returns
     -------
     matplotlib.collections.LineCollection:
-        The plotted LineCollection. Required as argument to `matplotlib.pyplot.colorbar`
+        The plotted LineCollection. Required as argument to
+        :func:`matplotlib.pyplot.colorbar`
     """
     if ax is None:
         ax = plt.gca()

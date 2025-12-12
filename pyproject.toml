@@ -1,12 +1,12 @@
 [project]
 name = "huracanpy"
-version = "1.3.0"
+version = "1.4.0"
 authors = [
   { name="Leo Saffin", email="l.saffin@reading.ac.uk" },
   { name="Stella Bourdin", email="stella.bourdin@physics.ox.ac.uk" },
 ]
 description = "A python package for working with various forms of feature tracking data"
-requires-python = ">=3.9, <3.14"
+requires-python = ">=3.9"
 dependencies = [
     "numpy",
     "xarray",
@@ -69,6 +69,7 @@ extend-select = [
     "T20", # Flake8 print
     "E501", # Line too long
     "N", # pep8 naming conventions
+    "D417", # undocumented parameters
 ]
 
 [tool.ruff.lint.per-file-ignores]

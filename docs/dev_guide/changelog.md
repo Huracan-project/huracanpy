@@ -9,9 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `huracanpy.info.beaufort_category`
 - `huracanpy.calc.corral_radius`
+- Load SuperBT from github file
+- Load IBTrACS from a netCDF file
+- Allow `huracanpy.load` to load non-ragged netCDF files. Essentially just calls `xarray.load` without modification
+- Add optional keywords to `huracanpy.save` to allow them to be passed to pandas `to_csv` or xarray `to_netcdf`
+- Add option to `assess.match` to only match tracks if the number of matching points needed are consecutive 
+- `assess.match` now uses `calc.distance` for the separation distance, so can use geodesic distance (as well as haversine)
+- `info.timestep` gives the best guess of timestep given a set of tracks
+- Centring options for delta-like functions (`delta`, `rate`, `azimuth`, `distance`, `translation_speed`)
+  - `centering="centre"` - Centred difference, NaN at the start and end of tracks
+  - `centering="adaptive"` - Centered difference. Forward difference at the start of tracks. Backward difference at the end of tracks
+- Basin definitions from [Knutson et al. (2020)](https://doi.org/10.1175/BAMS-D-18-0194.1) (`"Knutson2020"`)
+- Add `spherical` option to `calc.density`. Divides by area of gridboxes for `method="histogram"` and implements haversine weighting with scikit-learn for `method="kde"`
+- Add `info.landfall_points` which returns each point where a track crosses a coastline
+- New module `convert` and function `convert.to_geodataframe` to convert tracks to a geodataframe of points or linestrings (if track_id is given)
 
 ### Changed
+- Speed up `huracanpy.save` for netCDF files
+- Remove NaN only variables when loading online IBTrACS data.
+- Add a cyclic point when using `plot.density` so that the dateline doesn't show up as empty
 - `huracanpy.calc.apex_vals` always gives the first point when there a multiple minima/maxima with the same values. Consistent with the behaviour of argmin/argmax
+
+### Fixed
+- -180 and 180 no longer treated as different longitudes. -180 is always used instead
+- When a point is exactly on the boundary of basin, give the first basin in the list rather than no basin
+
+## v1.3.1
+### Fixed
+- `calc.density` with `crop=True` will only crop the region outside of where there are tracks rather than all empty longitudes/latitudes
 
 ## v1.3.0
 ### Added

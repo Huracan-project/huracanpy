@@ -71,6 +71,7 @@ def _reset_track_id(tracks, track_ids, start=0, *, keep_original=False):
     Parameters
     ----------
     tracks : xarray.Dataset
+        The set of tracks
     track_ids : array_like
         The current track IDs
     start : int, optional

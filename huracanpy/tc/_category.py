@@ -12,7 +12,7 @@ from .._metpy import dequantify_results, validate_units
 from ._conventions import _thresholds
 
 
-def saffir_simpson_category(wind, convention="Saffir-Simpson", wind_units="m s-1"):
+def saffir_simpson_category(wind, wind_units="m s-1"):
     """
     Function to determine the Saffir-Simpson Hurricane Scale (SSHS) category.
 
@@ -20,8 +20,6 @@ def saffir_simpson_category(wind, convention="Saffir-Simpson", wind_units="m s-1
     ----------
     wind : array_like
         10-minutes averaged 10m wind in m/s
-
-    convention : str
 
     wind_units : str, default="m s-1"
         The units of the input array if they are not already provided by the attributes
@@ -33,6 +31,7 @@ def saffir_simpson_category(wind, convention="Saffir-Simpson", wind_units="m s-1
         You can append it to your tracks by running
         tracks["sshs"] = get_sshs_cat(tracks.wind)
     """
+    convention = "Saffir-Simpson"
     return category(
         wind,
         bins=_thresholds[convention]["bins"],

@@ -11,11 +11,14 @@ def save(dataset, filename, **kwargs):
     Parameters
     ----------
     dataset : xarray.Dataset
+        The tracks to save
     filename : str
         Must end in ".nc" or ".csv"
-    **kwargs: Remaining keywords are passed to the save function one of
-        - `pandas.DataFrame.to_csv`
-        - `xarray.Dataset.to_netcdf`
+    **kwargs
+        Remaining keywords are passed to the save function, one of
+
+        - :obj:`pandas.DataFrame.to_csv`
+        - :obj:`xarray.Dataset.to_netcdf`
 
     """
     if filename.split(".")[-1] == "nc":

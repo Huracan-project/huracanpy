@@ -11,8 +11,10 @@ def time_from_genesis(time, track_ids):
 
     Parameters
     ----------
-    time: xr.DataArray
-    track_ids: xr.DataArray
+    time: xarray.DataArray
+        Time for each point
+    track_ids: xarray.DataArray
+        Track ID for each point
 
     Returns
     -------
@@ -49,8 +51,11 @@ def time_from_apex(time, track_ids, intensity_var, stat="max"):
     Parameters
     ----------
     time : array_like
+        Time for each point
     track_ids : xarray.DataArray
+        Track ID for each point
     intensity_var : array_like
+        The variable used to find the apex points
     stat : str, optional
         Take either the maxima ("max") or minima ("min") of `intensity_var`. Default is
         "max"

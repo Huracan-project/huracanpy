@@ -22,17 +22,20 @@ def tracks(
     Parameters
     ----------
     lon : array_like
+        Longitude points
     lat : array_like
+        Latitude points
     intensity_var : array_like, optional
         Colour the individual points by
     ax :  matplotlib.axes.Axes, optional
         The axes to draw the figure on. A new figure is created if ax is None
     subplot_kws : dict, optional
-        Keywords passed to the `subplot_kw` argument of `matplotlib.pyplot.subplots`
+        Keywords passed to the `subplot_kw` argument of
+        :func:`matplotlib.pyplot.subplots`
     fig_kws : dict, optional
-        Keywords passed to `matplotlib.pyplot.subplots`
+        Keywords passed to :func:`matplotlib.pyplot.subplots`
     scatter_kws : dict, optional
-        Keywords passed to `seaborn.scatterplot`
+        Keywords passed to :func:`seaborn.scatterplot`
 
     Returns
     -------
