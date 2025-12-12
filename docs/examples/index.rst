@@ -1,15 +1,26 @@
 Examples
 ========
+For more in depth examples, see the :doc:`example workflows <../user_guide/demos/index>` in the user guide
 
+Plots
+-----
 .. nbgallery::
 
-    fancy_line_plot
-    basins
-    IBTrACS
     plot_tracks
-    track_density
+    fancy_line_plot
     doughnuts
+    track_density
+
+Diagnostics
+-----------
+.. nbgallery::
     utils
     ERA-20C_assessment
     beta_drift
     Select_basin_plot_interannual_variability
+
+Reference
+-------------
+.. nbgallery::
+    basins
+    IBTrACS
