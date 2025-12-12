@@ -267,11 +267,13 @@ def corral_radius(lon, lat, time=None, track_id=None, *, window=None, min_points
     By default, calling corral radius with a set of lons/lats will return the corral
     radius for all these points. The returned array with have the same length as
     lons/lats, but the same value for all points
+
     >>> corral_radius(lons, lats)
 
     If you also pass a track_id, the corral radius is calculated separately for each
     unique track. The returned array still has the same length as lons/lats so the value
     for each track is repeated
+
     >>> corral_radius(lons, lats, track_id=track_id)
 
     Passing a time and window will calculate the corral radius in a rolling window. The
@@ -279,11 +281,13 @@ def corral_radius(lon, lat, time=None, track_id=None, *, window=None, min_points
     a more specific window). The code below will calculate the corral radius for each
     lon/lat include the lons/lats withing +/- 36 hours. Points where the window is
     outside the times are given NaNs
+
     >>> corral_radius(lons, lats, time=time, window=36)
 
     Including both a track_id and a time/window will ensure the corral radius is
     calculated separately for each track, leaving NaNs at the start and end of each
     track where the time window is outside the track times
+
     >>> corral_radius(lons, lats, time=time, track_id=track_id, window=36)
 
 

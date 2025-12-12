@@ -18,6 +18,7 @@ Diagnostics
     ERA-20C_assessment
     beta_drift
     Select_basin_plot_interannual_variability
+    stalling
 
 Reference
 -------------
