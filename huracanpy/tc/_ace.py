@@ -2,13 +2,10 @@
 Module containing functions to compute ACE
 """
 
-import warnings
-
-import numpy as np
 from numpy.polynomial.polynomial import Polynomial
-from pint.errors import UnitStrippedWarning
 from metpy.xarray import preprocess_and_wrap
 from metpy.units import units
+from sklearn.base import BaseEstimator
 
 from .._metpy import dequantify_results, validate_units
 
@@ -151,7 +148,7 @@ def pace(
     wind_units : str, default="m s-1"
         If the units of wind are not specified in the attributes then the function will
         assume it is in these units before converting to knots
-    pressure_units : str, default="Pa"
+    pressure_units : str, default="hPa"
         If the units of pressure are not specified in the attributes then the function
         will assume it is in these units
     **kwargs
@@ -160,9 +157,8 @@ def pace(
     Returns
     -------
     tuple (array_like, object) :
-        Array of pace_values
-        model : object
-
+        Array of pace_values and the trained model for mapping from pressure values to
+        wind values from :py:func:`pressure_wind_relation`
     """
     pace_values, model = _pace(
         pressure,
@@ -193,16 +189,25 @@ def _pace(
     pressure_units="hPa",
     **kwargs,
 ):
+    if wind is None and model is None:
+        raise ValueError(
+            "Need to specify either wind or model to calculate pressure-wind relation"
+        )
+
     pressure = validate_units(pressure, pressure_units)
-    pressure = pressure.to("hPa")
+
     if wind is not None:
         wind = validate_units(wind, wind_units)
-        wind = wind.to(units("knots"))
+        model = pressure_wind_relation(
+            pressure,
+            wind,
+            model=model,
+            pressure_units=pressure_units,
+            wind_units=wind_units,
+            **kwargs,
+        )
 
-    model_wind, model = _pressure_wind_relation(
-        pressure, wind=wind, model=model, **kwargs
-    )
-    pace_values = _ace(model_wind, threshold=threshold_wind, wind_units="knots")
+    pace_values = _ace(model.predict(pressure), threshold=threshold_wind)
 
     if threshold_pressure is not None:
         threshold_pressure = validate_units(threshold_pressure, pressure_units)
@@ -212,53 +217,140 @@ def _pace(
     return pace_values, model
 
 
-def _pressure_wind_relation(pressure, wind=None, model=None, **kwargs):
+@preprocess_and_wrap()
+def pressure_wind_relation(
+    pressure,
+    wind,
+    model=None,
+    pressure_units="hPa",
+    wind_units="m s-1",
+    **kwargs,
+):
+    """Fit a model pressure wind relation and return the trained model
+
+    To get the predicted wind from the call the predict function (scikit-learn API)
+
+    >>> wind = model.predict(pressure)
+
+    or call the model as a function (numpy API)
+
+    >>> wind = model(pressure)
+
+    Note that the returned model supports inputs and outputs with units.
+
+    Parameters
+    ----------
+    pressure : array_like
+        Cyclone minimum sea-level pressure
+    wind : array_like
+        Cyclone max wind
+    model : str, class, or object, optional
+        The model to fit the pressure wind relation or a model with preset parameters to
+        derive wind from pressure. Can also be set to "z2021" or "holland" for those
+        preset models. The object must have a `fit` function that returns a trained
+        model, consistent with numpy and scikit-learn models.
+        Default is py:class:`numpy.polynomial.polynomial.Polynomial` with `deg=2`
+    wind_units : str, default="m s-1"
+        If the units of wind are not specified in the attributes then the function will
+        assume it is in these units before converting to knots
+    pressure_units : str, default="hPa"
+        If the units of pressure are not specified in the attributes then the function
+        will assume it is in these units
+    **kwargs
+        Remaining keywords are passed to the `fit` function of the model
+
+    Returns
+    -------
+    object
+        The model for mapping from pressure to wind.
+    """
+    pressure = validate_units(pressure, pressure_units)
+    wind = validate_units(wind, wind_units)
+
     if isinstance(model, str):
         if model.lower() == "z2021":
-            model = pw_z2021
+            model = Z2021()
         elif model.lower() == "holland":
-            model = pw_holland
-
-    elif wind is not None:
-        if model is None:
-            # Here, we calculate a quadratic P/W fit based off of the "control"
-            if "deg" not in kwargs:
-                kwargs["deg"] = 2
-            model = Polynomial.fit(pressure.magnitude, wind.magnitude, **kwargs)
-
-        else:
-            model = model.fit(pressure.magnitude, wind.magnitude, **kwargs)
+            model = Holland()
 
     elif model is None:
-        raise ValueError(
-            "Need to specify either wind or model to calculate pressure-wind relation"
-        )
+        model = Polynomial
+        if "deg" not in kwargs:
+            kwargs["deg"] = 2
 
-    wind_from_fit = _get_wind_from_model(pressure.magnitude, model) * units("knots")
+    model = ModelWithUnits(model)
+    model.fit(x=pressure, y=wind, **kwargs)
 
-    return wind_from_fit, model
-
-
-def _get_wind_from_model(pressure, model):
-    with warnings.catch_warnings():
-        warnings.filterwarnings(
-            "ignore",
-            category=UnitStrippedWarning,
-            message="The unit of the quantity is stripped when downcasting to ndarray.",
-        )
-
-        result = np.asarray(model(pressure))
-    return result
+    return model
 
 
 # Pre-determined pressure-wind relationships
 # Input pressure in hPa, output wind in knots
-_z2021 = Polynomial([1.43290190e01, 5.68356519e-01, -1.05371378e-03])
+class Z2021(Polynomial):
+    def __init__(self):
+        self.units = dict(x=units("hPa"), y=units("knots"))
+        super().__init__([1.43290190e01, 5.68356519e-01, -1.05371378e-03])
+
+    def fit(self, *args, **kwargs):  # noqa: ARG002
+        self.units = dict(x=units("hPa"), y=units("knots"))
+        return self
+
+    def predict(self, pressure):
+        return self.__call__(pressure)
+
+    def __call__(self, pressure):
+        return super().__call__(1010.0 - pressure)
 
 
-def pw_z2021(pressure):
-    return _z2021(1010.0 - pressure)
+class Holland:
+    def __init__(self):
+        self.units = dict(x=units("hPa"), y=units("knots"))
+
+    def fit(self, *args, **kwargs):  # noqa: ARG002
+        self.units = dict(x=units("hPa"), y=units("knots"))
+        return self
+
+    def predict(self, pressure):
+        return self.__call__(pressure)
+
+    def __call__(self, pressure):
+        return 2.3 * (1010.0 - pressure) ** 0.76
 
 
-def pw_holland(pressure):
-    return 2.3 * (1010.0 - pressure) ** 0.76
+class ModelWithUnits:
+    def __init__(self, model):
+        if not hasattr(model, "units"):
+            model.units = dict(x=None, y=None)
+        self.model = model
+
+    @preprocess_and_wrap()
+    def fit(self, x, y, **kws):
+        self.model.units["x"] = x.units
+        self.model.units["y"] = y.units
+
+        if issubclass(self.model.__class__, BaseEstimator) and x.ndim <= 1:
+            x = x.reshape(-1, 1)
+
+        self.model = self.model.fit(x.magnitude, y.magnitude, **kws)
+
+        return self
+
+    @dequantify_results
+    @preprocess_and_wrap(wrap_like="x")
+    def predict(self, x, x_units=None):
+        if x_units is None:
+            x_units = str(self.model.units["x"])
+        x = validate_units(x, x_units).to(self.model.units["x"]).magnitude
+
+        if issubclass(self.model.__class__, BaseEstimator) and x.ndim <= 1:
+            x = x.reshape(-1, 1)
+
+        try:
+            y = self.model.predict(x)
+        except AttributeError:
+            y = self.model(x)
+
+        return y * self.model.units["y"]
+
+    def __call__(self, *args, **kwargs):
+        return self.predict(*args, **kwargs)

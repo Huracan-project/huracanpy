@@ -169,7 +169,6 @@ def test_accessor_methods_match_functions(
 
     # Special case for PACE returning the values and the model
     if function == huracanpy.tc.pace:
-        assert result[1] == result_accessor[1]
         result = result[0]
         result_accessor = result_accessor[0]
 
