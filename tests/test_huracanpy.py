@@ -162,27 +162,21 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks, isdatetime64):
             assert name in data
 
 
-def _fake_ibtracs_data(url, filename):  # noqa ARG001
-    return huracanpy.example_csv_file, None
+def test_load_ibtracs_online():
+    # Including NaN removal tests
+    tracks = huracanpy.load(source="ibtracs", ibtracs_subset="last3years")
+    assert len(tracks.record) > 0
 
+    # Check that no variables are all NaNs
+    nan_only_vars = [var for var in tracks.data_vars if tracks[var].isnull().all()]
+    assert len(nan_only_vars) == 0, (
+        f"Found {len(nan_only_vars)} variables that are all NaNs: {nan_only_vars}"
+    )
 
-def test_load_ibtracs_online(monkeypatch):
-    with monkeypatch.context() as m:
-        from huracanpy._data import ibtracs
-
-        m.setattr(ibtracs, "urlretrieve", _fake_ibtracs_data)
-        tracks = huracanpy.load(source="ibtracs", ibtracs_subset="last3years")
-
-    assert len(tracks) == 9
-    assert len(tracks.coords) == 0
-    # IBTrACS online load skips the second line (first line after header) so this is one
-    # less than expected
-    assert len(tracks.time) == 98
-    assert len(tracks.groupby("track_id")) == 3
-    assert "record" not in tracks.coords
-
-    for name in ["track_id", "time", "lon", "lat"]:
-        assert name in tracks
+    # Check that essential variables are preserved
+    essential_vars = ["sid", "season", "basin", "lon", "lat", "time"]
+    for var in essential_vars:
+        assert var in tracks.data_vars, f"Essential variable '{var}' was removed"
 
 
 @pytest.mark.parametrize(
