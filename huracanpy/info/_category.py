@@ -55,7 +55,7 @@ def category(variable, bins, labels=None, variable_units=None):
         variable,
         # If variable has no units, but bins do, copy the units from the bins to the
         # variable. But if neither have units specified use the "variable_units" kwarg
-        expected_units=lambda x: str(bins.units)  # noqa: ARG005
+        expected_units=str(bins.units)
         if variable_units is None and isinstance(bins, pint.Quantity)
         else variable_units,
     )
