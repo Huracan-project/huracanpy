@@ -13,7 +13,7 @@ dependencies = [
     "cftime",
     "parse",
     "shapely",
-    "pandas",
+    "pandas<3",
     # Issue with newer versions of fiona when using old versions of geopandas
     # see https://stackoverflow.com/a/78949565/8270394
     "geopandas>=0.14.4",
