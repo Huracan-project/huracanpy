@@ -10,6 +10,7 @@ Plots
     fancy_line_plot
     doughnuts
     track_density
+    pressure_wind
 
 Diagnostics
 -----------

@@ -20,6 +20,7 @@ _intentionally_missing = [
     "add_density",
     "add_track_duration",
     "add_timestep",
+    "add_pressure_wind_relation",
     # plot_ functions that are for multiple datasets
     "plot_doughnut",
     "plot_venn",
