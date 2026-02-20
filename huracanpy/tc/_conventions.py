@@ -27,5 +27,7 @@ _thresholds = {
     ),
 }
 
+# Aliases
+_thresholds["Saffir-Simpson"] = _thresholds["10min"]
 _thresholds["wmo"] = _thresholds["10min"]
 _thresholds["nhc"] = _thresholds["1min"]
