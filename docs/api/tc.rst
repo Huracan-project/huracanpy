@@ -11,6 +11,7 @@ tc
 
     ace
     pace
+    pressure_wind_relation
     saffir_simpson_category
     pressure_category
     beta_drift

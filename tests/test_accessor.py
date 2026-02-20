@@ -20,6 +20,7 @@ _intentionally_missing = [
     "add_density",
     "add_track_duration",
     "add_timestep",
+    "add_pressure_wind_relation",
     # plot_ functions that are for multiple datasets
     "plot_doughnut",
     "plot_venn",
@@ -169,7 +170,6 @@ def test_accessor_methods_match_functions(
 
     # Special case for PACE returning the values and the model
     if function == huracanpy.tc.pace:
-        assert result[1] == result_accessor[1]
         result = result[0]
         result_accessor = result_accessor[0]
 

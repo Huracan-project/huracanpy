@@ -12,26 +12,33 @@ from .._metpy import dequantify_results, validate_units
 from ._conventions import _thresholds
 
 
-def saffir_simpson_category(wind, wind_units="m s-1"):
+def saffir_simpson_category(wind, wind_units="m s-1", convention="10min"):
     """
-    Function to determine the Saffir-Simpson Hurricane Scale (SSHS) category.
+    Determine the Saffir-Simpson Hurricane Scale (SSHS) category.
 
     Parameters
     ----------
     wind : array_like
-        10-minutes averaged 10m wind in m/s
+        Maximum sustained wind speed. Averaging period depends on the convention used
+        (see convention)
 
     wind_units : str, default="m s-1"
         The units of the input array if they are not already provided by the attributes
 
+    convention : str, default="10min"
+        The thresholds based on the averaging periods used for the wind. Pass one of
+            * "10min" or "wmo
+            * "1min" or "nhc"
+
+        The default is the WMO convention of 10-minute sustained winds, which has lower
+        thresholds than the alternative NHC convention of 1-minute sustained winds
+
     Returns
     -------
     array_like
-        The category series.
-        You can append it to your tracks by running
-        tracks["sshs"] = get_sshs_cat(tracks.wind)
+        An array of integers ranging from -1 to 5. 1 to 5 is the Saffir-Simpson
+        category, zero is tropical storm, and -1 is anything weaker
     """
-    convention = "Saffir-Simpson"
     return category(
         wind,
         bins=_thresholds[convention]["bins"],

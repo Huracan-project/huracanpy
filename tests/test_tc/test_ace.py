@@ -2,6 +2,9 @@ from metpy.units import units
 import numpy as np
 from numpy.polynomial.polynomial import Polynomial
 import pytest
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import PolynomialFeatures
 
 import huracanpy
 
@@ -33,12 +36,24 @@ def test_ace(tracks_csv, threshold, sum_by, result):
     "model, threshold_pressure, threshold_wind, sum_by, kwargs, result",
     [
         (None, None, None, "track_id", {}, [4.34978137, 2.65410482, 6.09892875]),
+        # Passing the Polynomial explicitly gives the same answer
         (
             Polynomial,
             None,
             None,
             "track_id",
             {"deg": 2},
+            [4.34978137, 2.65410482, 6.09892875],
+        ),
+        # Recreating an equivalent polynomial fit with sklearn gives the same answer
+        (
+            make_pipeline(
+                PolynomialFeatures(degree=2, include_bias=False), LinearRegression()
+            ),
+            None,
+            None,
+            "track_id",
+            {},
             [4.34978137, 2.65410482, 6.09892875],
         ),
         (None, 1e5, None, "track_id", {}, [4.115545, 2.654105, 5.152805]),

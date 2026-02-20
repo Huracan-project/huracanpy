@@ -224,6 +224,16 @@ class HuracanPyDatasetAccessor:
         self._dataset["pace"] = pace_values
         return self._dataset, model
 
+    def get_pressure_wind_relation(
+        self, pressure_name="slp", wind_name="wind", model=None, **kwargs
+    ):
+        return tc.pressure_wind_relation(
+            self._dataset[pressure_name],
+            self._dataset[wind_name],
+            model=model,
+            **kwargs,
+        )
+
     # ---- time
     def get_timestep(self, time_name="time", track_id_name="track_id"):
         return info.timestep(self._dataset[time_name], self._dataset[track_id_name])
@@ -725,6 +735,18 @@ class HuracanPyDatasetAccessor:
             )
 
         return output
+
+    def plot_pressure_wind_relation(
+        self,
+        pressure_name="",
+        wind_name="",
+        **kwargs,
+    ):
+        return plot.pressure_wind_relation(
+            self._dataset[pressure_name],
+            self._dataset[wind_name],
+            **kwargs,
+        )
 
     # %% diags
     # ---- density

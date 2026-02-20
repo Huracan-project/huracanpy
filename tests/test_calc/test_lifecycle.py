@@ -11,7 +11,7 @@ def test_time_from_genesis():
     data = huracanpy.load(huracanpy.example_csv_file, source="csv")
     t = huracanpy.calc.time_from_genesis(data.time, data.track_id)
     assert t.min() == 0
-    assert t.max() == 1166400000000000
+    assert (t.max() / np.timedelta64(1, "D")) == 13.5
 
 
 @pytest.mark.parametrize("stat, t_min, t_max", [("max", -270, 102), ("min", -180, 252)])
