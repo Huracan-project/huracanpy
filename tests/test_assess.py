@@ -67,6 +67,33 @@ def test_match_consecutive():
     assert len(m2) == 0
 
 
+def test_match_mean():
+    # One track matching between the year file and IBTrACS is removed when using
+    # mean instead of max, because they are within the distance for one timestep, but
+    # clearly different tracks otherwise
+    with (
+        pytest.warns(
+            UserWarning, match="This offline function loads a light version of IBTrACS"
+        ),
+        pytest.warns(UserWarning, match="You are loading the IBTrACS-WMO subset"),
+    ):
+        ib = huracanpy.load(source="ibtracs", ibtracs_subset="wmo")
+    ref_1996 = ib.where(ib.time.dt.year == 1996, drop=True)
+    uz = huracanpy.load(huracanpy.example_year_file)
+
+    matches = huracanpy.assess.match([uz, ref_1996], ["uz", "ib"])
+    matches_mean = huracanpy.assess.match(
+        [uz, ref_1996], ["uz", "ib"], max_dist=None, mean_dist=300
+    )
+
+    assert len(matches) == 77
+    assert len(matches_mean) == 76
+    assert (
+        matches.loc[~np.isin(matches.id_uz, matches_mean.id_uz), "id_uz"].iloc[0]
+        == 1236
+    )
+
+
 @pytest.mark.parametrize("distance_method", ["haversine", "geodesic"])
 @pytest.mark.parametrize("shift, n_matches", [(1, 3), (4, 0)])
 def test_match_shifted(tracks_csv, distance_method, shift, n_matches):
