@@ -15,6 +15,7 @@ def match(
     tracksets,
     names=None,
     max_dist=300,
+    mean_dist=None,
     min_overlap=0,
     consecutive_overlap=False,
     tracks1_is_ref=False,
@@ -32,6 +33,9 @@ def match(
         ['1','2', ...].
     max_dist : float, optional
         Threshold for maximum distance between two tracks. The default is 300.
+    mean_dist : float, optional
+        Threshold for mean distance between two tracks, taken over all timesteps that
+        include both tracks.
     min_overlap : int, optional
         Minimum number of overlapping time steps for matching. The default is 0.
     consecutive_overlap: bool, optional
@@ -68,22 +72,24 @@ def match(
         return _match_pair(
             *tracksets,
             *names,
-            max_dist,
-            min_overlap,
-            consecutive_overlap,
-            tracks1_is_ref,
-            distance_method,
+            max_dist=max_dist,
+            mean_dist=mean_dist,
+            min_overlap=min_overlap,
+            consecutive_overlap=consecutive_overlap,
+            tracks1_is_ref=tracks1_is_ref,
+            distance_method=distance_method,
         )
     # More than two track sets
     else:
         return _match_multiple(
             tracksets,
             names,
-            max_dist,
-            min_overlap,
-            consecutive_overlap,
-            tracks1_is_ref,
-            distance_method,
+            max_dist=max_dist,
+            mean_dist=mean_dist,
+            min_overlap=min_overlap,
+            consecutive_overlap=consecutive_overlap,
+            tracks1_is_ref=tracks1_is_ref,
+            distance_method=distance_method,
         )
 
 
@@ -93,6 +99,7 @@ def _match_pair(
     name1="1",
     name2="2",
     max_dist=300,
+    mean_dist=None,
     min_overlap=0,
     consecutive_overlap=False,
     tracks1_is_ref=False,
@@ -107,7 +114,7 @@ def _match_pair(
     tracks2["lon"] = np.where(tracks2.lon > 180, tracks2.lon - 360, tracks2.lon)
 
     # Find corresponding points (same time step, less than max_dist km)
-    merged = pd.merge(tracks1, tracks2, on="time")
+    merged = pd.merge(tracks1, tracks2, on="time").drop_duplicates()
 
     if len(merged) == 0:
         # if there exist no matching points, return empty dataframe
@@ -128,7 +135,10 @@ def _match_pair(
             )
             * 1e-3
         )
-    merged = merged[merged.dist <= max_dist]
+
+    # Only consider points within the maximum distance
+    if max_dist is not None:
+        merged = merged[merged.dist <= max_dist]
 
     # Precompute groupby
     track_groups = merged.groupby(["track_id_x", "track_id_y"])
@@ -136,13 +146,18 @@ def _match_pair(
     # Compute temporal overlap
     temp = track_groups[["dist"]].count().rename(columns={"dist": "temp"})
 
+    # Only considering tracks within the mean distance
+    if mean_dist is not None:
+        temp = temp[track_groups[["dist"]].mean().dist < mean_dist]
+
     if min_overlap >= 2:
         if consecutive_overlap:
             # Replace temporal overlap with longest consecutive set of merged points
             # for each track
             dt = timestep(tracks1.time, tracks1.track_id)
 
-            for (track_id_x, track_id_y), track in track_groups:
+            for index, _ in temp.iterrows():
+                track = track_groups.get_group(index)
                 if len(track) >= min_overlap:
                     nconsecutive = (
                         max(
@@ -154,7 +169,7 @@ def _match_pair(
                         + 1
                     )
 
-                    temp.loc[(track_id_x, track_id_y)].temp = nconsecutive
+                    temp.loc[index].temp = nconsecutive
 
         # Subset by tracks sharing min_overlap points
         temp = temp[temp.temp >= min_overlap]
@@ -197,6 +212,7 @@ def _match_multiple(
     datasets,
     names,
     max_dist=300,
+    mean_dist=None,
     min_overlap=0,
     consecutive_overlap=False,
     tracks1_is_ref=False,
@@ -212,9 +228,10 @@ def _match_multiple(
         m = _match_pair(
             *dataset_pair,
             *names_pair,
-            max_dist,
-            min_overlap,
-            consecutive_overlap,
+            max_dist=max_dist,
+            mean_dist=mean_dist,
+            min_overlap=min_overlap,
+            consecutive_overlap=consecutive_overlap,
             tracks1_is_ref=tracks1_is_ref * (names_pair[0] == names[0]),
             distance_method=distance_method,
         )
