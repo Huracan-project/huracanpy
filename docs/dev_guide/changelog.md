@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `tc.pressure_wind_relation` to get/apply the model for a pressure wind relation without having to use `tc.pace`. The return model is als wrapped so that the fitting and predicting of the model uses units.
 - `plot.pressure_wind_relation`
 - `tc.saffir_simpson_category` has the option to use thresholds for 10-minute or 1-minute sustained winds. Previously it was only 10-minute by default
+- Optional mean distance (instead of default maximum distance) when matching tracks with `assess.match`
 
 ### Changed
 - Speed up `huracanpy.save` for netCDF files
