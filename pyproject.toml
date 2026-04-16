@@ -42,6 +42,7 @@ dev = [
     "nbsphinx",
 ]
 docs = [
+    "sphinx<9",
     "pydata-sphinx-theme",
     "sphinx-copybutton",
     "nbsphinx",
