@@ -5,6 +5,7 @@ repos:
     rev: v1.46.2
     hooks:
       - id: typos
+        args: []
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
