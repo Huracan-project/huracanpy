@@ -61,6 +61,17 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.package-data]
 huracanpy = ["_data/example_data/*", "_data/_ibtracs_files/*"]
 
+[tool.pytest]
+minversion = "9.0"
+addopts = ["--cov=huracanpy, --cov-report html", "-ra"]
+strict = true
+filterwarnings = [
+  "ignore:numpy.ndarray size changed:RuntimeWarning",
+  "ignore::cartopy.io.DownloadWarning"
+]
+log_level = "INFO"
+testpaths = ["tests"]
+
 [tool.ruff]
 extend-include = ["*.ipynb"]
 
@@ -77,14 +88,6 @@ extend-select = [
 [tool.ruff.lint.per-file-ignores]
 # Only check for use of assert/print in main module
 "!huracanpy/**" = ["S101", "T20"]
-
-[tool.pytest.ini_options]
-minversion = "6.0"
-filterwarnings = [
-    'ignore:numpy.ndarray size changed:RuntimeWarning',
-    "ignore::cartopy.io.DownloadWarning"
-]
-addopts = "--cov=huracanpy --cov-report html"
 
 [tool.tox]
 requires = ["tox>=4.15.0"]
