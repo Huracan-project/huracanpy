@@ -92,6 +92,10 @@ extend-select = [
 # Only check for use of assert/print in main module
 "!huracanpy/**" = ["S101", "T20"]
 
+[tool.typos.default]
+extend-ignore-re = ["T63vor_*", "arange"]
+
+
 [tool.tox]
 requires = ["tox>=4.15.0"]
 env_list = ["3.9", "3.10", "3.11", "3.12", "3.13"]

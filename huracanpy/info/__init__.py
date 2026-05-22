@@ -1,4 +1,4 @@
-"""Huracanpy module for useful auxilliary functions"""
+"""Huracanpy module for useful auxiliary functions"""
 
 __all__ = [
     "hemisphere",

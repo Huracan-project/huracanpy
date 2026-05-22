@@ -39,7 +39,7 @@ def match(
     min_overlap : int, optional
         Minimum number of overlapping time steps for matching. The default is 0.
     consecutive_overlap: bool, optional
-        If min_overlap > 1, require that min_overlap points also need to be consective
+        If min_overlap > 1, require that min_overlap points also need to be consecutive
     tracks1_is_ref: bool, optional
         If True, treat the first set of tracks as the reference set. If one track
         matches multiple reference tracks, only keep the longest match

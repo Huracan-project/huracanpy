@@ -193,7 +193,7 @@ def load(
           with the initial time and timestep e.g. ("1940-01-01", 6)
 
           * The first argument is the initial time and needs to be something readable by
-            :class:`numpy.datetime64`, or you can explicity pass a
+            :class:`numpy.datetime64`, or you can explicitly pass a
             :class:`numpy.datetime64` object.
           * The second argument is the step and is passed to :class:`numpy.timedelta64`
             and is assumed to be in hours, or you can explicitly pass a
@@ -207,8 +207,8 @@ def load(
         * CSV file - :func:`pandas.read_csv`
         * parquet file - :func:`pandas.read_parquet`
 
-        For CSV files pandas interprets "NA" as `nan` by default, which is overriden in
-        this function. To restore the pandas default behavious set
+        For CSV files pandas interprets "NA" as `nan` by default, which is overridden in
+        this function. To restore the pandas default behaviours set
         :code:`keep_default_NA=True` and :code:`na_values=[]`
 
     Returns

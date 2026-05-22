@@ -131,7 +131,7 @@ def load(filename, variable_names=None):
                     )
             else:
                 warnings.warn(
-                    "Parsed line is empty. It is possible this problem arrises because"
+                    "Parsed line is empty. It is possible this problem arises because"
                     "the number of tracks expected from the header was not found in the"
                     "file."
                 )

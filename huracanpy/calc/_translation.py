@@ -279,7 +279,7 @@ def corral_radius(lon, lat, time=None, track_id=None, *, window=None, min_points
     Passing a time and window will calculate the corral radius in a rolling window. The
     window is by default in hours (you can explicitly pass a datetime.timedelta to use
     a more specific window). The code below will calculate the corral radius for each
-    lon/lat include the lons/lats withing +/- 36 hours. Points where the window is
+    lon/lat include the lons/lats within +/- 36 hours. Points where the window is
     outside the times are given NaNs
 
     >>> corral_radius(lons, lats, time=time, window=36)

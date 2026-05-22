@@ -6,7 +6,7 @@ geodetic = Geodetic()
 
 # %% Basins
 
-basins = {}  # Dictionnary to save basin definition from different conventions
+basins = {}  # Dictionary to save basin definition from different conventions
 
 # WMO convention
 ## Northern hemisphere

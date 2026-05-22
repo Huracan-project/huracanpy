@@ -63,8 +63,8 @@ def beta_drift(
 
     # Beta-drift parameters
     v_char = (radius_wind_max**2) * beta  # m/s
-    b = v_char / wind_max  # non-dimensionnal
-    v_drift_adim = 0.72 * b ** (-0.54)  # non-dmensionnal
+    b = v_char / wind_max  # non-dimensional
+    v_drift_adim = 0.72 * b ** (-0.54)  # non-dmensional
     v_drift = v_drift_adim * v_char  # m/s
     theta_drift = 308 - 9.6 * np.log(b)  # degrees
 
