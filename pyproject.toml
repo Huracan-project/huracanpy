@@ -8,49 +8,50 @@ authors = [
 description = "A python package for working with various forms of feature tracking data"
 requires-python = ">=3.9"
 dependencies = [
-    "numpy",
-    "xarray",
-    "cftime",
-    "parse",
-    "shapely",
-    "pandas<3",
-    # Issue with newer versions of fiona when using old versions of geopandas
-    # see https://stackoverflow.com/a/78949565/8270394
-    "geopandas>=0.14.4",
-    "matplotlib",
-    "seaborn",
-    "netcdf4",
-    "haversine",
-    "cartopy",
-    "matplotlib-venn<1",
-    "metpy",
-    "tqdm",
-    "pyarrow",
-    "pyproj",
-    "scikit-learn",
-    "nvector",
+  "cartopy",
+  "cftime",
+  # Issue with newer versions of fiona when using old versions of geopandas
+  # see https://stackoverflow.com/a/78949565/8270394
+  "geopandas>=0.14.4",
+  "haversine",
+  "matplotlib",
+  "matplotlib-venn<1",
+  "metpy",
+  "netcdf4",
+  "numpy",
+  "nvector",
+  "pandas<3",
+  "parse",
+  "pyarrow",
+  "pyproj",
+  "scikit-learn",
+  "seaborn",
+  "shapely",
+  "tqdm",
+  "xarray",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    "pre-commit",
-    "pytest",
-    "pytest-cov",
-    "ruff>=0.9.0",
-    "tox",
-    "nbformat",
-    "nbsphinx",
+  "nbformat",
+  "nbsphinx",
+  "pre-commit",
+  "pytest",
+  "pytest-cov",
+  "ruff>=0.9.0",
+  "tox",
 ]
+
 docs = [
-    "sphinx<9",
-    "pydata-sphinx-theme",
-    "sphinx-copybutton",
-    "nbsphinx",
-    "IPython",
-    "sphinx-design",
-    "ipykernel",
-    "myst-parser",
-    "sphinx_autosummary_accessors",
+  "IPython",
+  "ipykernel",
+  "myst-parser",
+  "nbsphinx",
+  "pydata-sphinx-theme",
+  "sphinx<9",
+  "sphinx_autosummary_accessors",
+  "sphinx-copybutton",
+  "sphinx-design",
 ]
 
 [build-system]
