@@ -1,7 +1,7 @@
 """Venn diagrams for tracks matching visualisation"""
 
-from matplotlib_venn import venn2, venn2_circles, venn3, venn3_circles
 import numpy as np
+from matplotlib_venn import venn2, venn2_circles, venn3, venn3_circles
 
 
 def venn(datasets, match, labels, colors=None, circle_color="k"):

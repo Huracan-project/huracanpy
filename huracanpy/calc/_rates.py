@@ -13,7 +13,9 @@ from .._metpy import dequantify_results
 
 def _dummy_track_id(var):
     warnings.warn(
-        "track_id is not provided, all points are considered to come from the sametrack"
+        "track_id is not provided, all points are considered to come from the same "
+        "track",
+        stacklevel=2,
     )
     return np.zeros(np.shape(var))
 

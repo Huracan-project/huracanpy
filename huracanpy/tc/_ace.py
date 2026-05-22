@@ -2,9 +2,9 @@
 Module containing functions to compute ACE
 """
 
-from numpy.polynomial.polynomial import Polynomial
-from metpy.xarray import preprocess_and_wrap
 from metpy.units import units
+from metpy.xarray import preprocess_and_wrap
+from numpy.polynomial.polynomial import Polynomial
 from sklearn.base import BaseEstimator
 
 from .._metpy import dequantify_results, validate_units
@@ -13,7 +13,7 @@ from .._metpy import dequantify_results, validate_units
 def ace(
     wind,
     sum_by=None,
-    threshold=34 * units("knots"),
+    threshold="default",
     wind_units="m s-1",
 ):
     r"""Calculate accumulate cyclone energy (ACE)
@@ -76,11 +76,13 @@ def ace(
 
 @dequantify_results
 @preprocess_and_wrap(wrap_like="wind")
-def _ace(wind, threshold=34 * units("knots"), wind_units="m s-1"):
+def _ace(wind, threshold="default", wind_units="m s-1"):
     wind = validate_units(wind, wind_units)
     wind = wind.to(units("knots"))
 
     if threshold is not None:
+        if threshold == "default":
+            threshold = 34 * units("knots")
         threshold = validate_units(threshold, wind_units)
 
         wind[wind < threshold] = 0 * units("knots")

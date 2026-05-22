@@ -16,15 +16,15 @@ __all__ = [
     "inferred_track_id",
 ]
 
+from ._category import beaufort_category, category
 from ._geography import (
-    hemisphere,
     basin,
-    country,
     continent,
+    country,
+    hemisphere,
     is_land,
     is_ocean,
     landfall_points,
 )
-from ._category import category, beaufort_category
-from ._time import timestep, time_components, season
+from ._time import season, time_components, timestep
 from ._utils import inferred_track_id

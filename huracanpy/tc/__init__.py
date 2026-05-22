@@ -10,5 +10,5 @@ __all__ = [
 ]
 
 from ._ace import ace, pace, pressure_wind_relation
-from ._category import saffir_simpson_category, pressure_category
 from ._beta_drift import beta_drift
+from ._category import pressure_category, saffir_simpson_category

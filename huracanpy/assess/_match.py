@@ -1,14 +1,14 @@
 """Matching functions"""
 
-from itertools import combinations, groupby
 import warnings
+from itertools import combinations, groupby
 
 import numpy as np
 import pandas as pd
 from pint.errors import UnitStrippedWarning
 
-from ..info import timestep
 from ..calc import distance
+from ..info import timestep
 
 
 def match(
@@ -162,7 +162,7 @@ def _match_pair(
                     nconsecutive = (
                         max(
                             [
-                                sum([1 for _ in grouper]) if value else 0
+                                sum([1 for _n in grouper]) if value else 0
                                 for value, grouper in groupby(np.diff(track.time) == dt)
                             ]
                         )

@@ -3,12 +3,11 @@ from io import StringIO
 
 from . import _csv
 
-
 time_vars = ["year", "month", "timestep"]
 
 
 def load(filename, iris_timestep, **kwargs):
-    with open(filename, "rt") as f:
+    with open(filename) as f:
         # First line is variable names. Rename track_id
         header = f.readline().strip().replace("#tcid", "track_id").split()
 

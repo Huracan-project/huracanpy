@@ -34,7 +34,7 @@ def load():
 
     tracks = xr.concat(tracks, dim="record")
 
-    for n, row in meta.iterrows():
+    for _n, row in meta.iterrows():
         varname = row.varname
         details = row.details
 

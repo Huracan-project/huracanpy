@@ -4,11 +4,11 @@ Module containing function to compute track densities
 
 import warnings
 
-from metpy.constants import earth_avg_radius
 import numpy as np
+import xarray as xr
+from metpy.constants import earth_avg_radius
 from scipy.stats import gaussian_kde
 from sklearn.neighbors import KernelDensity
-import xarray as xr
 
 from .._metpy import dequantify_results
 
@@ -87,7 +87,8 @@ def density(
         # Account for cell area differences
         warnings.warn(
             "By default density does not take into account the spherical geometry of"
-            "the Earth. Set spherical=True to account for this"
+            "the Earth. Set spherical=True to account for this",
+            stacklevel=2,
         )
 
     # Define coordinates for mapping

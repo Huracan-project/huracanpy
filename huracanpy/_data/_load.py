@@ -1,25 +1,25 @@
-from datetime import timedelta
 import warnings
+from datetime import timedelta
 
 import cftime
-from dateutil.parser import parse
 import numpy as np
 import pandas as pd
+from dateutil.parser import parse
 from pandas.errors import OutOfBoundsDatetime
 
+from .._concat import concat_tracks
+from .._util import combine_kws
 from . import (
     _csv,
-    track_files,
     _netcdf,
     _tempestextremes,
-    witrack,
-    old_hurdat,
+    ibtracs,
     iris_tc,
+    old_hurdat,
     superbt,
+    track_files,
+    witrack,
 )
-from . import ibtracs
-from .._concat import concat_tracks
-
 
 rename_defaults = dict(
     id="track_id",
@@ -69,7 +69,7 @@ def load(
     filename=None,
     source=None,
     variable_names=None,
-    rename=dict(),
+    rename=None,
     units=None,
     baselon=None,
     infer_track_id=None,
@@ -218,7 +218,7 @@ def load(
     """
     # Overwrite default arguments with explicit arguments passed to rename by putting
     # "rename" second in this dictionary combination
-    rename = {**rename_defaults, **rename}
+    rename = combine_kws(rename, rename_defaults)
 
     if isinstance(filename, (list, tuple, np.ndarray)):
         # Loop through all the files and open them
@@ -388,7 +388,8 @@ def _parse_dates(tracks, calendar):
                 warnings.warn(
                     "Converting out of bounds np.datetime64 to cftime.datetime. Update"
                     " to xarray>=2025.01.2 to remove this warning and use lower"
-                    " precision np.datetime64 instead"
+                    " precision np.datetime64 instead",
+                    stacklevel=2,
                 )
                 time = [parse(t) for t in time.values]
                 time = [

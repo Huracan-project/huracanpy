@@ -5,20 +5,27 @@ To compute the density, see huracanpy.diags.track_density
 """
 
 import cartopy.crs as ccrs
-from cartopy.mpl.geoaxes import GeoAxes
-from cartopy.util import add_cyclic
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
+from cartopy.mpl.geoaxes import GeoAxes
+from cartopy.util import add_cyclic
+
+from .._util import combine_kws
+
+_contourf_default_kws = dict(cmap="magma_r", levels=10)
+_subplot_default_kws = dict(projection=ccrs.PlateCarree(180))
+_fig_default_kws = dict()
+_cbar_default_kws = dict(label="")
 
 
 def density(
     d,
     ax=None,
-    contourf_kws=dict(cmap="magma_r", levels=10),
-    subplot_kws=dict(projection=ccrs.PlateCarree(180)),
-    fig_kws=dict(),
-    cbar_kwargs={"label": ""},
+    contourf_kws=None,
+    subplot_kws=None,
+    fig_kws=None,
+    cbar_kwargs=None,
 ):
     """Create a map showing the input density
 
@@ -43,6 +50,11 @@ def density(
         The figure and axes instances created for the plot
 
     """
+    contourf_kws = combine_kws(contourf_kws, _contourf_default_kws)
+    subplot_kws = combine_kws(subplot_kws, _subplot_default_kws)
+    fig_kws = combine_kws(fig_kws, _fig_default_kws)
+    cbar_kwargs = combine_kws(cbar_kwargs, _cbar_default_kws)
+
     if ax is None:
         fig, ax = plt.subplots(subplot_kw=subplot_kws, **fig_kws)
     else:

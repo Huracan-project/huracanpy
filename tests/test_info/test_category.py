@@ -1,13 +1,14 @@
-from metpy.units import units
 import numpy as np
 import pytest
+from metpy.units import units
 
 import huracanpy
 
 
 @pytest.mark.parametrize("with_units", [True, False])
 @pytest.mark.parametrize("with_units_on_bins", [True, False])
-def test_get_category(tracks_csv, with_units, with_units_on_bins, bins=[0, 10, 20, 30]):
+@pytest.mark.parametrize("bins", [[0, 10, 20, 30]])
+def test_get_category(tracks_csv, with_units, with_units_on_bins, bins):
     if with_units:
         tracks_csv.wind10.attrs["units"] = "m s-1"
     if with_units_on_bins:

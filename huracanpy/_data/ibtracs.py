@@ -1,8 +1,8 @@
 """Module for functions related to the ibtracs database"""
 
-from urllib.request import urlretrieve
-import warnings
 import pathlib
+import warnings
+from urllib.request import urlretrieve
 
 from . import _csv
 
@@ -122,7 +122,8 @@ def offline(subset="wmo"):
         " It was last updated on the 15th Nov 2024, based on the IBTrACS file at that"
         " date.\n It contains only data from 1980 up to the last year with no"
         " provisional tracks. All spur tracks were removed. Only 6-hourly time steps"
-        " were kept."
+        " were kept.",
+        stacklevel=2,
     )
     if subset.lower() == "wmo":
         warnings.warn(
@@ -132,7 +133,8 @@ def offline(subset="wmo"):
             " as they are in IBTrACS, which means in particular that wind speeds are in"
             " knots and averaged over different time periods.\n For more information,"
             " see the IBTrACS column documentation at"
-            " https://www.ncei.noaa.gov/sites/default/files/2021-07/IBTrACS_v04_column_documentation.pdf"
+            " https://www.ncei.noaa.gov/sites/default/files/2021-07/IBTrACS_v04_column_documentation.pdf",
+            stacklevel=2,
         )
         return _csv.load(wmo_file)
     if subset.lower() in ["usa", "jtwc"]:

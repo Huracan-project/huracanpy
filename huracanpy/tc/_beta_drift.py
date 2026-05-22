@@ -5,7 +5,6 @@ from metpy.xarray import preprocess_and_wrap
 
 from .._metpy import dequantify_results, validate_units
 
-
 omega = omega / units("radian")
 
 

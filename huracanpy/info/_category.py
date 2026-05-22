@@ -5,15 +5,13 @@ Function to categorise
 import warnings
 
 import numpy as np
-import pint
-from pint.errors import UnitStrippedWarning
 import pandas as pd
-
+import pint
 from metpy.xarray import preprocess_and_wrap
+from pint.errors import UnitStrippedWarning
 
-
-from ._conventions import _thresholds
 from .._metpy import validate_units
+from ._conventions import _thresholds
 
 
 @preprocess_and_wrap(wrap_like="variable")
@@ -45,7 +43,8 @@ def category(variable, bins, labels=None, variable_units=None):
     if labels is None:
         warnings.warn(
             "labels not provided, categories will be named from 1 to n in the order of"
-            "the provided bins"
+            "the provided bins",
+            stacklevel=2,
         )
         labels = [str(i) for i in range(len(bins) - 1)]
 

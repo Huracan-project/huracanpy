@@ -9,7 +9,7 @@ def load(
     tempest_extremes_unstructured=False,
     tempest_extremes_header_str="start",
 ):
-    with open(filename, "r") as f:
+    with open(filename) as f:
         data = f.readlines()
 
     lineno = 0

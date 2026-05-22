@@ -1,6 +1,6 @@
-import pytest
 import numpy as np
 import pint
+import pytest
 from metpy.units import units
 
 import huracanpy

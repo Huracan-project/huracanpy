@@ -1,6 +1,6 @@
-from cartopy.crs import Geodetic
-from shapely.geometry import Polygon, MultiPolygon
 import geopandas as gpd
+from cartopy.crs import Geodetic
+from shapely.geometry import MultiPolygon, Polygon
 
 geodetic = Geodetic()
 

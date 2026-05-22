@@ -1,10 +1,11 @@
-from matplotlib.collections import PathCollection
-from metpy.xarray import preprocess_and_wrap
 import numpy as np
 import seaborn as sb
+from matplotlib.collections import PathCollection
+from metpy.xarray import preprocess_and_wrap
 
-from .._metpy import validate_units
 from .. import tc
+from .._metpy import validate_units
+from .._util import combine_kws
 from ..tc._conventions import _thresholds
 
 _jointgrid_kws_defaults = dict(marginal_ticks=True)
@@ -107,11 +108,11 @@ def pressure_wind_relation(
     pressure = validate_units(pressure, pressure_units)
     wind = validate_units(wind, wind_units)
 
-    jointgrid_kws = _combine_kws(jointgrid_kws, _jointgrid_kws_defaults)
-    scatterplot_kws = _combine_kws(scatterplot_kws, _scatterplot_kws_defaults)
-    lineplot_kws = _combine_kws(lineplot_kws, _lineplot_kws_defaults)
-    histplot_kws = _combine_kws(histplot_kws, _histplot_kws_defaults)
-    pressure_wind_model_kwargs = _combine_kws(
+    jointgrid_kws = combine_kws(jointgrid_kws, _jointgrid_kws_defaults)
+    scatterplot_kws = combine_kws(scatterplot_kws, _scatterplot_kws_defaults)
+    lineplot_kws = combine_kws(lineplot_kws, _lineplot_kws_defaults)
+    histplot_kws = combine_kws(histplot_kws, _histplot_kws_defaults)
+    pressure_wind_model_kwargs = combine_kws(
         pressure_wind_model_kwargs, _pressure_wind_model_kws_defaults
     )
 
@@ -179,14 +180,6 @@ def pressure_wind_relation(
     grid.figure.tight_layout()
 
     return grid, bins_pressure, bins_wind
-
-
-def _combine_kws(kws, kws_default):
-    if kws is None:
-        return kws_default.copy()
-    else:
-        # Overwrite default arguments with explicit arguments
-        return {**kws_default, **kws}
 
 
 def _setup_grid(

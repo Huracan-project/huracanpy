@@ -1,11 +1,9 @@
 import pathlib
 import warnings
 
-import pytest
-
-import nbformat
 import nbclient
-
+import nbformat
+import pytest
 
 docs_path = pathlib.Path(__file__).parent / "../docs/"
 all_notebooks = [(str(fname),) for fname in docs_path.glob("examples/*.ipynb")] + [

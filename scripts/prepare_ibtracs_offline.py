@@ -89,7 +89,8 @@ def prepare_offline(wmo=True, jtwc=True):
 
     warnings.warn(
         "If you just updated the offline files within the package, do not forget to"
-        "update information in offline loader warnings"
+        "update information in offline loader warnings",
+        stacklevel=2,
     )
 
 

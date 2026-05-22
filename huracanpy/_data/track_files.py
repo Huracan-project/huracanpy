@@ -1,11 +1,9 @@
 import gzip
-from io import StringIO
-
 import warnings
+from io import StringIO
 
 import numpy as np
 import xarray as xr
-
 from parse import parse
 
 from . import _csv
@@ -108,7 +106,7 @@ def load(filename, variable_names=None):
 
         # Read in each track as an xarray dataset with time as the coordinate
         output = [",".join(var_labels)]
-        for n in range(ntracks):
+        for _n in range(ntracks):
             # Read individual track header (two lines)
             line = f.readline().strip()
             if not line.replace(" ", "") == "":  # If line is empty
@@ -121,7 +119,7 @@ def load(filename, variable_names=None):
                 npoints = _parse(track_info_fmt, line)["npoints"]
 
                 # Populate time and data line by line
-                for m in range(npoints):
+                for _m in range(npoints):
                     line = f.readline().strip()
                     output.append(
                         ",".join(
@@ -133,7 +131,8 @@ def load(filename, variable_names=None):
                 warnings.warn(
                     "Parsed line is empty. It is possible this problem arises because"
                     "the number of tracks expected from the header was not found in the"
-                    "file."
+                    "file.",
+                    stacklevel=2,
                 )
 
     return _csv.load(StringIO("\n".join(output)), index_col=False)
@@ -143,7 +142,7 @@ def load_tilts(filename, nans=1e25):
     output = list()
     track_id = list()
     times = list()
-    with open(filename, "rt") as f:
+    with open(filename) as f:
         # First line
         header = _parse(tilt_header_fmt, f.readline().strip()).named
         ntracks = header["ntracks"]
@@ -153,7 +152,7 @@ def load_tilts(filename, nans=1e25):
         levels = np.asarray(_parse(line_fmt, f.readline().strip()).fixed)
 
         # Read in each track as an xarray dataset with time as the coordinate
-        for n in range(ntracks):
+        for _n in range(ntracks):
             # Read individual track header
             track_info = _parse(tilt_track_header_fmt, f.readline().strip()).named
             npoints = track_info["npoints"]
@@ -163,7 +162,7 @@ def load_tilts(filename, nans=1e25):
             track_id.extend([track_info["track_id"]] * npoints)
 
             # Populate time and data line by line
-            for m in range(npoints):
+            for _m in range(npoints):
                 line = f.readline().strip()
                 times.append(line.split(" ")[0])
                 output.append(line)

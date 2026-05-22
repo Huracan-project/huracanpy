@@ -1,7 +1,7 @@
 from importlib.metadata import version
 
-import pytest
 import numpy as np
+import pytest
 
 import huracanpy
 
@@ -162,7 +162,7 @@ def test_load(filename, kwargs, nvars, ncoords, npoints, ntracks, isdatetime64):
             assert name in data
 
 
-def _fake_ibtracs_data(url, filename):  # noqa ARG001
+def _fake_ibtracs_data(_, __):
     return huracanpy.example_csv_file, None
 
 

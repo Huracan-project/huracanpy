@@ -1,8 +1,8 @@
 import functools
 
-from metpy.units import units
 import pint
 import xarray as xr
+from metpy.units import units
 
 
 def dequantify_results(original_function):

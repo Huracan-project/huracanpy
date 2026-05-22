@@ -5,7 +5,6 @@ import xarray as xr
 
 import huracanpy
 
-
 data_path = pathlib.Path(__file__).parent / "saved_results"
 
 

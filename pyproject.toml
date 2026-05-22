@@ -83,9 +83,13 @@ extend-select = [
     "ARG", # Flake8 unused arguments
     "S", # Flake8 bandit
     "T20", # Flake8 print
+    "B", # flake8-bugbear
+    "I", # isort
+    "UP", # pyupgrade
     "E501", # Line too long
     "N", # pep8 naming conventions
     "D417", # undocumented parameters
+    "PGH", # pygrep-hooks
 ]
 
 [tool.ruff.lint.per-file-ignores]

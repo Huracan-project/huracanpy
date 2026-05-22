@@ -1,13 +1,12 @@
 from inspect import getmembers, isfunction
 
 import matplotlib.pyplot as plt
-from matplotlib.testing.decorators import check_figures_equal
 import numpy as np
 import pytest
 import xarray as xr
+from matplotlib.testing.decorators import check_figures_equal
 
 import huracanpy
-
 
 # Functions not in the accessor
 _intentionally_missing = [

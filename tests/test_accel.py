@@ -3,10 +3,10 @@ Test functions that use tricks to speed up their code produce the same result as
 slower method
 """
 
-import pytest
-from haversine import haversine_vector, Unit
 import numpy as np
+import pytest
 import xarray as xr
+from haversine import Unit, haversine_vector
 
 import huracanpy
 
@@ -67,7 +67,7 @@ def test_accel_get_time_from_genesis(tracks, request):
 
     track_groups = tracks.groupby("track_id")
     expected = []
-    for track_id, track in track_groups:
+    for _track_id, track in track_groups:
         expected.append(track.time - track.time[0])
 
     expected = xr.concat(expected, dim="record")
@@ -86,7 +86,7 @@ def test_accel_get_time_from_apex(tracks, request):
 
     track_groups = tracks.groupby("track_id")
     expected = []
-    for track_id, track in track_groups:
+    for _track_id, track in track_groups:
         idx = np.argmax(track.wind10.values)
         expected.append(track.time - track.time[idx])
 
@@ -159,7 +159,7 @@ def test_accel_overlap(tracks, request):
     delta_start = []
     delta_end = []
 
-    for n, row in result.iterrows():
+    for _n, row in result.iterrows():
         track = tracks.where(tracks.track_id == row.id_1, drop=True)
         track_ref = ref.where(ref.track_id == row.id_2, drop=True)
 

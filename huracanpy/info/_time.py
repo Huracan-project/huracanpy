@@ -4,10 +4,10 @@ Utils related to time
 
 import warnings
 
-from metpy.xarray import preprocess_and_wrap
 import numpy as np
-from pint.errors import UnitStrippedWarning
 import pandas as pd
+from metpy.xarray import preprocess_and_wrap
+from pint.errors import UnitStrippedWarning
 
 from ._geography import hemisphere
 
@@ -45,7 +45,8 @@ def timestep(time, track_id=None):
             "Found multiple different timesteps within the tracks\n"
             + ", ".join([str(step) for step in steps])
             + "\n"
-            + "Returning the most common one."
+            + "Returning the most common one.",
+            stacklevel=2,
         )
         return steps[counts.argmax()]
 

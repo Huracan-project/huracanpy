@@ -1,10 +1,9 @@
-import pytest
-
 import datetime
 from collections import namedtuple
 
 import cftime
 import numpy as np
+import pytest
 import xarray as xr
 
 import huracanpy

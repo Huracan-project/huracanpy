@@ -2,23 +2,22 @@
 Utils related to translation distance and time
 """
 
-from datetime import timedelta
-import shapely
 import warnings
+from datetime import timedelta
 
+import numpy as np
+import nvector
+import pandas as pd
+import pyproj
+import shapely
 from cartopy.crs import Geodetic, Orthographic
 from haversine import haversine_vector
 from metpy.units import units
 from metpy.xarray import preprocess_and_wrap
-import nvector
-import numpy as np
-import pandas as pd
 from pint.errors import UnitStrippedWarning
-import pyproj
 
-
-from ._rates import delta, _dummy_track_id, _align_array
 from .._metpy import dequantify_results
+from ._rates import _align_array, _dummy_track_id, delta
 
 
 def _get_distance_azimuth_geod(lon1, lat1, lon2, lat2, ellps="WGS84"):

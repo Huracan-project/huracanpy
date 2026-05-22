@@ -16,11 +16,11 @@ __all__ = [
 ]
 
 from ._density import density
-from ._track_stats import (
-    track_duration,
-    gen_vals,
-    apex_vals,
-)
-from ._lifecycle import time_from_genesis, time_from_apex
+from ._lifecycle import time_from_apex, time_from_genesis
 from ._rates import delta, rate
-from ._translation import distance, translation_speed, azimuth, corral_radius
+from ._track_stats import (
+    apex_vals,
+    gen_vals,
+    track_duration,
+)
+from ._translation import azimuth, corral_radius, distance, translation_speed

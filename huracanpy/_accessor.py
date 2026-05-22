@@ -1,15 +1,14 @@
-import xarray as xr
-from metpy.units import units
 import pandas as pd
+import xarray as xr
 
 from . import (
-    plot,
-    tc,
-    info,
     calc,
-    save,
+    info,
     interp_time,
+    plot,
+    save,
     sel_id,
+    tc,
     trackswhere,
 )
 
@@ -146,7 +145,7 @@ class HuracanPyDatasetAccessor:
         self,
         wind_name="wind",
         sum_by=None,
-        threshold=34 * units("knots"),
+        threshold="default",
         wind_units="m s-1",
     ):
         """
@@ -161,9 +160,7 @@ class HuracanPyDatasetAccessor:
             wind_units=wind_units,
         )
 
-    def add_ace(
-        self, wind_name="wind", threshold=34 * units("knots"), wind_units="m s-1"
-    ):
+    def add_ace(self, wind_name="wind", threshold="default", wind_units="m s-1"):
         """
         Add ACE calculation to the dataset.
         """
@@ -698,9 +695,9 @@ class HuracanPyDatasetAccessor:
             self._dataset[lon_name], self._dataset[lat_name], intensity_var, **kwargs
         )
 
-    def plot_density(
-        self, lon_name="lon", lat_name="lat", density_kws=dict(), **kwargs
-    ):
+    def plot_density(self, lon_name="lon", lat_name="lat", density_kws=None, **kwargs):
+        if density_kws is None:
+            density_kws = dict()
         d = self.get_density(lon_name=lon_name, lat_name=lat_name, **density_kws)
         return plot.density(d, **kwargs)
 
@@ -719,7 +716,7 @@ class HuracanPyDatasetAccessor:
             colors=colors, linewidths=linewidths, alphas=alphas, linestyles=linestyles
         )
         output = []
-        for track_id, track in self._dataset.groupby(track_id_name):
+        for _, track in self._dataset.groupby(track_id_name):
             # Allow the other variables to be passed as variable names or constant
             # strings
             # e.g. colors can be a variable on the track or could just be "red"

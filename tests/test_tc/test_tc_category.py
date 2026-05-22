@@ -1,6 +1,6 @@
+import numpy as np
 import pint
 import pytest
-import numpy as np
 import xarray as xr
 
 import huracanpy

@@ -17,7 +17,7 @@ def identify_line_type(content):
     elif len(content) == 3:
         return "track_type"
     else:
-        warnings.warn("Line type not recognized")
+        warnings.warn("Line type not recognized", stacklevel=2)
         return None
 
 
@@ -40,7 +40,7 @@ def parse_track_point(content):
 
 
 def load(filename):
-    with open(filename, "rt") as f:
+    with open(filename) as f:
         # Read file
         lines = f.readlines()
         # Remove escape character

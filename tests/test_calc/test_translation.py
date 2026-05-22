@@ -3,11 +3,10 @@ import pathlib
 import numpy as np
 import pint
 import pytest
-from metpy.units import units
 import xarray as xr
+from metpy.units import units
 
 import huracanpy
-
 
 data_path = pathlib.Path(__file__).parent.parent / "saved_results"
 

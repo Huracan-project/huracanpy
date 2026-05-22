@@ -1,7 +1,7 @@
-from metpy.units import units
 import numpy as np
-from numpy.polynomial.polynomial import Polynomial
 import pytest
+from metpy.units import units
+from numpy.polynomial.polynomial import Polynomial
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
