@@ -98,14 +98,13 @@ def azimuth(lon, lat, track_id=None, ellps="WGS84", centering="forward"):
     if centering in ["forward", "backward"]:
         return _align_array(fwd_azimuth, track_id, centering)
 
-    else:
-        # Compute angle in steps of two
-        _, centred_azimuth = _get_distance_azimuth_geod(
-            lon[:-2], lat[:-2], lon[2:], lat[2:], ellps=ellps
-        )
-        centred_azimuth[track_id[2:] != track_id[:-2]] = np.nan * centred_azimuth[0]
+    # Compute angle in steps of two
+    _, centred_azimuth = _get_distance_azimuth_geod(
+        lon[:-2], lat[:-2], lon[2:], lat[2:], ellps=ellps
+    )
+    centred_azimuth[track_id[2:] != track_id[:-2]] = np.nan * centred_azimuth[0]
 
-        return _align_array(fwd_azimuth, track_id, centering, centred_azimuth)
+    return _align_array(fwd_azimuth, track_id, centering, centred_azimuth)
 
 
 @dequantify_results
@@ -171,9 +170,8 @@ def distance(
             if track_id is None:
                 track_id = args[0]
             else:
-                raise ValueError(
-                    "Distance either takes 2 arrays (lon/lat) or 4 arrays 2x(lon/lat)"
-                )
+                msg = "Distance either takes 2 arrays (lon/lat) or 4 arrays 2x(lon/lat)"
+                raise ValueError(msg)
 
         if track_id is None:
             track_id = _dummy_track_id(lon)
@@ -184,19 +182,19 @@ def distance(
         lon2, lat2 = args
 
     else:
-        raise ValueError(
-            "Distance either takes 2 arrays (lon/lat) or 4 arrays 2x(lon/lat)"
-        )
+        msg = "Distance either takes 2 arrays (lon/lat) or 4 arrays 2x(lon/lat)"
+        raise ValueError(msg)
 
     if method in ["geod", "geodesic"]:
         dist, _ = _get_distance_azimuth_geod(lon1, lat1, lon2, lat2, ellps=ellps)
     elif method == "haversine":
         dist = _get_distance_haversine(lon1, lat1, lon2, lat2)
     else:
-        raise ValueError(
+        msg = (
             f"Method {method} for distance calculation not recognised, use one of"
             f"('geod', 'haversine')"
         )
+        raise ValueError(msg)
 
     if len(args) < 2 and track_id is not None:
         dist = _align_array(dist, track_id, centering)

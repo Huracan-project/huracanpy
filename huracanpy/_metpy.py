@@ -12,8 +12,7 @@ def dequantify_results(original_function):
 
         if isinstance(result, tuple):
             return tuple(_dequantify_result(r) for r in result)
-        else:
-            return _dequantify_result(result)
+        return _dequantify_result(result)
 
     return wrapped_function
 
@@ -21,10 +20,9 @@ def dequantify_results(original_function):
 def _dequantify_result(result):
     if isinstance(result, xr.DataArray) and isinstance(result.data, pint.Quantity):
         return result.metpy.dequantify()
-    elif isinstance(result, pint.Quantity) and result.unitless:
+    if isinstance(result, pint.Quantity) and result.unitless:
         return result.magnitude
-    else:
-        return result
+    return result
 
 
 def validate_units(variable, expected_units):

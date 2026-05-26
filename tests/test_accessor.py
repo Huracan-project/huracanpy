@@ -45,7 +45,7 @@ def test_nunique():
 
 @pytest.mark.parametrize("call_type", ["get", "add"])
 @pytest.mark.parametrize(
-    "function, function_args, accessor_function_kwargs",
+    ("function", "function_args", "accessor_function_kwargs"),
     [
         (huracanpy.info.hemisphere, ["lat"], {}),
         (huracanpy.info.basin, ["lon", "lat"], {}),
@@ -206,7 +206,7 @@ def test_accessor_methods_match_functions(
 
 @check_figures_equal()
 @pytest.mark.parametrize(
-    "function, function_args, accessor_function_kwargs",
+    ("function", "function_args", "accessor_function_kwargs"),
     [
         (huracanpy.plot.density, [], {}),
         (huracanpy.plot.fancyline, ["lon", "lat", "wind10"], {"colors": "wind10"}),
@@ -334,10 +334,12 @@ def test_accessor_namespace_matches():
         ]
         extras = [func for func in accessor_functions if func not in expected_functions]
 
-        raise ValueError(
-            "Module and accessor functions do not match\n"
-            + "Functions missing from accessor\n    - "
-            + "\n    - ".join(missing)
-            + "\nExtra functions in the accessor\n    - "
-            + "\n    - ".join(extras)
-        )
+        nl = "\n"
+        msg = f"""
+        Module and accessor functions do not match
+        Functions missing from accessor
+        {nl.join(["    - " + n for n in missing])}
+        Extra functions in the accessor
+        {nl.join(["    - " + n for n in extras])}
+        """
+        raise ValueError(msg)

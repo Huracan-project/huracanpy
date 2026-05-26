@@ -253,7 +253,8 @@ def load(
         elif filename.split(".")[-1] == "nc":
             tracks = _netcdf.load(filename, **kwargs)
         else:
-            raise ValueError("Source is set to None and file type is not detected")
+            msg = "Source is set to None and file type is not detected"
+            raise ValueError(msg)
 
     # If source is given, use the relevant function
     else:
@@ -288,7 +289,8 @@ def load(
             # superbt.load call
             tracks = superbt.load()
         else:
-            raise ValueError(f"Source {source} unsupported or misspelled")
+            msg = f"Source {source} unsupported or misspelled"
+            raise ValueError(msg)
 
     # xarray.Dataset.rename only accepts keys that are actually in the dataset
     # Also, don't rename to a variable that already exists
@@ -366,7 +368,7 @@ def _parse_dates(tracks, calendar):
                 timestep = np.timedelta64(timestep, "h")
             return tracks.assign(time=initial_date + (time - 1) * timestep)
 
-        elif isinstance(calendar, str):
+        if isinstance(calendar, str):
             # cftime calendar
             default = cftime.datetime(1, 1, 1, calendar=calendar)
             time = [parse(t, default=default) for t in time.values]
@@ -374,14 +376,14 @@ def _parse_dates(tracks, calendar):
 
         # Convert strings to np.datetime64, but allow for varying precision for possible
         # out of bounds times
-        elif isinstance(time.values[0], str):
+        if isinstance(time.values[0], str):
             # This may still break at this point with older versions of xarray
             # attempting to convert back to "ns" precision
             try:
                 newtime = time.astype("datetime64")
 
                 if (time.astype("datetime64[Y]").dt.year != newtime.dt.year).any():
-                    raise OutOfBoundsDatetime
+                    raise OutOfBoundsDatetime  # noqa: TRY301
 
                 return tracks.assign(time=newtime)
             except OutOfBoundsDatetime:

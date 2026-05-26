@@ -10,7 +10,7 @@ import huracanpy
 
 
 @pytest.mark.parametrize(
-    "threshold, sum_by, result",
+    ("threshold", "sum_by", "result"),
     [
         (34 * units("knots"), None, [10.0894797]),
         ((34 * units("knots")).to("m s-1"), None, [10.0894797]),
@@ -33,7 +33,7 @@ def test_ace(tracks_csv, threshold, sum_by, result):
 
 
 @pytest.mark.parametrize(
-    "model, threshold_pressure, threshold_wind, sum_by, kwargs, result",
+    ("model", "threshold_pressure", "threshold_wind", "sum_by", "kwargs", "result"),
     [
         (None, None, None, "track_id", {}, [4.34978137, 2.65410482, 6.09892875]),
         # Passing the Polynomial explicitly gives the same answer

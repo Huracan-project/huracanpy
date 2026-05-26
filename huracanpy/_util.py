@@ -4,6 +4,5 @@ def combine_kws(kws, kws_default):
     # default arguments
     if kws is None:
         return kws_default.copy()
-    else:
-        # Overwrite default arguments with explicit arguments
-        return {**kws_default, **kws}
+    # Overwrite default arguments with explicit arguments
+    return {**kws_default, **kws}

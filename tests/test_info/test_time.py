@@ -43,7 +43,7 @@ def test_time_components(tracks_csv):
     np.testing.assert_equal(hour, hours)
 
 
-@pytest.mark.parametrize(("tracks",), [("tracks_year",), ("tracks_year_cftime",)])
+@pytest.mark.parametrize("tracks", ["tracks_year", "tracks_year_cftime"])
 def test_seasons(tracks, request):
     tracks = request.getfixturevalue(tracks)
 

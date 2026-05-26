@@ -12,8 +12,8 @@ import huracanpy
 
 
 @pytest.mark.parametrize(
-    ("tracks",),
-    (["tracks_csv"], ["tracks_with_extra_coord"]),
+    "tracks",
+    ["tracks_csv", "tracks_with_extra_coord"],
 )
 def test_accel_sel_id(tracks, request):
     tracks = request.getfixturevalue(tracks)
@@ -30,8 +30,8 @@ def test_accel_trackswhere():
 
 
 @pytest.mark.parametrize(
-    ("tracks",),
-    (["tracks_csv"], ["tracks_with_extra_coord"]),
+    "tracks",
+    ["tracks_csv", "tracks_with_extra_coord"],
 )
 def test_accel_get_gen_vals(tracks, request):
     tracks = request.getfixturevalue(tracks)
@@ -44,8 +44,8 @@ def test_accel_get_gen_vals(tracks, request):
 
 
 @pytest.mark.parametrize(
-    ("tracks",),
-    (["tracks_csv"], ["tracks_with_extra_coord"]),
+    "tracks",
+    ["tracks_csv", "tracks_with_extra_coord"],
 )
 def test_accel_get_apex_vals(tracks, request):
     tracks = request.getfixturevalue(tracks)
@@ -58,8 +58,8 @@ def test_accel_get_apex_vals(tracks, request):
 
 
 @pytest.mark.parametrize(
-    ("tracks",),
-    (["tracks_csv"], ["tracks_with_extra_coord"]),
+    "tracks",
+    ["tracks_csv", "tracks_with_extra_coord"],
 )
 def test_accel_get_time_from_genesis(tracks, request):
     tracks = request.getfixturevalue(tracks)
@@ -77,8 +77,8 @@ def test_accel_get_time_from_genesis(tracks, request):
 
 
 @pytest.mark.parametrize(
-    ("tracks",),
-    (["tracks_csv"], ["tracks_with_extra_coord"]),
+    "tracks",
+    ["tracks_csv", "tracks_with_extra_coord"],
 )
 def test_accel_get_time_from_apex(tracks, request):
     tracks = request.getfixturevalue(tracks)
@@ -97,8 +97,8 @@ def test_accel_get_time_from_apex(tracks, request):
 
 
 @pytest.mark.parametrize(
-    ("tracks",),
-    (["tracks_csv"], ["tracks_with_extra_coord"]),
+    "tracks",
+    ["tracks_csv", "tracks_with_extra_coord"],
 )
 def test_accel_match(tracks, request):
     ref = request.getfixturevalue(tracks)
@@ -144,8 +144,8 @@ def test_accel_match(tracks, request):
 
 
 @pytest.mark.parametrize(
-    ("tracks",),
-    (["tracks_csv"], ["tracks_with_extra_coord"]),
+    "tracks",
+    ["tracks_csv", "tracks_with_extra_coord"],
 )
 def test_accel_overlap(tracks, request):
     ref = request.getfixturevalue(tracks)

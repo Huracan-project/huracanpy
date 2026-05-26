@@ -1,5 +1,5 @@
 import numpy as np
-import seaborn as sb
+import seaborn as sns
 from matplotlib.collections import PathCollection
 from metpy.xarray import preprocess_and_wrap
 
@@ -135,7 +135,7 @@ def pressure_wind_relation(
             category_linestyle=category_linestyle,
         )
 
-    sb.scatterplot(
+    sns.scatterplot(
         x=wind,
         y=pressure,
         ax=grid.ax_joint,
@@ -150,7 +150,7 @@ def pressure_wind_relation(
         color = pc.get_facecolor()[0][:3]
 
     model = tc.pressure_wind_relation(pressure, wind, **pressure_wind_model_kwargs)
-    sb.lineplot(
+    sns.lineplot(
         x=model.predict(bins_pressure),
         y=bins_pressure,
         ax=grid.ax_joint,
@@ -159,7 +159,7 @@ def pressure_wind_relation(
         **lineplot_kws,
     )
 
-    sb.histplot(
+    sns.histplot(
         x=wind,
         bins=np.asarray(bins_wind),
         color=color,
@@ -168,7 +168,7 @@ def pressure_wind_relation(
     )
     grid.ax_marg_x.set_ylabel("")
 
-    sb.histplot(
+    sns.histplot(
         y=pressure,
         bins=np.asarray(bins_pressure),
         color=color,
@@ -193,7 +193,7 @@ def _setup_grid(
     category_color="darkgrey",
     category_linestyle="--",
 ):
-    grid = sb.JointGrid(**jointgrid_kws)
+    grid = sns.JointGrid(**jointgrid_kws)
     categories_mslp = _thresholds[mslp_convention]
     bins_mslp = categories_mslp["bins"].to(mslp_units)
     categories_vmax = _thresholds[wind_convention]
@@ -243,7 +243,6 @@ def _setup_grid(
 def _get_label_position(bins, n):
     if np.isinf(bins[n]):
         return bins[n + 1] - 0.5 * (bins[n + 2] - bins[n + 1])
-    elif np.isinf(bins[n + 1]):
+    if np.isinf(bins[n + 1]):
         return bins[n] + 0.5 * (bins[n] - bins[n - 1])
-    else:
-        return 0.5 * (bins[n] + bins[n + 1])
+    return 0.5 * (bins[n] + bins[n + 1])

@@ -40,7 +40,8 @@ def inferred_track_id(*variables):
         track_id_return = variables[0].copy()
         track_id_return[:] = track_id
 
-        return track_id_return
-
     except AttributeError:
         return track_id
+
+    else:
+        return track_id_return

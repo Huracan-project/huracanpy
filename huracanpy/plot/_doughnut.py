@@ -7,7 +7,7 @@ def doughnut(values, reference_total, ax=None, **kwargs):
 
     Based on Figs. 1/2 from
     Roberts et al. (2020) - Impact of Model Resolution on Tropical Cyclone Simulation
-    Using the HighResMIP–PRIMAVERA Multimodel Ensemble
+    Using the HighResMIP-PRIMAVERA Multimodel Ensemble
     https://doi.org/10.1175/JCLI-D-19-0639.1
 
     Parameters

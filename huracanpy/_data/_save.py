@@ -26,6 +26,5 @@ def save(dataset, filename, **kwargs):
     elif filename.split(".")[-1] == "csv":
         dataset.to_dataframe().to_csv(filename, index=False, **kwargs)
     else:
-        raise NotImplementedError(
-            "File format not recognized. Please use one of {.nc, .csv}"
-        )
+        msg = "File format not recognized. Please use one of {.nc, .csv}"
+        raise NotImplementedError(msg)

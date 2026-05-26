@@ -87,9 +87,7 @@ def _ace(wind, threshold="default", wind_units="m s-1"):
 
         wind[wind < threshold] = 0 * units("knots")
 
-    ace_values = (wind**2.0) * 1e-4
-
-    return ace_values
+    return (wind**2.0) * 1e-4
 
 
 def pace(
@@ -192,9 +190,8 @@ def _pace(
     **kwargs,
 ):
     if wind is None and model is None:
-        raise ValueError(
-            "Need to specify either wind or model to calculate pressure-wind relation"
-        )
+        msg = "Need to specify either wind or model to calculate pressure-wind relation"
+        raise ValueError(msg)
 
     pressure = validate_units(pressure, pressure_units)
 

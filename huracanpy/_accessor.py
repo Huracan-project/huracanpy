@@ -4,13 +4,12 @@ import xarray as xr
 from . import (
     calc,
     info,
-    interp_time,
     plot,
-    save,
-    sel_id,
     tc,
-    trackswhere,
 )
+from ._data import save
+from ._interp import interp_time
+from ._subset import sel_id, trackswhere
 
 
 @xr.register_dataarray_accessor("hrcn")
@@ -420,6 +419,7 @@ class HuracanPyDatasetAccessor:
                 ellps=ellps,
                 centering=centering,
             )
+        return None
 
     def add_azimuth(
         self,
@@ -469,6 +469,7 @@ class HuracanPyDatasetAccessor:
                 ellps=ellps,
                 centering=centering,
             )
+        return None
 
     def add_distance(
         self,
@@ -522,6 +523,7 @@ class HuracanPyDatasetAccessor:
                 ellps=ellps,
                 centering=centering,
             )
+        return None
 
     def add_translation_speed(
         self,
@@ -597,6 +599,7 @@ class HuracanPyDatasetAccessor:
             track_id_name not in list(self._dataset.variables)
         ):
             return calc.delta(self._dataset[var_name], track_ids=None, **kwargs)
+        return None
 
     def add_delta(self, var_name="wind10", track_id_name="track_id", **kwargs):
         """
@@ -626,6 +629,7 @@ class HuracanPyDatasetAccessor:
                 track_ids=None,
                 **kwargs,
             )
+        return None
 
     def add_rate(
         self, var_name="wind10", time_name="time", track_id_name="track_id", **kwargs
@@ -721,8 +725,7 @@ class HuracanPyDatasetAccessor:
             # strings
             # e.g. colors can be a variable on the track or could just be "red"
             extra_variables = {
-                key: (track[name] if name in track else name)
-                for key, name in extra_names.items()
+                key: (track.get(name, name)) for key, name in extra_names.items()
             }
 
             output.append(

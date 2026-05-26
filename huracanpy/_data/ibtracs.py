@@ -29,8 +29,7 @@ online_default_kwargs = dict(
 def load(subset, filename, **kwargs):
     if subset.lower() in ["wmo", "usa", "jtwc"]:
         return offline(subset)
-    else:
-        return online(subset, filename=filename, **kwargs)
+    return online(subset, filename=filename, **kwargs)
 
 
 def online(subset, filename=None, **kwargs):
@@ -139,6 +138,7 @@ def offline(subset="wmo"):
         return _csv.load(wmo_file)
     if subset.lower() in ["usa", "jtwc"]:
         return _csv.load(jtwc_file)
+    return None
 
 
 # TODOS:

@@ -7,7 +7,7 @@ import huracanpy
 
 
 @pytest.mark.parametrize(
-    "filename, kwargs, nvars, ncoords, npoints, ntracks, isdatetime64",
+    ("filename", "kwargs", "nvars", "ncoords", "npoints", "ntracks", "isdatetime64"),
     [
         (huracanpy.example_TRACK_file, dict(source="TRACK"), 35, 0, 46, 2, True),
         (
@@ -123,7 +123,7 @@ import huracanpy
             0,
             40,
             2,
-            True if version("xarray") >= "2025.01.2" else False,
+            version("xarray") >= "2025.01.2",
         ),
         # Two csv file that should load with the same options
         (
@@ -186,7 +186,7 @@ def test_load_ibtracs_online(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    "filename, kwargs, error, message",
+    ("filename", "kwargs", "error", "message"),
     [
         ("", dict(source="nonsense"), ValueError, "Source nonsense unsupported"),
         ("", dict(), ValueError, "Source is set to None"),
@@ -226,7 +226,7 @@ def test_load_baselon():
 
 
 @pytest.mark.parametrize(
-    "filename, source",
+    ("filename", "source"),
     [
         (huracanpy.example_TRACK_file, "TRACK"),
         (huracanpy.example_TRACK_tilt_file, "TRACK.tilt"),
@@ -242,7 +242,7 @@ def test_load_baselon():
 )
 @pytest.mark.parametrize("extension", ["csv", "nc"])
 @pytest.mark.parametrize(
-    "muddle, use_accessor", [(False, False), (True, False), (False, True)]
+    ("muddle", "use_accessor"), [(False, False), (True, False), (False, True)]
 )
 def test_save(filename, source, extension, muddle, use_accessor, tmp_path):
     if extension == "csv" and (
@@ -319,10 +319,7 @@ def _assert_dataset_identical(ds1, ds2):
         # depending on fill_value and scale_factor
         # np.testing.assert_allclose doesn't work for datetime64, object, or string
         if np.issubdtype(ds1[var].dtype, np.number):
-            if ds1[var].dtype != ds2[var].dtype:
-                rtol = 1e-6
-            else:
-                rtol = 0
+            rtol = 1e-06 if ds1[var].dtype != ds2[var].dtype else 0
             np.testing.assert_allclose(
                 ds1[var].data.astype(ds2[var].dtype), ds2[var].data, rtol=rtol
             )

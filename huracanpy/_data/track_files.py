@@ -27,7 +27,8 @@ def _parse(fmt, string, **kwargs):
     result = parse(fmt, string, **kwargs)
 
     if result is None:
-        raise ValueError(f"Format {fmt} does not match string {string}")
+        msg = f"Format {fmt} does not match string {string}"
+        raise ValueError(msg)
 
     return result
 
@@ -47,10 +48,7 @@ def load(filename, variable_names=None):
     -------
     xarray.Dataset
     """
-    if filename.split(".")[-1] == "gz":
-        open_func = gzip.open
-    else:
-        open_func = open
+    open_func = gzip.open if filename.split(".")[-1] == "gz" else open
 
     with open_func(filename, "rt") as f:
         # The first lines can contain extra information bounded by two extra lines
@@ -74,18 +72,20 @@ def load(filename, variable_names=None):
 
         # Check header data is consistent
         if len(has_coords) != nfields:
-            raise ValueError(
+            msg = (
                 f"TRACK file header is inconsistent. Number of fields "
                 f"({len(has_coords)}) does not match nfields from header ({nfields})."
             )
+            raise ValueError(msg)
 
         nvars_expected = sum([3 if x == 1 else 1 for x in has_coords])
         if nvars_expected != nvars:
-            raise ValueError(
+            msg = (
                 f"TRACK file header is inconsistent. Number of variables including"
                 f"lat/lon for variables ({nvars_expected}) does not match nvars from"
                 f"header ({nvars})."
             )
+            raise ValueError(msg)
 
         # Create a list of variables stored in each track
         # Generic names for variables as there is currently no information otherwise
@@ -94,10 +94,11 @@ def load(filename, variable_names=None):
             variable_names = [f"feature_{n}" for n in range(nfields)]
         else:
             if len(variable_names) != nfields:
-                raise ValueError(
+                msg = (
                     f"Number of variable names given ({len(variable_names)}) does not"
                     f"match number of fields in file ({len(nfields)})"
                 )
+                raise ValueError(msg)
         for n, variable_name in enumerate(variable_names):
             if has_coords[n]:
                 var_labels.append(f"{variable_name}_lon")
@@ -109,7 +110,7 @@ def load(filename, variable_names=None):
         for _n in range(ntracks):
             # Read individual track header (two lines)
             line = f.readline().strip()
-            if not line.replace(" ", "") == "":  # If line is empty
+            if line.replace(" ", "") != "":  # If line is empty
                 try:
                     track_info = _parse(track_header_fmt, line).named
                 except ValueError:

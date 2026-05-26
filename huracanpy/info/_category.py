@@ -73,9 +73,7 @@ def category(variable, bins, labels=None, variable_units=None):
             message="The unit of the quantity is stripped when downcasting to ndarray.",
         )
 
-        result = np.asarray(pd.cut(variable, bins, labels=labels))
-
-    return result
+        return np.asarray(pd.cut(variable, bins, labels=labels))
 
 
 def beaufort_category(wind, wind_units="m s-1"):

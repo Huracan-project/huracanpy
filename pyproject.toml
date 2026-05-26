@@ -80,10 +80,15 @@ extend-include = ["*.ipynb"]
 
 [tool.ruff.lint]
 extend-select = [
-    "ARG", # Flake8 unused arguments
-    "S", # Flake8 bandit
-    "T20", # Flake8 print
-    "B", # flake8-bugbear
+    "ARG", # flake8 unused arguments
+    "B", # flake8 bugbear
+    "BLE", # flake8 blind except
+    "EM", # flake8 error message
+    "S", # flake8 bandit
+    "PT", # flake8 pytest
+    "RSE", # flake8 raise
+    "SIM", # flake8 simplify
+    "T20", # flake8 print
     "I", # isort
     "UP", # pyupgrade
     "E501", # Line too long

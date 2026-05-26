@@ -20,7 +20,7 @@ def test_venn3(tracks_year):
 
 
 @pytest.mark.parametrize(
-    "datasets, labels, colors, error, message",
+    ("datasets", "labels", "colors", "error", "message"),
     [
         (
             list(range(4)),

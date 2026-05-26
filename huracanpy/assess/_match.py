@@ -59,13 +59,13 @@ def match(
 
     # Check input
     if len(tracksets) < 2:
-        raise ValueError("You must provide at least two datasets to match")
+        msg = "You must provide at least two datasets to match"
+        raise ValueError(msg)
     if names is None:
         names = [str(n) for n in range(1, len(tracksets) + 1)]
     if len(names) != len(tracksets):
-        raise ValueError(
-            "Number of names provided do not correspond to the number of track sets"
-        )
+        msg = "Number of names provided do not correspond to the number of track sets"
+        raise ValueError(msg)
 
     # Two track sets
     if len(tracksets) == 2:
@@ -80,17 +80,16 @@ def match(
             distance_method=distance_method,
         )
     # More than two track sets
-    else:
-        return _match_multiple(
-            tracksets,
-            names,
-            max_dist=max_dist,
-            mean_dist=mean_dist,
-            min_overlap=min_overlap,
-            consecutive_overlap=consecutive_overlap,
-            tracks1_is_ref=tracks1_is_ref,
-            distance_method=distance_method,
-        )
+    return _match_multiple(
+        tracksets,
+        names,
+        max_dist=max_dist,
+        mean_dist=mean_dist,
+        min_overlap=min_overlap,
+        consecutive_overlap=consecutive_overlap,
+        tracks1_is_ref=tracks1_is_ref,
+        distance_method=distance_method,
+    )
 
 
 def _match_pair(
@@ -202,10 +201,9 @@ def _match_pair(
         )
 
     # Rename columns before output
-    matches = matches.rename(
+    return matches.rename(
         columns={"track_id_x": "id_" + name1, "track_id_y": "id_" + name2}
     )
-    return matches
 
 
 def _match_multiple(
