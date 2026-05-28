@@ -82,12 +82,16 @@ using the `hrcn` accessor from HuracanPy. See the [accessor](accessor.ipynb) pag
 more details.
 
 ```python
+import matplotlib.pyplot as plt
+
 # Quickly view the tracks
 tracks.hrcn.plot_tracks(intensity_var_name="wind10")
 
 # Add a new variable to the tracks and plot this instead
 tracks = tracks.hrcn.add_is_land()
 tracks.hrcn.plot_tracks(intensity_var_name="is_land")
+
+plt.show()
 ```
 ![Plot showing 3 tracks in the southern hemisphere with points coloured by wind speed](docs/images/readme/plot_tracks_wind.png)
 ![Plot showing 3 tracks in the southern hemisphere with points coloured by whether they are over land or ocean](docs/images/readme/plot_tracks_is_land.png)
