@@ -12,12 +12,12 @@ def parse_any_line(line):
 def identify_line_type(content):
     if len(content) == 28:
         return "track_header"
-    if len(content) == 38:
+    elif len(content) == 38:
         return "track_point"
-    if len(content) == 3:
+    elif len(content) == 3:
         return "track_type"
-    warnings.warn("Line type not recognized", stacklevel=2)
-    return None
+    else:
+        warnings.warn("Line type not recognized", stacklevel=2)
 
 
 def parse_track_header(content):

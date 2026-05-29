@@ -232,7 +232,10 @@ class HuracanPyDatasetAccessor:
 
     # ---- time
     def get_timestep(self, time_name="time", track_id_name="track_id"):
-        return info.timestep(self._dataset[time_name], self._dataset[track_id_name])
+        return info.timestep(
+            self._dataset[time_name],
+            track_id=None if track_id_name is None else self._dataset[track_id_name],
+        )
 
     def get_time_components(self, time_name="time"):
         """
@@ -401,25 +404,13 @@ class HuracanPyDatasetAccessor:
         """
         Compute the azimuth between points along a track
         """
-        if track_id_name in list(self._dataset.variables):
-            return calc.azimuth(
-                self._dataset[lon_name],
-                self._dataset[lat_name],
-                track_id=self._dataset[track_id_name],
-                ellps=ellps,
-                centering=centering,
-            )
-        if (track_id_name is None) or (
-            track_id_name not in list(self._dataset.variables)
-        ):
-            return calc.azimuth(
-                self._dataset[lon_name],
-                self._dataset[lat_name],
-                track_id=None,
-                ellps=ellps,
-                centering=centering,
-            )
-        return None
+        return calc.azimuth(
+            self._dataset[lon_name],
+            self._dataset[lat_name],
+            track_id=None if track_id_name is None else self._dataset[track_id_name],
+            ellps=ellps,
+            centering=centering,
+        )
 
     def add_azimuth(
         self,
@@ -449,27 +440,14 @@ class HuracanPyDatasetAccessor:
         """
         Compute the distance between points along a track.
         """
-        if track_id_name in list(self._dataset.variables):
-            return calc.distance(
-                self._dataset[lon_name],
-                self._dataset[lat_name],
-                track_id=self._dataset[track_id_name],
-                method=method,
-                ellps=ellps,
-                centering=centering,
-            )
-        if (track_id_name is None) or (
-            track_id_name not in list(self._dataset.variables)
-        ):
-            return calc.distance(
-                self._dataset[lon_name],
-                self._dataset[lat_name],
-                track_id=None,
-                method=method,
-                ellps=ellps,
-                centering=centering,
-            )
-        return None
+        return calc.distance(
+            self._dataset[lon_name],
+            self._dataset[lat_name],
+            track_id=None if track_id_name is None else self._dataset[track_id_name],
+            method=method,
+            ellps=ellps,
+            centering=centering,
+        )
 
     def add_distance(
         self,
@@ -501,29 +479,15 @@ class HuracanPyDatasetAccessor:
         """
         Compute the translation speed along tracks.
         """
-        if track_id_name in list(self._dataset.variables):
-            return calc.translation_speed(
-                self._dataset[lon_name],
-                self._dataset[lat_name],
-                self._dataset[time_name],
-                track_id=self._dataset[track_id_name],
-                method=method,
-                ellps=ellps,
-                centering=centering,
-            )
-        if (track_id_name is None) or (
-            track_id_name not in list(self._dataset.variables)
-        ):
-            return calc.translation_speed(
-                self._dataset[lon_name],
-                self._dataset[lat_name],
-                self._dataset[time_name],
-                track_id=None,
-                method=method,
-                ellps=ellps,
-                centering=centering,
-            )
-        return None
+        return calc.translation_speed(
+            self._dataset[lon_name],
+            self._dataset[lat_name],
+            self._dataset[time_name],
+            track_id=None if track_id_name is None else self._dataset[track_id_name],
+            method=method,
+            ellps=ellps,
+            centering=centering,
+        )
 
     def add_translation_speed(
         self,
@@ -562,7 +526,7 @@ class HuracanPyDatasetAccessor:
             self._dataset[lon_name],
             self._dataset[lat_name],
             time=self._dataset[time_name],
-            track_id=self._dataset[track_id_name],
+            track_id=None if track_id_name is None else self._dataset[track_id_name],
             window=window,
             min_points=min_points,
         )
@@ -589,17 +553,11 @@ class HuracanPyDatasetAccessor:
 
     # ---- rates
     def get_delta(self, var_name="wind10", track_id_name="track_id", **kwargs):
-        if track_id_name in list(self._dataset.variables):
-            return calc.delta(
-                self._dataset[var_name],
-                track_ids=self._dataset[track_id_name],
-                **kwargs,
-            )
-        if (track_id_name is None) or (
-            track_id_name not in list(self._dataset.variables)
-        ):
-            return calc.delta(self._dataset[var_name], track_ids=None, **kwargs)
-        return None
+        return calc.delta(
+            self._dataset[var_name],
+            track_ids=None if track_id_name is None else self._dataset[track_id_name],
+            **kwargs,
+        )
 
     def add_delta(self, var_name="wind10", track_id_name="track_id", **kwargs):
         """
@@ -613,23 +571,12 @@ class HuracanPyDatasetAccessor:
     def get_rate(
         self, var_name="wind10", time_name="time", track_id_name="track_id", **kwargs
     ):
-        if track_id_name in list(self._dataset.variables):
-            return calc.rate(
-                self._dataset[var_name],
-                self._dataset[time_name],
-                track_ids=self._dataset[track_id_name],
-                **kwargs,
-            )
-        if (track_id_name is None) or (
-            track_id_name not in list(self._dataset.variables)
-        ):
-            return calc.rate(
-                self._dataset[var_name],
-                self._dataset[time_name],
-                track_ids=None,
-                **kwargs,
-            )
-        return None
+        return calc.rate(
+            self._dataset[var_name],
+            self._dataset[time_name],
+            track_ids=None if track_id_name is None else self._dataset[track_id_name],
+            **kwargs,
+        )
 
     def add_rate(
         self, var_name="wind10", time_name="time", track_id_name="track_id", **kwargs
@@ -719,6 +666,16 @@ class HuracanPyDatasetAccessor:
         extra_names = dict(
             colors=colors, linewidths=linewidths, alphas=alphas, linestyles=linestyles
         )
+        if track_id_name is None:
+            return plot.fancyline(
+                self._dataset[lon_name],
+                self._dataset[lat_name],
+                **{
+                    key: (self._dataset.get(name, name))
+                    for key, name in extra_names.items()
+                },
+                **kwargs,
+            )
         output = []
         for _, track in self._dataset.groupby(track_id_name):
             # Allow the other variables to be passed as variable names or constant

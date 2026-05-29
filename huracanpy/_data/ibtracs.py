@@ -136,9 +136,11 @@ def offline(subset="wmo"):
             stacklevel=2,
         )
         return _csv.load(wmo_file)
-    if subset.lower() in ["usa", "jtwc"]:
+    elif subset.lower() in ["usa", "jtwc"]:
         return _csv.load(jtwc_file)
-    return None
+    else:
+        msg = f"{subset} not available"
+        raise ValueError(msg)
 
 
 # TODOS:
