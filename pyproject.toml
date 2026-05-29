@@ -66,7 +66,7 @@ huracanpy = ["_data/example_data/*", "_data/_ibtracs_files/*"]
 
 [tool.pytest]
 minversion = "9.0"
-addopts = ["--cov=huracanpy, --cov-report html", "-ra"]
+addopts = ["--cov=huracanpy", "--cov-report=html", "-ra"]
 strict = true
 filterwarnings = [
   "ignore:numpy.ndarray size changed:RuntimeWarning",
@@ -89,7 +89,6 @@ extend-select = [
     "RSE", # flake8 raise
     "SIM", # flake8 simplify
     "T20", # flake8 print
-    "I", # isort
     "UP", # pyupgrade
     "E501", # Line too long
     "N", # pep8 naming conventions

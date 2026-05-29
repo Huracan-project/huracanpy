@@ -383,7 +383,7 @@ def _parse_dates(tracks, calendar):
                 newtime = time.astype("datetime64")
 
                 if (time.astype("datetime64[Y]").dt.year != newtime.dt.year).any():
-                    raise OutOfBoundsDatetime  # noqa: TRY301
+                    raise OutOfBoundsDatetime
 
                 return tracks.assign(time=newtime)
             except OutOfBoundsDatetime:
