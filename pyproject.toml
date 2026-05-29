@@ -20,7 +20,7 @@ dependencies = [
   "netcdf4",
   "numpy",
   "nvector",
-  "pandas<3",
+  "pandas",
   "parse",
   "pyarrow",
   "pyproj",
@@ -116,16 +116,3 @@ commands = [
     ["ruff", "check"],
     ["pytest"]
 ]
-
-# - How to distribute the package
-
-# 0/ Applying black formatting
-
-# 1/ Generate the distribution
-# 1a. Make sure that build is up-to-date: `pip install --upgrade build`(add the --user option if necessary)
-# 1b. Run python -m build in the package's root directory
-# -> Two new files are created in the dist folder, a wheel (.whl) and a tarball (.tar.gz), with the the version code in the present file
-
-# 2/ Distribute the distribution of PyPI
-# 2a. Make sure that twine is up-to-date `pip install (--user) --upgrade twine`
-# 2b. Upload the package: `python -m twine upload --repository pypi dist/*x.x.x*` (x.x.x = version number)

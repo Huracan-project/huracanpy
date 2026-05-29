@@ -168,7 +168,7 @@ def _match_pair(
                         + 1
                     )
 
-                    temp.loc[index].temp = nconsecutive
+                    temp.loc[index, "temp"] = nconsecutive
 
         # Subset by tracks sharing min_overlap points
         temp = temp[temp.temp >= min_overlap]

@@ -167,4 +167,4 @@ def season(track_id, lat, time, convention="tc-short"):
     group["season"] = season
     df = df.merge(group[["season"]], on="track_id")
 
-    return df.season.values
+    return df.season.to_numpy()
