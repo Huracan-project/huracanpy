@@ -105,6 +105,6 @@ def _reset_track_id(tracks, track_ids, start=0, *, keep_original=False):
         **{track_ids.name: (track_ids.dims[0], start + new_track_ids)}
     )
 
-    tracks.track_id.attrs["cf_role"] = "trajectory_id"
+    tracks[track_ids.name].attrs["cf_role"] = "trajectory_id"
 
     return tracks

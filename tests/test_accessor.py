@@ -49,6 +49,7 @@ def test_nunique():
     [
         (huracanpy.info.hemisphere, ["lat"], {}),
         (huracanpy.info.basin, ["lon", "lat"], {}),
+        (huracanpy.info.beaufort_category, ["wind10"], {"wind_name": "wind10"}),
         (huracanpy.info.is_land, ["lon", "lat"], {}),
         (huracanpy.info.is_ocean, ["lon", "lat"], {}),
         (huracanpy.info.country, ["lon", "lat"], {}),
@@ -58,6 +59,7 @@ def test_nunique():
             ["wind10", [0, 10, 20, 30], [0, 1, 2]],
             {"var_name": "wind10", "bins": [0, 10, 20, 30], "labels": [0, 1, 2]},
         ),
+        (huracanpy.info.landfall_points, ["lon", "lat", "track_id"], {}),
         (huracanpy.info.season, ["track_id", "lat", "time"], {}),
         (huracanpy.info.timestep, ["time", "track_id"], {}),
         (huracanpy.info.time_components, ["time"], {}),
@@ -106,6 +108,11 @@ def test_nunique():
         ),
         (
             huracanpy.tc.pace,
+            ["slp", "wind10"],
+            {"pressure_name": "slp", "wind_name": "wind10"},
+        ),
+        (
+            huracanpy.tc.pressure_wind_relation,
             ["slp", "wind10"],
             {"pressure_name": "slp", "wind_name": "wind10"},
         ),
@@ -196,6 +203,8 @@ def test_accessor_methods_match_functions(
     )
     if isinstance(result, xr.Dataset):
         xr.testing.assert_identical(result, result_accessor)
+    elif function == huracanpy.tc.pressure_wind_relation:
+        assert result.model == result_accessor.model
     else:
         np.testing.assert_equal(
             np.asarray(result),
