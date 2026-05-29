@@ -31,7 +31,7 @@ dependencies = [
   "xarray",
 ]
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
   "nbformat",
   "nbsphinx",
