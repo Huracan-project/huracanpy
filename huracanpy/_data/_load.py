@@ -1,25 +1,25 @@
-from datetime import timedelta
 import warnings
+from datetime import timedelta
 
 import cftime
-from dateutil.parser import parse
 import numpy as np
 import pandas as pd
+from dateutil.parser import parse
 from pandas.errors import OutOfBoundsDatetime
 
+from .._concat import concat_tracks
+from .._util import combine_kws
 from . import (
     _csv,
-    track_files,
     _netcdf,
     _tempestextremes,
-    witrack,
-    old_hurdat,
+    ibtracs,
     iris_tc,
+    old_hurdat,
     superbt,
+    track_files,
+    witrack,
 )
-from . import ibtracs
-from .._concat import concat_tracks
-
 
 rename_defaults = dict(
     id="track_id",
@@ -69,7 +69,7 @@ def load(
     filename=None,
     source=None,
     variable_names=None,
-    rename=dict(),
+    rename=None,
     units=None,
     baselon=None,
     infer_track_id=None,
@@ -193,7 +193,7 @@ def load(
           with the initial time and timestep e.g. ("1940-01-01", 6)
 
           * The first argument is the initial time and needs to be something readable by
-            :class:`numpy.datetime64`, or you can explicity pass a
+            :class:`numpy.datetime64`, or you can explicitly pass a
             :class:`numpy.datetime64` object.
           * The second argument is the step and is passed to :class:`numpy.timedelta64`
             and is assumed to be in hours, or you can explicitly pass a
@@ -207,8 +207,8 @@ def load(
         * CSV file - :func:`pandas.read_csv`
         * parquet file - :func:`pandas.read_parquet`
 
-        For CSV files pandas interprets "NA" as `nan` by default, which is overriden in
-        this function. To restore the pandas default behavious set
+        For CSV files pandas interprets "NA" as `nan` by default, which is overridden in
+        this function. To restore the pandas default behaviours set
         :code:`keep_default_NA=True` and :code:`na_values=[]`
 
     Returns
@@ -218,7 +218,7 @@ def load(
     """
     # Overwrite default arguments with explicit arguments passed to rename by putting
     # "rename" second in this dictionary combination
-    rename = {**rename_defaults, **rename}
+    rename = combine_kws(rename, rename_defaults)
 
     if isinstance(filename, (list, tuple, np.ndarray)):
         # Loop through all the files and open them
@@ -253,7 +253,8 @@ def load(
         elif filename.split(".")[-1] == "nc":
             tracks = _netcdf.load(filename, **kwargs)
         else:
-            raise ValueError("Source is set to None and file type is not detected")
+            msg = "Source is set to None and file type is not detected"
+            raise ValueError(msg)
 
     # If source is given, use the relevant function
     else:
@@ -288,7 +289,8 @@ def load(
             # superbt.load call
             tracks = superbt.load()
         else:
-            raise ValueError(f"Source {source} unsupported or misspelled")
+            msg = f"Source {source} unsupported or misspelled"
+            raise ValueError(msg)
 
     # xarray.Dataset.rename only accepts keys that are actually in the dataset
     # Also, don't rename to a variable that already exists
@@ -366,7 +368,7 @@ def _parse_dates(tracks, calendar):
                 timestep = np.timedelta64(timestep, "h")
             return tracks.assign(time=initial_date + (time - 1) * timestep)
 
-        elif isinstance(calendar, str):
+        if isinstance(calendar, str):
             # cftime calendar
             default = cftime.datetime(1, 1, 1, calendar=calendar)
             time = [parse(t, default=default) for t in time.values]
@@ -374,7 +376,7 @@ def _parse_dates(tracks, calendar):
 
         # Convert strings to np.datetime64, but allow for varying precision for possible
         # out of bounds times
-        elif isinstance(time.values[0], str):
+        if isinstance(time.values[0], str):
             # This may still break at this point with older versions of xarray
             # attempting to convert back to "ns" precision
             try:
@@ -388,7 +390,8 @@ def _parse_dates(tracks, calendar):
                 warnings.warn(
                     "Converting out of bounds np.datetime64 to cftime.datetime. Update"
                     " to xarray>=2025.01.2 to remove this warning and use lower"
-                    " precision np.datetime64 instead"
+                    " precision np.datetime64 instead",
+                    stacklevel=2,
                 )
                 time = [parse(t) for t in time.values]
                 time = [

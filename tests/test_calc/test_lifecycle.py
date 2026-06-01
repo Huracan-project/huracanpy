@@ -14,7 +14,9 @@ def test_time_from_genesis():
     assert (t.max() / np.timedelta64(1, "D")) == 13.5
 
 
-@pytest.mark.parametrize("stat, t_min, t_max", [("max", -270, 102), ("min", -180, 252)])
+@pytest.mark.parametrize(
+    ("stat", "t_min", "t_max"), [("max", -270, 102), ("min", -180, 252)]
+)
 def test_time_from_apex(stat, t_min, t_max):
     data = huracanpy.load(huracanpy.example_csv_file, source="csv")
     t = huracanpy.calc.time_from_apex(data.time, data.track_id, data.wind10, stat)
@@ -38,7 +40,7 @@ def test_time_from_apex_fails(tracks_csv):
 
 
 @pytest.mark.parametrize(
-    "track_ids, variable, stat",
+    ("track_ids", "variable", "stat"),
     [
         (["1980051S12102", "1980171N06142", "1980140N16116"], "slp", "min"),
         (["1980005S14120", "1980052S16155", "1980177N13259"], "wind", "max"),

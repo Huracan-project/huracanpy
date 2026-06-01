@@ -22,7 +22,8 @@ def sel_id(tracks, track_ids, track_id):
 
     """
     if track_ids.ndim != 1:
-        raise ValueError("track_ids must be 1d")
+        msg = "track_ids must be 1d"
+        raise ValueError(msg)
 
     if np.isscalar(track_id):
         track_id = [track_id]
@@ -65,7 +66,8 @@ def trackswhere(tracks, track_ids, condition):
 
     """
     if track_ids.ndim != 1:
-        raise ValueError("track_ids must be 1d")
+        msg = "track_ids must be 1d"
+        raise ValueError(msg)
 
     track_groups = [
         track for track_id, track in tracks.groupby(track_ids) if condition(track)

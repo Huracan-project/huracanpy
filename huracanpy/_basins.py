@@ -1,12 +1,12 @@
-from cartopy.crs import Geodetic
-from shapely.geometry import Polygon, MultiPolygon
 import geopandas as gpd
+from cartopy.crs import Geodetic
+from shapely.geometry import MultiPolygon, Polygon
 
 geodetic = Geodetic()
 
 # %% Basins
 
-basins = {}  # Dictionnary to save basin definition from different conventions
+basins = {}  # Dictionary to save basin definition from different conventions
 
 # WMO convention
 ## Northern hemisphere

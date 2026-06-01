@@ -70,7 +70,8 @@ def time_from_apex(time, track_ids, intensity_var, stat="max"):
     elif stat == "min":
         asc = True
     else:
-        raise NotImplementedError("stat not recognized. Please use one of {min, max}")
+        msg = "stat not recognized. Please use one of {min, max}"
+        raise NotImplementedError(msg)
     data_df = pd.DataFrame(
         {"time": time, "track_id": track_ids, "intensity": intensity_var}
     )

@@ -7,8 +7,8 @@ import warnings
 from metpy.units import units
 from metpy.xarray import preprocess_and_wrap
 
-from ..info import category
 from .._metpy import dequantify_results, validate_units
+from ..info import category
 from ._conventions import _thresholds
 
 
@@ -80,7 +80,8 @@ def pressure_category(slp, convention="Klotzbach", slp_units=None):
                 "Caution, pressure are likely in Pa, they are being converted to hPa "
                 "for categorization. In future specify the units explicitly by passing "
                 'slp_units="Pa" to this function or setting '
-                'slp.attrs["units"] = "Pa"'
+                'slp.attrs["units"] = "Pa"',
+                stacklevel=2,
             )
             slp_units = "Pa"
         else:

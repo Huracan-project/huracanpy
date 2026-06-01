@@ -1,6 +1,6 @@
 [project]
 name = "huracanpy"
-version = "1.4.0"
+version = "1.4.1"
 authors = [
   { name="Leo Saffin", email="l.saffin@reading.ac.uk" },
   { name="Stella Bourdin", email="stella.bourdin@physics.ox.ac.uk" },
@@ -8,82 +8,101 @@ authors = [
 description = "A python package for working with various forms of feature tracking data"
 requires-python = ">=3.9"
 dependencies = [
-    "numpy",
-    "xarray",
-    "cftime",
-    "parse",
-    "shapely",
-    "pandas<3",
-    # Issue with newer versions of fiona when using old versions of geopandas
-    # see https://stackoverflow.com/a/78949565/8270394
-    "geopandas>=0.14.4",
-    "matplotlib",
-    "seaborn",
-    "netcdf4",
-    "haversine",
-    "cartopy",
-    "matplotlib-venn<1",
-    "metpy",
-    "tqdm",
-    "pyarrow",
-    "pyproj",
-    "scikit-learn",
-    "nvector",
+  "cartopy",
+  "cftime",
+  # Issue with newer versions of fiona when using old versions of geopandas
+  # see https://stackoverflow.com/a/78949565/8270394
+  "geopandas>=0.14.4",
+  "haversine",
+  "matplotlib",
+  "matplotlib-venn<1",
+  "metpy",
+  "netcdf4",
+  "numpy",
+  "nvector",
+  "pandas",
+  "parse",
+  "pyarrow",
+  "pyproj",
+  "scikit-learn",
+  "seaborn",
+  "shapely",
+  "tqdm",
+  "xarray",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pre-commit",
-    "pytest",
-    "pytest-cov",
-    "ruff>=0.9.0",
-    "tox",
-    "nbformat",
-    "nbsphinx",
+  "nbformat",
+  "nbsphinx",
+  "pre-commit",
+  "pytest",
+  "pytest-cov",
+  "ruff>=0.9.0",
+  "tox",
 ]
+
 docs = [
-    "sphinx<9",
-    "pydata-sphinx-theme",
-    "sphinx-copybutton",
-    "nbsphinx",
-    "IPython",
-    "sphinx-design",
-    "ipykernel",
-    "myst-parser",
-    "sphinx_autosummary_accessors",
+  "IPython",
+  "ipykernel",
+  "myst-parser",
+  "nbsphinx",
+  "pydata-sphinx-theme",
+  "sphinx<9",
+  "sphinx_autosummary_accessors",
+  "sphinx-copybutton",
+  "sphinx-design",
 ]
 
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+packages = ["huracanpy"]
+
 [tool.setuptools.package-data]
 huracanpy = ["_data/example_data/*", "_data/_ibtracs_files/*"]
+
+[tool.pytest]
+minversion = "9.0"
+addopts = ["--cov=huracanpy", "--cov-report=html", "-ra"]
+strict = true
+filterwarnings = [
+  "ignore:numpy.ndarray size changed:RuntimeWarning",
+  "ignore::cartopy.io.DownloadWarning"
+]
+log_level = "INFO"
+testpaths = ["tests"]
 
 [tool.ruff]
 extend-include = ["*.ipynb"]
 
 [tool.ruff.lint]
 extend-select = [
-    "ARG", # Flake8 unused arguments
-    "S", # Flake8 bandit
-    "T20", # Flake8 print
+    "ARG", # flake8 unused arguments
+    "B", # flake8 bugbear
+    "BLE", # flake8 blind except
+    "EM", # flake8 error message
+    "S", # flake8 bandit
+    "PT", # flake8 pytest
+    "RSE", # flake8 raise
+    "SIM", # flake8 simplify
+    "T20", # flake8 print
+    "UP", # pyupgrade
     "E501", # Line too long
     "N", # pep8 naming conventions
     "D417", # undocumented parameters
+    "PGH", # pygrep-hooks
 ]
 
 [tool.ruff.lint.per-file-ignores]
 # Only check for use of assert/print in main module
 "!huracanpy/**" = ["S101", "T20"]
 
-[tool.pytest.ini_options]
-minversion = "6.0"
-filterwarnings = [
-    'ignore:numpy.ndarray size changed:RuntimeWarning',
-    "ignore::cartopy.io.DownloadWarning"
-]
-addopts = "--cov=huracanpy --cov-report html"
+[tool.typos.default]
+extend-ignore-re = ["T63vor_*", "arange"]
+
 
 [tool.tox]
 requires = ["tox>=4.15.0"]
@@ -96,16 +115,3 @@ commands = [
     ["ruff", "check"],
     ["pytest"]
 ]
-
-# - How to distribute the package
-
-# 0/ Applying black formatting
-
-# 1/ Generate the distribution
-# 1a. Make sure that build is up-to-date: `pip install --upgrade build`(add the --user option if necessary)
-# 1b. Run python -m build in the package's root directory
-# -> Two new files are created in the dist folder, a wheel (.whl) and a tarball (.tar.gz), with the the version code in the present file
-
-# 2/ Distribute the distribution of PyPI
-# 2a. Make sure that twine is up-to-date `pip install (--user) --upgrade twine`
-# 2b. Upload the package: `python -m twine upload --repository pypi dist/*x.x.x*` (x.x.x = version number)

@@ -9,14 +9,14 @@ def load(
     tempest_extremes_unstructured=False,
     tempest_extremes_header_str="start",
 ):
-    with open(filename, "r") as f:
+    with open(filename) as f:
         data = f.readlines()
 
     lineno = 0
 
     # Just in case there are any empty lines at the start of the file
     # This can probably be deleted
-    while not data[lineno].split()[0] == tempest_extremes_header_str:
+    while data[lineno].split()[0] != tempest_extremes_header_str:
         lineno += 1
 
     nfields = len(data[lineno + 1].split())
@@ -33,10 +33,11 @@ def load(
     else:
         nvars = nfields - len(varnames) - 4
         if len(variable_names) != nvars:
-            raise ValueError(
+            msg = (
                 f"Number of variable names does not match expected number of variables:"
                 f"{nvars}"
             )
+            raise ValueError(msg)
         varnames += variable_names
 
     # TempestExtremes ASCII does not have a track_id, so just use a counter variable
@@ -50,8 +51,10 @@ def load(
         npoints = int(npoints)
 
         # Populate time and data line by line
-        for m in range(npoints):
-            output.append(",".join([str(track_id)] + data[lineno + 1 + m].split()))
+        output.extend(
+            ",".join([str(track_id)] + data[lineno + 1 + m].split())
+            for m in range(npoints)
+        )
 
         track_id += 1
         lineno += npoints + 1

@@ -17,8 +17,7 @@ def identify_line_type(content):
     elif len(content) == 3:
         return "track_type"
     else:
-        warnings.warn("Line type not recognized")
-        return None
+        warnings.warn("Line type not recognized", stacklevel=2)
 
 
 def parse_track_header(content):
@@ -40,7 +39,7 @@ def parse_track_point(content):
 
 
 def load(filename):
-    with open(filename, "rt") as f:
+    with open(filename) as f:
         # Read file
         lines = f.readlines()
         # Remove escape character
@@ -56,7 +55,8 @@ def load(filename):
         if line_type == "track_header":
             # Check that previous track was finished
             if c != track_length:
-                raise ValueError("Previous track not finished")
+                msg = "Previous track not finished"
+                raise ValueError(msg)
             # Start new track
             c = 0
             date, track_length, track_id = parse_track_header(content)

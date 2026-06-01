@@ -2,15 +2,15 @@
 Utils related to geographical attributes
 """
 
-from collections import Counter
 import warnings
+from collections import Counter
 
-from cartopy.io.shapereader import natural_earth
 import geopandas as gpd
-from metpy.xarray import preprocess_and_wrap
 import numpy as np
-from pint.errors import UnitStrippedWarning
 import xarray as xr
+from cartopy.io.shapereader import natural_earth
+from metpy.xarray import preprocess_and_wrap
+from pint.errors import UnitStrippedWarning
 
 from .._basins import basins
 from ..convert import to_geodataframe
@@ -169,7 +169,7 @@ def _get_natural_earth_feature(
     iloc_indices = list(range(len(result)))
     offset = 1
     for idx, count in counts:
-        for n in range(1, count):
+        for _n in range(1, count):
             iloc_indices.remove(idx + offset)
             offset += 1
 

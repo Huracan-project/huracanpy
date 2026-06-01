@@ -95,7 +95,7 @@ def test_match_mean():
 
 
 @pytest.mark.parametrize("distance_method", ["haversine", "geodesic"])
-@pytest.mark.parametrize("shift, n_matches", [(1, 3), (4, 0)])
+@pytest.mark.parametrize(("shift", "n_matches"), [(1, 3), (4, 0)])
 def test_match_shifted(tracks_csv, distance_method, shift, n_matches):
     tracks_shifted = tracks_csv.copy()
     tracks_shifted["lat"] = tracks_shifted.lat + shift
@@ -131,7 +131,7 @@ def test_match_multiple_empty(tracks_year):
 
 
 @pytest.mark.parametrize(
-    "tracksets, names, message",
+    ("tracksets", "names", "message"),
     [
         ([], [], "You must provide at least two"),
         ([1, 2, 3], ["1", "2"], "Number of names provided"),

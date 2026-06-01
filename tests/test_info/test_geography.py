@@ -6,12 +6,11 @@ import xarray as xr
 
 import huracanpy
 
-
 data_path = pathlib.Path(__file__).parent.parent / "saved_results"
 
 
 @pytest.mark.parametrize(
-    "data, expected",
+    ("data", "expected"),
     [
         ("tracks_minus180_plus180", np.asarray(["S"] * 12 + ["N"] * 12)),
         ("tracks_0_360", np.asarray(["S"] * 12 + ["N"] * 12)),
@@ -31,7 +30,7 @@ _expected = np.asarray(
 
 
 @pytest.mark.parametrize(
-    "data, expected",
+    ("data", "expected"),
     [
         (
             "tracks_minus180_plus180",
@@ -55,7 +54,7 @@ def test_basin(data, expected, request):
 
 
 @pytest.mark.parametrize(
-    "convention, expected",
+    ("convention", "expected"),
     [
         (
             "Sainsbury2022JCLI",
@@ -107,7 +106,7 @@ _expected = np.asarray(
 
 
 @pytest.mark.parametrize(
-    "data, expected",
+    ("data", "expected"),
     [
         (
             "tracks_minus180_plus180",
@@ -147,7 +146,7 @@ _expected = np.asarray(
 
 
 @pytest.mark.parametrize(
-    "data, expected",
+    ("data", "expected"),
     [
         (
             "tracks_minus180_plus180",
@@ -180,7 +179,7 @@ _expected = np.asarray(
 
 
 @pytest.mark.parametrize(
-    "data, expected",
+    ("data", "expected"),
     [
         (
             "tracks_minus180_plus180",
@@ -200,7 +199,7 @@ def test_get_continent(data, expected, request):
 
 
 @pytest.mark.parametrize(
-    "data, expected",
+    ("data", "expected"),
     [
         (
             "tracks_minus180_plus180",

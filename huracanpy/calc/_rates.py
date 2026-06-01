@@ -13,7 +13,9 @@ from .._metpy import dequantify_results
 
 def _dummy_track_id(var):
     warnings.warn(
-        "track_id is not provided, all points are considered to come from the sametrack"
+        "track_id is not provided, all points are considered to come from the same "
+        "track",
+        stacklevel=2,
     )
     return np.zeros(np.shape(var))
 
@@ -131,23 +133,22 @@ def _align_array(array, track_id, centering, centred=None):
 
         if centering in ["centre", "center"]:
             return centred
-        else:
-            # Replace start/end points with forward and backward deltas
-            centred[0] = array[0]
-            centred[transition_points] = array[transition_points - 1]
-            centred[transition_points + 1] = array[transition_points + 1]
-            centred[-1] = array[-1]
+        # Replace start/end points with forward and backward deltas
+        centred[0] = array[0]
+        centred[transition_points] = array[transition_points - 1]
+        centred[transition_points + 1] = array[transition_points + 1]
+        centred[-1] = array[-1]
 
-            return centred
+        return centred
 
-    elif centering == "forward":
+    if centering == "forward":
         return np.concatenate([array, [np.nan * array[0]]])
 
-    elif centering == "backward":
+    if centering == "backward":
         return np.concatenate([[np.nan * array[0]], array])
 
-    else:
-        raise ValueError(
-            f"Option align='{centering}' not recognised. Use one of"
-            f" ['forward', 'backward', 'centre'/'center', 'adaptive']"
-        )
+    msg = (
+        f"Option align='{centering}' not recognised. Use one of"
+        f" ['forward', 'backward', 'centre'/'center', 'adaptive']"
+    )
+    raise ValueError(msg)

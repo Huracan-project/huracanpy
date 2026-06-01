@@ -1,6 +1,6 @@
-from cartopy.crs import EqualEarth
 import matplotlib.pyplot as plt
 import pytest
+from cartopy.crs import EqualEarth
 
 import huracanpy
 

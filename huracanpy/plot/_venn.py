@@ -1,7 +1,7 @@
 """Venn diagrams for tracks matching visualisation"""
 
-from matplotlib_venn import venn2, venn2_circles, venn3, venn3_circles
 import numpy as np
+from matplotlib_venn import venn2, venn2_circles, venn3, venn3_circles
 
 
 def venn(datasets, match, labels, colors=None, circle_color="k"):
@@ -36,18 +36,19 @@ def venn(datasets, match, labels, colors=None, circle_color="k"):
     elif len(datasets) == 3:
         f = _venn_3datasets
     else:
-        raise NotImplementedError(
-            "We cannot plot Venn diagrams for more than 3 datasets."
-        )
+        msg = "We cannot plot Venn diagrams for more than 3 datasets."
+        raise NotImplementedError(msg)
 
     if len(datasets) != len(labels):
-        raise ValueError("datasets and labels must have the same length")
+        msg = "datasets and labels must have the same length"
+        raise ValueError(msg)
 
     if colors is None:
         colors = ["w"] * len(datasets)
     else:
         if len(colors) != len(datasets):
-            raise ValueError("datasets and colors must have the same length")
+            msg = "datasets and colors must have the same length"
+            raise ValueError(msg)
     f(*datasets, match, colors, labels, circle_color)
 
 

@@ -1,7 +1,7 @@
+import numpy as np
 from cartopy.crs import Geodetic
 from geopandas import GeoDataFrame
-import numpy as np
-from shapely.geometry import Point, LineString
+from shapely.geometry import LineString, Point
 
 
 def to_geodataframe(lon, lat, track_id=None, *, crs=None):

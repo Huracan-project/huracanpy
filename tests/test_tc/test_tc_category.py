@@ -1,6 +1,6 @@
+import numpy as np
 import pint
 import pytest
-import numpy as np
 import xarray as xr
 
 import huracanpy
@@ -22,7 +22,7 @@ def test_pressure_cat():
 
 @pytest.mark.parametrize("pass_as_numpy", [False, True])
 @pytest.mark.parametrize(
-    "units, expected",
+    ("units", "expected"),
     [
         ("m s-1", "default"),
         ("cm s-1", np.asarray([-1.0] * 99)),
@@ -55,7 +55,7 @@ def test_sshs_units(units, expected, pass_as_numpy):
 @pytest.mark.parametrize("pass_as_numpy", [False, True])
 @pytest.mark.parametrize("convention", ["Klotzbach", "Simpson"])
 @pytest.mark.parametrize(
-    "units, expected",
+    ("units", "expected"),
     [
         ("Pa", "default"),
         ("hPa", np.asarray([-1.0] * 99)),

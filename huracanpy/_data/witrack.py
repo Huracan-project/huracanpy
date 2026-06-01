@@ -4,7 +4,7 @@ from . import _csv
 
 
 def load(filename):
-    with open(filename, "rt") as f:
+    with open(filename) as f:
         line = ""
         while "DATE" not in line:
             line = f.readline().strip()

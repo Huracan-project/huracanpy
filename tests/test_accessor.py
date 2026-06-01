@@ -1,13 +1,12 @@
 from inspect import getmembers, isfunction
 
 import matplotlib.pyplot as plt
-from matplotlib.testing.decorators import check_figures_equal
 import numpy as np
 import pytest
 import xarray as xr
+from matplotlib.testing.decorators import check_figures_equal
 
 import huracanpy
-
 
 # Functions not in the accessor
 _intentionally_missing = [
@@ -46,10 +45,11 @@ def test_nunique():
 
 @pytest.mark.parametrize("call_type", ["get", "add"])
 @pytest.mark.parametrize(
-    "function, function_args, accessor_function_kwargs",
+    ("function", "function_args", "accessor_function_kwargs"),
     [
         (huracanpy.info.hemisphere, ["lat"], {}),
         (huracanpy.info.basin, ["lon", "lat"], {}),
+        (huracanpy.info.beaufort_category, ["wind10"], {"wind_name": "wind10"}),
         (huracanpy.info.is_land, ["lon", "lat"], {}),
         (huracanpy.info.is_ocean, ["lon", "lat"], {}),
         (huracanpy.info.country, ["lon", "lat"], {}),
@@ -59,6 +59,7 @@ def test_nunique():
             ["wind10", [0, 10, 20, 30], [0, 1, 2]],
             {"var_name": "wind10", "bins": [0, 10, 20, 30], "labels": [0, 1, 2]},
         ),
+        (huracanpy.info.landfall_points, ["lon", "lat", "track_id"], {}),
         (huracanpy.info.season, ["track_id", "lat", "time"], {}),
         (huracanpy.info.timestep, ["time", "track_id"], {}),
         (huracanpy.info.time_components, ["time"], {}),
@@ -107,6 +108,11 @@ def test_nunique():
         ),
         (
             huracanpy.tc.pace,
+            ["slp", "wind10"],
+            {"pressure_name": "slp", "wind_name": "wind10"},
+        ),
+        (
+            huracanpy.tc.pressure_wind_relation,
             ["slp", "wind10"],
             {"pressure_name": "slp", "wind_name": "wind10"},
         ),
@@ -197,6 +203,8 @@ def test_accessor_methods_match_functions(
     )
     if isinstance(result, xr.Dataset):
         xr.testing.assert_identical(result, result_accessor)
+    elif function == huracanpy.tc.pressure_wind_relation:
+        assert result.model == result_accessor.model
     else:
         np.testing.assert_equal(
             np.asarray(result),
@@ -207,7 +215,7 @@ def test_accessor_methods_match_functions(
 
 @check_figures_equal()
 @pytest.mark.parametrize(
-    "function, function_args, accessor_function_kwargs",
+    ("function", "function_args", "accessor_function_kwargs"),
     [
         (huracanpy.plot.density, [], {}),
         (huracanpy.plot.fancyline, ["lon", "lat", "wind10"], {"colors": "wind10"}),
@@ -335,10 +343,12 @@ def test_accessor_namespace_matches():
         ]
         extras = [func for func in accessor_functions if func not in expected_functions]
 
-        raise ValueError(
-            "Module and accessor functions do not match\n"
-            + "Functions missing from accessor\n    - "
-            + "\n    - ".join(missing)
-            + "\nExtra functions in the accessor\n    - "
-            + "\n    - ".join(extras)
-        )
+        nl = "\n"
+        msg = f"""
+        Module and accessor functions do not match
+        Functions missing from accessor
+        {nl.join(["    - " + n for n in missing])}
+        Extra functions in the accessor
+        {nl.join(["    - " + n for n in extras])}
+        """
+        raise ValueError(msg)

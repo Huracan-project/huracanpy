@@ -1,14 +1,14 @@
 """Matching functions"""
 
-from itertools import combinations, groupby
 import warnings
+from itertools import combinations, groupby
 
 import numpy as np
 import pandas as pd
 from pint.errors import UnitStrippedWarning
 
-from ..info import timestep
 from ..calc import distance
+from ..info import timestep
 
 
 def match(
@@ -39,7 +39,7 @@ def match(
     min_overlap : int, optional
         Minimum number of overlapping time steps for matching. The default is 0.
     consecutive_overlap: bool, optional
-        If min_overlap > 1, require that min_overlap points also need to be consective
+        If min_overlap > 1, require that min_overlap points also need to be consecutive
     tracks1_is_ref: bool, optional
         If True, treat the first set of tracks as the reference set. If one track
         matches multiple reference tracks, only keep the longest match
@@ -59,13 +59,13 @@ def match(
 
     # Check input
     if len(tracksets) < 2:
-        raise ValueError("You must provide at least two datasets to match")
+        msg = "You must provide at least two datasets to match"
+        raise ValueError(msg)
     if names is None:
         names = [str(n) for n in range(1, len(tracksets) + 1)]
     if len(names) != len(tracksets):
-        raise ValueError(
-            "Number of names provided do not correspond to the number of track sets"
-        )
+        msg = "Number of names provided do not correspond to the number of track sets"
+        raise ValueError(msg)
 
     # Two track sets
     if len(tracksets) == 2:
@@ -80,17 +80,16 @@ def match(
             distance_method=distance_method,
         )
     # More than two track sets
-    else:
-        return _match_multiple(
-            tracksets,
-            names,
-            max_dist=max_dist,
-            mean_dist=mean_dist,
-            min_overlap=min_overlap,
-            consecutive_overlap=consecutive_overlap,
-            tracks1_is_ref=tracks1_is_ref,
-            distance_method=distance_method,
-        )
+    return _match_multiple(
+        tracksets,
+        names,
+        max_dist=max_dist,
+        mean_dist=mean_dist,
+        min_overlap=min_overlap,
+        consecutive_overlap=consecutive_overlap,
+        tracks1_is_ref=tracks1_is_ref,
+        distance_method=distance_method,
+    )
 
 
 def _match_pair(
@@ -162,14 +161,14 @@ def _match_pair(
                     nconsecutive = (
                         max(
                             [
-                                sum([1 for _ in grouper]) if value else 0
+                                sum([1 for _n in grouper]) if value else 0
                                 for value, grouper in groupby(np.diff(track.time) == dt)
                             ]
                         )
                         + 1
                     )
 
-                    temp.loc[index].temp = nconsecutive
+                    temp.loc[index, "temp"] = nconsecutive
 
         # Subset by tracks sharing min_overlap points
         temp = temp[temp.temp >= min_overlap]
@@ -202,10 +201,9 @@ def _match_pair(
         )
 
     # Rename columns before output
-    matches = matches.rename(
+    return matches.rename(
         columns={"track_id_x": "id_" + name1, "track_id_y": "id_" + name2}
     )
-    return matches
 
 
 def _match_multiple(

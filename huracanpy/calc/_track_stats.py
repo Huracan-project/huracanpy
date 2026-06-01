@@ -108,7 +108,8 @@ def apex_vals(tracks, variable, track_id, stat="max"):
     elif stat == "min":
         asc = True
     else:
-        raise NotImplementedError("stat not recognized. Please use one of {min, max}")
+        msg = "stat not recognized. Please use one of {min, max}"
+        raise NotImplementedError(msg)
 
     # It is 350 times much faster to switch to a dataframe.
     # Use the same trick as with gen_vals

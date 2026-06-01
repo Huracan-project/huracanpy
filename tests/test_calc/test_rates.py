@@ -1,13 +1,13 @@
-import pytest
 import numpy as np
 import pint
+import pytest
 from metpy.units import units
 
 import huracanpy
 
 
-@pytest.mark.parametrize(("centering",), [("forward",), ("backward",)])
-@pytest.mark.parametrize(("unit",), [(None,), ("m s-1",)])
+@pytest.mark.parametrize("centering", ["forward", "backward"])
+@pytest.mark.parametrize("unit", [None, "m s-1"])
 @pytest.mark.parametrize(
     ("var", "track_id", "expected"),
     [

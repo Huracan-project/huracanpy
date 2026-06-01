@@ -22,9 +22,8 @@ def load(filename, **kwargs):
         # If time and track_id don't have the same dimension it could be 2d or ragged
         # Track ID should always be 1d
         if track_id.ndim != 1:
-            raise ValueError(
-                f"File has a track ID with {track_id.ndim} dimensions. Should be 1d"
-            )
+            msg = f"File has a track ID with {track_id.ndim} dimensions. Should be 1d"
+            raise ValueError(msg)
         dims = [track_id.dims[0]] + [
             dim for dim in time.dims if dim not in track_id.dims
         ]
@@ -33,13 +32,11 @@ def load(filename, **kwargs):
 
         if len(vars_2d) > 0:
             return as1d(dataset, dims, track_id, vars_2d)
-        else:
-            # Otherwise ragged array
-            return stretch_trid(dataset, track_id)
-    else:
-        # Otherwise it is in the CSV format used by huracanpy, so just return the
-        # dataset
-        return dataset
+        # Otherwise ragged array
+        return stretch_trid(dataset, track_id)
+    # Otherwise it is in the CSV format used by huracanpy, so just return the
+    # dataset
+    return dataset
 
 
 def save(dataset, filename, **kwargs):
@@ -54,9 +51,8 @@ def save(dataset, filename, **kwargs):
     if len(sample_dimension) == 1:
         sample_dimension = sample_dimension[0]
     else:
-        raise ValueError(
-            f"{trajectory_id.name} spans multiple dimensions, should be 1d"
-        )
+        msg = f"{trajectory_id.name} spans multiple dimensions, should be 1d"
+        raise ValueError(msg)
 
     # Sort by trajectory_id so each track can be described by the first index and
     # number of elements of the unique trajectory id
@@ -147,17 +143,17 @@ def _find_trajectory_id(dataset):
 
     if len(trajectory_id) == 1:
         return trajectory_id[0]
-    else:
-        for name in _trajectory_id_names:
-            if name in dataset or name in dataset.dims:
-                trajectory_id = dataset[name]
-                trajectory_id.attrs["cf_role"] = "trajectory_id"
-                return trajectory_id
+    for name in _trajectory_id_names:
+        if name in dataset or name in dataset.dims:
+            trajectory_id = dataset[name]
+            trajectory_id.attrs["cf_role"] = "trajectory_id"
+            return trajectory_id
 
-        raise ValueError(
-            f"Found {len(trajectory_id)} variables with cf_role=trajectory_id."
-            f"Should be exactly one."
-        )
+    msg = (
+        f"Found {len(trajectory_id)} variables with cf_role=trajectory_id."
+        f"Should be exactly one."
+    )
+    raise ValueError(msg)
 
 
 def _find_rowsize(dataset):
@@ -170,7 +166,5 @@ def _find_rowsize(dataset):
 
     if len(rowsize) == 1:
         return rowsize[0]
-    else:
-        raise ValueError(
-            f"Found {len(rowsize)} variables to map to row size. Should be exactly one"
-        )
+    msg = f"Found {len(rowsize)} variables to map to row size. Should be exactly one"
+    raise ValueError(msg)

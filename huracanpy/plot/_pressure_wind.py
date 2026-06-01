@@ -1,10 +1,11 @@
+import numpy as np
+import seaborn as sns
 from matplotlib.collections import PathCollection
 from metpy.xarray import preprocess_and_wrap
-import numpy as np
-import seaborn as sb
 
-from .._metpy import validate_units
 from .. import tc
+from .._metpy import validate_units
+from .._util import combine_kws
 from ..tc._conventions import _thresholds
 
 _jointgrid_kws_defaults = dict(marginal_ticks=True)
@@ -107,11 +108,11 @@ def pressure_wind_relation(
     pressure = validate_units(pressure, pressure_units)
     wind = validate_units(wind, wind_units)
 
-    jointgrid_kws = _combine_kws(jointgrid_kws, _jointgrid_kws_defaults)
-    scatterplot_kws = _combine_kws(scatterplot_kws, _scatterplot_kws_defaults)
-    lineplot_kws = _combine_kws(lineplot_kws, _lineplot_kws_defaults)
-    histplot_kws = _combine_kws(histplot_kws, _histplot_kws_defaults)
-    pressure_wind_model_kwargs = _combine_kws(
+    jointgrid_kws = combine_kws(jointgrid_kws, _jointgrid_kws_defaults)
+    scatterplot_kws = combine_kws(scatterplot_kws, _scatterplot_kws_defaults)
+    lineplot_kws = combine_kws(lineplot_kws, _lineplot_kws_defaults)
+    histplot_kws = combine_kws(histplot_kws, _histplot_kws_defaults)
+    pressure_wind_model_kwargs = combine_kws(
         pressure_wind_model_kwargs, _pressure_wind_model_kws_defaults
     )
 
@@ -134,7 +135,7 @@ def pressure_wind_relation(
             category_linestyle=category_linestyle,
         )
 
-    sb.scatterplot(
+    sns.scatterplot(
         x=wind,
         y=pressure,
         ax=grid.ax_joint,
@@ -149,7 +150,7 @@ def pressure_wind_relation(
         color = pc.get_facecolor()[0][:3]
 
     model = tc.pressure_wind_relation(pressure, wind, **pressure_wind_model_kwargs)
-    sb.lineplot(
+    sns.lineplot(
         x=model.predict(bins_pressure),
         y=bins_pressure,
         ax=grid.ax_joint,
@@ -158,7 +159,7 @@ def pressure_wind_relation(
         **lineplot_kws,
     )
 
-    sb.histplot(
+    sns.histplot(
         x=wind,
         bins=np.asarray(bins_wind),
         color=color,
@@ -167,7 +168,7 @@ def pressure_wind_relation(
     )
     grid.ax_marg_x.set_ylabel("")
 
-    sb.histplot(
+    sns.histplot(
         y=pressure,
         bins=np.asarray(bins_pressure),
         color=color,
@@ -181,14 +182,6 @@ def pressure_wind_relation(
     return grid, bins_pressure, bins_wind
 
 
-def _combine_kws(kws, kws_default):
-    if kws is None:
-        return kws_default.copy()
-    else:
-        # Overwrite default arguments with explicit arguments
-        return {**kws_default, **kws}
-
-
 def _setup_grid(
     xlabel_ypos,
     ylabel_xpos,
@@ -200,7 +193,7 @@ def _setup_grid(
     category_color="darkgrey",
     category_linestyle="--",
 ):
-    grid = sb.JointGrid(**jointgrid_kws)
+    grid = sns.JointGrid(**jointgrid_kws)
     categories_mslp = _thresholds[mslp_convention]
     bins_mslp = categories_mslp["bins"].to(mslp_units)
     categories_vmax = _thresholds[wind_convention]
@@ -250,7 +243,6 @@ def _setup_grid(
 def _get_label_position(bins, n):
     if np.isinf(bins[n]):
         return bins[n + 1] - 0.5 * (bins[n + 2] - bins[n + 1])
-    elif np.isinf(bins[n + 1]):
+    if np.isinf(bins[n + 1]):
         return bins[n] + 0.5 * (bins[n] - bins[n - 1])
-    else:
-        return 0.5 * (bins[n] + bins[n + 1])
+    return 0.5 * (bins[n] + bins[n + 1])

@@ -2,10 +2,16 @@
 Functions to plot the tracks
 """
 
+import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import seaborn as sns
-import cartopy.crs as ccrs
 from cartopy.mpl.geoaxes import GeoAxes
+
+from .._util import combine_kws
+
+_subplot_kws_default = dict(projection=ccrs.PlateCarree(180))
+_fig_kws_default = dict(figsize=(10, 10))
+_scatter_kws_default = dict(palette="turbo", color="k")
 
 
 def tracks(
@@ -13,9 +19,9 @@ def tracks(
     lat,
     intensity_var=None,
     ax=None,
-    subplot_kws=dict(projection=ccrs.PlateCarree(180)),
-    fig_kws=dict(figsize=(10, 10)),
-    scatter_kws=dict(palette="turbo", color="k"),
+    subplot_kws=None,
+    fig_kws=None,
+    scatter_kws=None,
 ):
     """Create a map of all lon/lat points
 
@@ -43,6 +49,10 @@ def tracks(
         The figure and axes instances created for the plot
 
     """
+    subplot_kws = combine_kws(subplot_kws, _subplot_kws_default)
+    fig_kws = combine_kws(fig_kws, _fig_kws_default)
+    scatter_kws = combine_kws(scatter_kws, _scatter_kws_default)
+
     if ax is None:
         fig, ax = plt.subplots(subplot_kw=subplot_kws, **fig_kws)
     else:

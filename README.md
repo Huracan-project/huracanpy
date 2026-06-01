@@ -3,6 +3,8 @@
 [![Documentation Status](https://readthedocs.org/projects/huracanpy/badge/?version=latest)](https://huracanpy.readthedocs.io/en/latest/?badge=latest)
 [![status](https://joss.theoj.org/papers/bb15b667a6306bcd0383d06d3b788cb6/status.svg)](https://joss.theoj.org/papers/bb15b667a6306bcd0383d06d3b788cb6)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/huracanpy/badges/version.svg)](https://anaconda.org/conda-forge/huracanpy)
+[![PyPI - Version](https://img.shields.io/pypi/v/huracanpy)](https://pypi.org/project/huracanpy/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 *A python package for working with various forms of feature tracking data, including but not restricted to cyclone tracks.*
 
@@ -80,12 +82,16 @@ using the `hrcn` accessor from HuracanPy. See the [accessor](accessor.ipynb) pag
 more details.
 
 ```python
+import matplotlib.pyplot as plt
+
 # Quickly view the tracks
 tracks.hrcn.plot_tracks(intensity_var_name="wind10")
 
 # Add a new variable to the tracks and plot this instead
 tracks = tracks.hrcn.add_is_land()
 tracks.hrcn.plot_tracks(intensity_var_name="is_land")
+
+plt.show()
 ```
 ![Plot showing 3 tracks in the southern hemisphere with points coloured by wind speed](docs/images/readme/plot_tracks_wind.png)
 ![Plot showing 3 tracks in the southern hemisphere with points coloured by whether they are over land or ocean](docs/images/readme/plot_tracks_is_land.png)

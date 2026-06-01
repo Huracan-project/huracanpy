@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.4.1
+### Fixed
+- Fixed errors using pandas>=3
+
 ## v1.4.0
 ### Added
 - `huracanpy.info.beaufort_category`
@@ -23,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `spherical` option to `calc.density`. Divides by area of gridboxes for `method="histogram"` and implements haversine weighting with scikit-learn for `method="kde"`
 - Add `info.landfall_points` which returns each point where a track crosses a coastline
 - New module `convert` and function `convert.to_geodataframe` to convert tracks to a geodataframe of points or linestrings (if track_id is given)
-- `tc.pressure_wind_relation` to get/apply the model for a pressure wind relation without having to use `tc.pace`. The return model is als wrapped so that the fitting and predicting of the model uses units.
+- `tc.pressure_wind_relation` to get/apply the model for a pressure wind relation without having to use `tc.pace`. The return model is also wrapped so that the fitting and predicting of the model uses units.
 - `plot.pressure_wind_relation`
 - `tc.saffir_simpson_category` has the option to use thresholds for 10-minute or 1-minute sustained winds. Previously it was only 10-minute by default
 - Optional mean distance (instead of default maximum distance) when matching tracks with `assess.match`
@@ -82,7 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Support for WiTRACK text files in huracanpy.load
 - Beta-drift computation (along with RMW support within distance function)
-- Full documentation incuding new examples
+- Full documentation including new examples
 - kde option for densities
 - Reference track set option for matching
 - Basin definitions from E. Sainsbury's papers

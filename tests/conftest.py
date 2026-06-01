@@ -1,10 +1,9 @@
-import pytest
-
 import datetime
 from collections import namedtuple
 
 import cftime
 import numpy as np
+import pytest
 import xarray as xr
 
 import huracanpy
@@ -19,12 +18,12 @@ def pytest_addoption(parser):
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def tracks_csv():
     return huracanpy.load(huracanpy.example_csv_file)
 
 
-@pytest.fixture()
+@pytest.fixture
 def tracks_with_extra_coord(tracks_csv):
     # Test that the same results apply if a variable has an additional dimension to the
     # time/track_id dimension (e.g. if each point had a profile on pressure levels)
@@ -42,12 +41,12 @@ def tracks_with_extra_coord(tracks_csv):
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def tracks_year():
     return huracanpy.load(huracanpy.example_year_file)
 
 
-@pytest.fixture()
+@pytest.fixture
 def tracks_year_cftime():
     tracks = huracanpy.load(huracanpy.example_year_file)
     time = [
@@ -57,9 +56,9 @@ def tracks_year_cftime():
     return tracks
 
 
-@pytest.fixture()
+@pytest.fixture
 def tracks_minus180_plus180():
-    tracks = xr.Dataset(
+    return xr.Dataset(
         dict(
             track_id=("record", np.zeros(24)),
             time=("record", [datetime.datetime(2000, 1, 1, n) for n in range(24)]),
@@ -68,10 +67,8 @@ def tracks_minus180_plus180():
         )
     )
 
-    return tracks
 
-
-@pytest.fixture()
+@pytest.fixture
 def tracks_0_360(tracks_minus180_plus180):
     tracks = tracks_minus180_plus180.copy()
     tracks.lon.values[:] = tracks.lon.values % 360
@@ -82,11 +79,11 @@ def tracks_0_360(tracks_minus180_plus180):
 coords = namedtuple("coords", ["lon", "lat"])
 
 
-@pytest.fixture()
+@pytest.fixture
 def tracks_as_list():
     return coords(lon=[0, 20], lat=[0, 0])
 
 
-@pytest.fixture()
+@pytest.fixture
 def tracks_as_point():
     return coords(lon=0.0, lat=0.0)

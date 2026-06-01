@@ -1,11 +1,9 @@
 import gzip
-from io import StringIO
-
 import warnings
+from io import StringIO
 
 import numpy as np
 import xarray as xr
-
 from parse import parse
 
 from . import _csv
@@ -29,7 +27,8 @@ def _parse(fmt, string, **kwargs):
     result = parse(fmt, string, **kwargs)
 
     if result is None:
-        raise ValueError(f"Format {fmt} does not match string {string}")
+        msg = f"Format {fmt} does not match string {string}"
+        raise ValueError(msg)
 
     return result
 
@@ -49,10 +48,7 @@ def load(filename, variable_names=None):
     -------
     xarray.Dataset
     """
-    if filename.split(".")[-1] == "gz":
-        open_func = gzip.open
-    else:
-        open_func = open
+    open_func = gzip.open if filename.split(".")[-1] == "gz" else open
 
     with open_func(filename, "rt") as f:
         # The first lines can contain extra information bounded by two extra lines
@@ -76,18 +72,20 @@ def load(filename, variable_names=None):
 
         # Check header data is consistent
         if len(has_coords) != nfields:
-            raise ValueError(
+            msg = (
                 f"TRACK file header is inconsistent. Number of fields "
                 f"({len(has_coords)}) does not match nfields from header ({nfields})."
             )
+            raise ValueError(msg)
 
         nvars_expected = sum([3 if x == 1 else 1 for x in has_coords])
         if nvars_expected != nvars:
-            raise ValueError(
+            msg = (
                 f"TRACK file header is inconsistent. Number of variables including"
                 f"lat/lon for variables ({nvars_expected}) does not match nvars from"
                 f"header ({nvars})."
             )
+            raise ValueError(msg)
 
         # Create a list of variables stored in each track
         # Generic names for variables as there is currently no information otherwise
@@ -96,10 +94,11 @@ def load(filename, variable_names=None):
             variable_names = [f"feature_{n}" for n in range(nfields)]
         else:
             if len(variable_names) != nfields:
-                raise ValueError(
+                msg = (
                     f"Number of variable names given ({len(variable_names)}) does not"
                     f"match number of fields in file ({len(nfields)})"
                 )
+                raise ValueError(msg)
         for n, variable_name in enumerate(variable_names):
             if has_coords[n]:
                 var_labels.append(f"{variable_name}_lon")
@@ -108,10 +107,10 @@ def load(filename, variable_names=None):
 
         # Read in each track as an xarray dataset with time as the coordinate
         output = [",".join(var_labels)]
-        for n in range(ntracks):
+        for _n in range(ntracks):
             # Read individual track header (two lines)
             line = f.readline().strip()
-            if not line.replace(" ", "") == "":  # If line is empty
+            if line.replace(" ", "") != "":  # If line is empty
                 try:
                     track_info = _parse(track_header_fmt, line).named
                 except ValueError:
@@ -121,7 +120,7 @@ def load(filename, variable_names=None):
                 npoints = _parse(track_info_fmt, line)["npoints"]
 
                 # Populate time and data line by line
-                for m in range(npoints):
+                for _m in range(npoints):
                     line = f.readline().strip()
                     output.append(
                         ",".join(
@@ -131,9 +130,10 @@ def load(filename, variable_names=None):
                     )
             else:
                 warnings.warn(
-                    "Parsed line is empty. It is possible this problem arrises because"
+                    "Parsed line is empty. It is possible this problem arises because"
                     "the number of tracks expected from the header was not found in the"
-                    "file."
+                    "file.",
+                    stacklevel=2,
                 )
 
     return _csv.load(StringIO("\n".join(output)), index_col=False)
@@ -143,7 +143,7 @@ def load_tilts(filename, nans=1e25):
     output = list()
     track_id = list()
     times = list()
-    with open(filename, "rt") as f:
+    with open(filename) as f:
         # First line
         header = _parse(tilt_header_fmt, f.readline().strip()).named
         ntracks = header["ntracks"]
@@ -153,7 +153,7 @@ def load_tilts(filename, nans=1e25):
         levels = np.asarray(_parse(line_fmt, f.readline().strip()).fixed)
 
         # Read in each track as an xarray dataset with time as the coordinate
-        for n in range(ntracks):
+        for _n in range(ntracks):
             # Read individual track header
             track_info = _parse(tilt_track_header_fmt, f.readline().strip()).named
             npoints = track_info["npoints"]
@@ -163,7 +163,7 @@ def load_tilts(filename, nans=1e25):
             track_id.extend([track_info["track_id"]] * npoints)
 
             # Populate time and data line by line
-            for m in range(npoints):
+            for _m in range(npoints):
                 line = f.readline().strip()
                 times.append(line.split(" ")[0])
                 output.append(line)

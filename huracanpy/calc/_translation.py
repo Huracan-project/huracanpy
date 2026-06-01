@@ -2,23 +2,22 @@
 Utils related to translation distance and time
 """
 
-from datetime import timedelta
-import shapely
 import warnings
+from datetime import timedelta
 
+import numpy as np
+import nvector
+import pandas as pd
+import pyproj
+import shapely
 from cartopy.crs import Geodetic, Orthographic
 from haversine import haversine_vector
 from metpy.units import units
 from metpy.xarray import preprocess_and_wrap
-import nvector
-import numpy as np
-import pandas as pd
 from pint.errors import UnitStrippedWarning
-import pyproj
 
-
-from ._rates import delta, _dummy_track_id, _align_array
 from .._metpy import dequantify_results
+from ._rates import _align_array, _dummy_track_id, delta
 
 
 def _get_distance_azimuth_geod(lon1, lat1, lon2, lat2, ellps="WGS84"):
@@ -99,14 +98,13 @@ def azimuth(lon, lat, track_id=None, ellps="WGS84", centering="forward"):
     if centering in ["forward", "backward"]:
         return _align_array(fwd_azimuth, track_id, centering)
 
-    else:
-        # Compute angle in steps of two
-        _, centred_azimuth = _get_distance_azimuth_geod(
-            lon[:-2], lat[:-2], lon[2:], lat[2:], ellps=ellps
-        )
-        centred_azimuth[track_id[2:] != track_id[:-2]] = np.nan * centred_azimuth[0]
+    # Compute angle in steps of two
+    _, centred_azimuth = _get_distance_azimuth_geod(
+        lon[:-2], lat[:-2], lon[2:], lat[2:], ellps=ellps
+    )
+    centred_azimuth[track_id[2:] != track_id[:-2]] = np.nan * centred_azimuth[0]
 
-        return _align_array(fwd_azimuth, track_id, centering, centred_azimuth)
+    return _align_array(fwd_azimuth, track_id, centering, centred_azimuth)
 
 
 @dequantify_results
@@ -172,9 +170,8 @@ def distance(
             if track_id is None:
                 track_id = args[0]
             else:
-                raise ValueError(
-                    "Distance either takes 2 arrays (lon/lat) or 4 arrays 2x(lon/lat)"
-                )
+                msg = "Distance either takes 2 arrays (lon/lat) or 4 arrays 2x(lon/lat)"
+                raise ValueError(msg)
 
         if track_id is None:
             track_id = _dummy_track_id(lon)
@@ -185,19 +182,19 @@ def distance(
         lon2, lat2 = args
 
     else:
-        raise ValueError(
-            "Distance either takes 2 arrays (lon/lat) or 4 arrays 2x(lon/lat)"
-        )
+        msg = "Distance either takes 2 arrays (lon/lat) or 4 arrays 2x(lon/lat)"
+        raise ValueError(msg)
 
     if method in ["geod", "geodesic"]:
         dist, _ = _get_distance_azimuth_geod(lon1, lat1, lon2, lat2, ellps=ellps)
     elif method == "haversine":
         dist = _get_distance_haversine(lon1, lat1, lon2, lat2)
     else:
-        raise ValueError(
+        msg = (
             f"Method {method} for distance calculation not recognised, use one of"
             f"('geod', 'haversine')"
         )
+        raise ValueError(msg)
 
     if len(args) < 2 and track_id is not None:
         dist = _align_array(dist, track_id, centering)
@@ -279,7 +276,7 @@ def corral_radius(lon, lat, time=None, track_id=None, *, window=None, min_points
     Passing a time and window will calculate the corral radius in a rolling window. The
     window is by default in hours (you can explicitly pass a datetime.timedelta to use
     a more specific window). The code below will calculate the corral radius for each
-    lon/lat include the lons/lats withing +/- 36 hours. Points where the window is
+    lon/lat include the lons/lats within +/- 36 hours. Points where the window is
     outside the times are given NaNs
 
     >>> corral_radius(lons, lats, time=time, window=36)

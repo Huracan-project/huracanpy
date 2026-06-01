@@ -1,8 +1,8 @@
+import numpy as np
 import pytest
+from metpy.constants import earth_avg_radius
 
 import huracanpy
-from metpy.constants import earth_avg_radius
-import numpy as np
 
 
 @pytest.mark.parametrize("baselon", [-180, 0])

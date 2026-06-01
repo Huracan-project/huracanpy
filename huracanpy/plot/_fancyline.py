@@ -1,9 +1,9 @@
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.collections import LineCollection
-from matplotlib.patheffects import Stroke
+import numpy as np
 from cartopy.crs import Geodetic
 from cartopy.mpl.geoaxes import GeoAxes
+from matplotlib.collections import LineCollection
+from matplotlib.patheffects import Stroke
 
 
 def _map_values(values, vmin, vmax, vrange, clip):

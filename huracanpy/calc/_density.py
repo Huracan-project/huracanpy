@@ -4,11 +4,11 @@ Module containing function to compute track densities
 
 import warnings
 
-from metpy.constants import earth_avg_radius
 import numpy as np
+import xarray as xr
+from metpy.constants import earth_avg_radius
 from scipy.stats import gaussian_kde
 from sklearn.neighbors import KernelDensity
-import xarray as xr
 
 from .._metpy import dequantify_results
 
@@ -87,15 +87,13 @@ def density(
         # Account for cell area differences
         warnings.warn(
             "By default density does not take into account the spherical geometry of"
-            "the Earth. Set spherical=True to account for this"
+            "the Earth. Set spherical=True to account for this",
+            stacklevel=2,
         )
 
     # Define coordinates for mapping
     if lon_range is None:
-        if lon.min() < 0:
-            lon_range = (-180, 180)
-        else:
-            lon_range = (0, 360)
+        lon_range = (-180, 180) if lon.min() < 0 else (0, 360)
 
     x_edge = np.arange(lon_range[0], lon_range[1] + bin_size, bin_size)
     y_edge = np.arange(lat_range[0], lat_range[1] + bin_size, bin_size)
@@ -116,9 +114,8 @@ def density(
         else:
             h = _kde(lon, lat, x_mid, y_mid, function_kws)
     else:
-        raise NotImplementedError(
-            f"Method {method} not implemented yet. Use one 'histogram', 'kde'"
-        )
+        msg = f"Method {method} not implemented yet. Use one 'histogram', 'kde'"
+        raise NotImplementedError(msg)
 
     # Turn into xarray
     da = xr.DataArray(
@@ -137,11 +134,9 @@ def density(
         da = da.isel(lat=slice(idx_lat[0], idx_lat[-1] + 1))
 
         idx_lon = np.where(has_data.any(dim="lat"))[0]
-        da = da.isel(lon=slice(idx_lon[0], idx_lon[-1] + 1))
+        return da.isel(lon=slice(idx_lon[0], idx_lon[-1] + 1))
 
-        return da
-    else:
-        return da
+    return da
 
 
 def _histogram(lon, lat, x_edge, y_edge, function_kws):

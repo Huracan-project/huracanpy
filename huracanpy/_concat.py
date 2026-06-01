@@ -87,7 +87,8 @@ def _reset_track_id(tracks, track_ids, start=0, *, keep_original=False):
         A copy of the input dataset with reassigned track_ids
     """
     if track_ids.ndim != 1:
-        raise ValueError("track_ids must be 1d")
+        msg = "track_ids must be 1d"
+        raise ValueError(msg)
 
     _, new_track_ids = np.unique(track_ids, return_inverse=True)
 
@@ -104,6 +105,6 @@ def _reset_track_id(tracks, track_ids, start=0, *, keep_original=False):
         **{track_ids.name: (track_ids.dims[0], start + new_track_ids)}
     )
 
-    tracks.track_id.attrs["cf_role"] = "trajectory_id"
+    tracks[track_ids.name].attrs["cf_role"] = "trajectory_id"
 
     return tracks

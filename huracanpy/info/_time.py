@@ -4,10 +4,10 @@ Utils related to time
 
 import warnings
 
-from metpy.xarray import preprocess_and_wrap
 import numpy as np
-from pint.errors import UnitStrippedWarning
 import pandas as pd
+from metpy.xarray import preprocess_and_wrap
+from pint.errors import UnitStrippedWarning
 
 from ._geography import hemisphere
 
@@ -40,14 +40,14 @@ def timestep(time, track_id=None):
 
     if len(steps) == 1:
         return steps[0]
-    else:
-        warnings.warn(
-            "Found multiple different timesteps within the tracks\n"
-            + ", ".join([str(step) for step in steps])
-            + "\n"
-            + "Returning the most common one."
-        )
-        return steps[counts.argmax()]
+    warnings.warn(
+        "Found multiple different timesteps within the tracks\n"
+        + ", ".join([str(step) for step in steps])
+        + "\n"
+        + "Returning the most common one.",
+        stacklevel=2,
+    )
+    return steps[counts.argmax()]
 
 
 def time_components(time, components=("year", "month", "day", "hour")):
@@ -161,9 +161,10 @@ def season(track_id, lat, time, convention="tc-short"):
             season,
         )
     else:
-        raise NotImplementedError("Convention not recognized")
+        msg = "Convention not recognized"
+        raise NotImplementedError(msg)
 
     group["season"] = season
     df = df.merge(group[["season"]], on="track_id")
 
-    return df.season.values
+    return df.season.to_numpy()

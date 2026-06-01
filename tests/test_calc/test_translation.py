@@ -3,11 +3,10 @@ import pathlib
 import numpy as np
 import pint
 import pytest
-from metpy.units import units
 import xarray as xr
+from metpy.units import units
 
 import huracanpy
-
 
 data_path = pathlib.Path(__file__).parent.parent / "saved_results"
 
@@ -84,7 +83,7 @@ def test_distance_warns(tracks_csv):
 
 
 @pytest.mark.parametrize(
-    "varnames, method, message",
+    ("varnames", "method", "message"),
     [
         (["lon", "lat", "lon"], "geod", "Distance either takes 2 arrays"),
         (["lon", "lat", "lon", "lat", "lon"], "geod", "Distance either takes 2 arrays"),
@@ -139,7 +138,7 @@ def test_corral_radius(tracks_csv):
 
 
 @pytest.mark.parametrize(
-    "lons, lats, expected",
+    ("lons", "lats", "expected"),
     [
         # Spherical cap. Tests treating distances across pole and dateline correctly
         ([0, 90, 180, 270], [80] * 4, [1107551.86696002] * 4),
