@@ -39,7 +39,6 @@ __all__ = [
     "_accessor",
 ]
 
-from . import _accessor, assess, calc, convert, info, plot, tc
 from ._basins import basins
 from ._concat import concat_tracks
 from ._data import (
@@ -65,3 +64,5 @@ from ._data import (
 )
 from ._interp import interp_time
 from ._subset import sel_id, trackswhere
+from . import assess, calc, convert, info, plot, tc
+from . import _accessor
