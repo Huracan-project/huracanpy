@@ -1,16 +1,13 @@
 import xarray as xr
 import pandas as pd
 
-from . import (
-    plot,
-    tc,
-    info,
-    calc,
-    save,
-    interp_time,
-    sel_id,
-    trackswhere,
-)
+from . import info
+from . import calc
+from . import tc
+from . import plot
+from ._data import save
+from ._interp import interp_time
+from ._subset import sel_id, trackswhere
 
 
 @xr.register_dataarray_accessor("hrcn")
