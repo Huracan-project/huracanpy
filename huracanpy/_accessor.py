@@ -1,12 +1,10 @@
-import pandas as pd
 import xarray as xr
+import pandas as pd
 
-from . import (
-    calc,
-    info,
-    plot,
-    tc,
-)
+from . import info
+from . import calc
+from . import tc
+from . import plot
 from ._data import save
 from ._interp import interp_time
 from ._subset import sel_id, trackswhere

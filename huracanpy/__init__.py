@@ -9,7 +9,6 @@ __all__ = [
     "assess",
     "info",
     "tc",
-    "convert",
     # Functions
     "load",
     "save",
@@ -39,29 +38,31 @@ __all__ = [
     "_accessor",
 ]
 
-from . import _accessor, assess, calc, convert, info, plot, tc
-from ._basins import basins
-from ._concat import concat_tracks
 from ._data import (
-    _test_ibtracs_netcdf_file,
-    _test_non_ragged_netcdf_file,
-    example_CHAZ_file,
-    example_csv_file,
-    example_ERA20C_file,
-    example_IRIS_file,
-    example_MIT_file,
-    example_old_HURDAT_file,
-    example_parquet_file,
-    example_STORM_file,
-    example_TE_file,
-    example_TRACK_file,
-    example_TRACK_netcdf_file,
-    example_TRACK_tilt_file,
-    example_TRACK_timestep_file,
-    example_WiTRACK_file,
-    example_year_file,
     load,
     save,
+    example_csv_file,
+    example_parquet_file,
+    example_year_file,
+    example_TRACK_file,
+    example_TRACK_tilt_file,
+    example_TRACK_netcdf_file,
+    example_TRACK_timestep_file,
+    example_TE_file,
+    example_CHAZ_file,
+    example_MIT_file,
+    example_ERA20C_file,
+    example_WiTRACK_file,
+    example_old_HURDAT_file,
+    example_STORM_file,
+    example_IRIS_file,
+    _test_ibtracs_netcdf_file,
+    _test_non_ragged_netcdf_file,
 )
+from ._basins import basins
 from ._interp import interp_time
+from ._concat import concat_tracks
 from ._subset import sel_id, trackswhere
+from . import calc, plot, assess, info, tc
+
+from . import _accessor
