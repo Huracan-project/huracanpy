@@ -1,6 +1,3 @@
-import matplotlib.pyplot as plt
-
-
 def doughnut(values, reference_total, ax=None, **kwargs):
     """Plot a pie chart with a doughnut shape with thickness showing the total number of
     points relative to a reference total
@@ -30,6 +27,8 @@ def doughnut(values, reference_total, ax=None, **kwargs):
         Unlike :py:func:`matplotlib.pyplot.pie`, autotexts will return an empty list if
         no labels are specified, so the length of the tuple is always three
     """
+    import matplotlib.pyplot as plt
+
     if ax is None:
         ax = plt.gca()
 

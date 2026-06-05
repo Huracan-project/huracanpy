@@ -1,7 +1,4 @@
 import numpy as np
-from cartopy.crs import Geodetic
-from geopandas import GeoDataFrame
-from shapely.geometry import LineString, Point
 
 
 def to_geodataframe(lon, lat, track_id=None, *, crs=None):
@@ -26,6 +23,10 @@ def to_geodataframe(lon, lat, track_id=None, *, crs=None):
         multiple LineStrings where tracks cross the dateline) or
         :class:`shapely.Point` for any length-1 tracks
     """
+    from cartopy.crs import Geodetic
+    from geopandas import GeoDataFrame
+    from shapely.geometry import LineString, Point
+
     if crs is None:
         crs = Geodetic()
 

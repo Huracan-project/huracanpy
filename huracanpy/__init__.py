@@ -40,6 +40,9 @@ __all__ = [
 ]
 
 from . import _accessor, assess, calc, convert, info, plot, tc
+# Heavy optional dependencies (geopandas, cartopy, metpy, matplotlib, seaborn) are
+# imported lazily inside the functions that use them, so that `import huracanpy` itself
+# remains fast even when those libraries are installed.
 from ._basins import basins
 from ._concat import concat_tracks
 from ._data import (

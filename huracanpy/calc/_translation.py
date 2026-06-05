@@ -10,7 +10,6 @@ import nvector
 import pandas as pd
 import pyproj
 import shapely
-from cartopy.crs import Geodetic, Orthographic
 from haversine import haversine_vector
 from metpy.units import units
 from metpy.xarray import preprocess_and_wrap
@@ -362,6 +361,8 @@ def _make_circle(lons, lats):
 
 
 def _latlon_to_xy(lon, lat):
+    from cartopy.crs import Geodetic, Orthographic
+
     # Convert lat/lon to x/y using Orthographic projection for small areas
     # For more accuracy, use spherical geometry, but for <2000km, this is fine
     # Center for projection
