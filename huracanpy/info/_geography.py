@@ -135,7 +135,8 @@ def _cache_natural_earth_feature(feature, category, name, resolution):
             df = basins[name].rename_axis("basin").reset_index()
             _natural_earth_feature_cache[key] = df
         else:
-            raise KeyError(f"Unknown basin convention: {name!r}")
+            msg = f"Unknown basin convention: {name!r}"
+            raise KeyError(msg)
     else:
         fname = natural_earth(resolution=resolution, category=category, name=name)
         df = gpd.read_file(fname)
@@ -401,7 +402,9 @@ def landfall_points(lon, lat, track_id, *, resolution="10m", crs=None):
     def _impl(lon, lat, track_id, *, resolution="10m", crs=None):
         lon, lat, track_id = _wrap_arrays(lon, lat, track_id)
 
-        df = _cache_natural_earth_feature("featurecla", "physical", "coastline", resolution)
+        df = _cache_natural_earth_feature(
+            "featurecla", "physical", "coastline", resolution
+        )
 
         tracks = to_geodataframe(lon, lat, track_id, crs=crs).to_crs(df.crs)
 
