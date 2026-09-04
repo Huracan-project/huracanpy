@@ -24,7 +24,16 @@ def prepare_offline(wmo=True, jtwc=True):
         print("... WMO ...")
         ## Select WMO variables
         ib_wmo = ib[
-            ["sid", "season", "basin", "time", "lon", "lat", "wmo_wind", "wmo_pres"]
+            [
+                "track_id",
+                "season",
+                "basin",
+                "time",
+                "lon",
+                "lat",
+                "wmo_wind",
+                "wmo_pres",
+            ]
         ].rename({"wmo_wind": "wind", "wmo_pres": "slp"})  # 19MB
 
         ## Select only 6-hourly time steps
@@ -47,7 +56,7 @@ def prepare_offline(wmo=True, jtwc=True):
         ## Select usa variables
         ib_usa = ib[
             [
-                "sid",
+                "track_id",
                 "season",
                 "basin",
                 "time",

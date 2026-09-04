@@ -1,6 +1,6 @@
 [project]
 name = "huracanpy"
-version = "1.4.1"
+version = "1.5.0"
 authors = [
   { name="Leo Saffin", email="l.saffin@reading.ac.uk" },
   { name="Stella Bourdin", email="stella.bourdin@physics.ox.ac.uk" },
@@ -95,6 +95,11 @@ extend-select = [
     "D417", # undocumented parameters
     "PGH", # pygrep-hooks
     "I", # ISort
+]
+ignore = [
+  "C408", # dict() vs {}
+  "DTZ001", # datetime.datetime with tzinfo
+  "RUF022", # sorted imports/__all__
 ]
 
 [tool.ruff.lint.per-file-ignores]

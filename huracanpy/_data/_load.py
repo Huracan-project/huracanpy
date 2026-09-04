@@ -75,7 +75,7 @@ def load(
     baselon=None,
     infer_track_id=None,
     track_id_prefix=None,
-    ibtracs_subset="wmo",
+    ibtracs_subset="offline-wmo",
     iris_timestep=timedelta(hours=3),
     tempest_extremes_unstructured=False,
     tempest_extremes_header_str="start",
@@ -151,17 +151,18 @@ def load(
         the track_ids to keep them as unique identifiers. See
         :py:func:`huracanpy.concat_tracks` for more details
 
-    ibtracs_subset : str, default="wmo"
+    ibtracs_subset : str, default="offline-wmo"
         IBTrACS subset. Two offline versions are available:
 
-        * **wmo**: Data with the wmo_* variables. The data as reported by the WMO agency
-          responsible for each basin, so methods are not consistent across basins
-        * **usa** or **JTWC**: Data with the usa_* variables. The data as recorded by
-          the USA/Joint Typhoon Warning Centre. Methods are consistent across basins,
-          but may not be complete.
+        * **offline-wmo**: Data with the wmo_* variables. The data as reported by the
+          WMO agency responsible for each basin, so methods are not consistent across
+          basins
+        * **offline-usa** or **offline-jtwc**: Data with the usa_* variables. The data
+          as recorded by the USA/Joint Typhoon Warning Centre. Methods are consistent
+          across basins, but may not be complete.
 
         To download online data, the subsets are the different files provided by
-        IBTrACS.
+        IBTrACS (case sensitive).
 
         * **ACTIVE**: TCs currently active
         * **ALL**: Entire IBTrACS database

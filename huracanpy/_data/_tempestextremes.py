@@ -47,7 +47,7 @@ def load(
 
     output = [",".join(varnames)]
     while lineno < len(data):
-        start, npoints, year, month, day, hour = data[lineno].split()
+        _start, npoints, _year, _month, _day, _hour = data[lineno].split()
         npoints = int(npoints)
 
         # Populate time and data line by line

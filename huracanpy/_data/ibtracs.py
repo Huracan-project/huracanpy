@@ -27,7 +27,14 @@ online_default_kwargs = dict(
 
 
 def load(subset, filename, **kwargs):
-    if subset.lower() in ["wmo", "usa", "jtwc"]:
+    if subset.lower() in [
+        "offline-wmo",
+        "offline-usa",
+        "offline-jtwc",
+        "wmo",
+        "usa",
+        "jtwc",
+    ]:
         return offline(subset)
     return online(subset, filename=filename, **kwargs)
 
@@ -118,13 +125,13 @@ def offline(subset="wmo"):
     warnings.warn(
         "This offline function loads a light version of IBTrACS which is embedded"
         " within the package, based on a file produced manually by the developers.\n"
-        " It was last updated on the 15th Nov 2024, based on the IBTrACS file at that"
+        " It was last updated on the 4th Sep 2026, based on the IBTrACS file at that"
         " date.\n It contains only data from 1980 up to the last year with no"
         " provisional tracks. All spur tracks were removed. Only 6-hourly time steps"
         " were kept.",
         stacklevel=2,
     )
-    if subset.lower() == "wmo":
+    if subset.lower() in ["offline-wmo", "wmo"]:
         warnings.warn(
             "You are loading the IBTrACS-WMO subset. This dataset contains the"
             " positions and intensity reported by the WMO agency responsible for"
@@ -136,7 +143,7 @@ def offline(subset="wmo"):
             stacklevel=2,
         )
         return _csv.load(wmo_file)
-    elif subset.lower() in ["usa", "jtwc"]:
+    elif subset.lower() in ["offline-jtwc", "offline-usa", "usa", "jtwc"]:
         return _csv.load(jtwc_file)
     else:
         msg = f"{subset} not available"
