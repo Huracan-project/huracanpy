@@ -27,7 +27,14 @@ online_default_kwargs = dict(
 
 
 def load(subset, filename, **kwargs):
-    if subset.lower() in ["wmo", "usa", "jtwc"]:
+    if subset.lower() in [
+        "offline-wmo",
+        "offline-usa",
+        "offline-jtwc",
+        "wmo",
+        "usa",
+        "jtwc",
+    ]:
         return offline(subset)
     return online(subset, filename=filename, **kwargs)
 
@@ -124,7 +131,7 @@ def offline(subset="wmo"):
         " were kept.",
         stacklevel=2,
     )
-    if subset.lower() == "wmo":
+    if subset.lower() in ["offline-wmo", "wmo"]:
         warnings.warn(
             "You are loading the IBTrACS-WMO subset. This dataset contains the"
             " positions and intensity reported by the WMO agency responsible for"
@@ -136,7 +143,7 @@ def offline(subset="wmo"):
             stacklevel=2,
         )
         return _csv.load(wmo_file)
-    elif subset.lower() in ["usa", "jtwc"]:
+    elif subset.lower() in ["offline-jtwc", "offline-usa", "usa", "jtwc"]:
         return _csv.load(jtwc_file)
     else:
         msg = f"{subset} not available"
