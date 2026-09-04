@@ -6,7 +6,7 @@ import huracanpy
 
 
 @pytest.mark.parametrize("baselon", [-180, 0])
-@pytest.mark.parametrize("method", ["histogram", "kde"])
+@pytest.mark.parametrize("method", ["histogram", "kde", "line"])
 @pytest.mark.parametrize("crop", [True, False])
 def test_density(baselon, method, crop):
     data = huracanpy.load(huracanpy.example_year_file, baselon=baselon)
@@ -15,13 +15,24 @@ def test_density(baselon, method, crop):
         UserWarning,
         match="By default density does not take into account the spherical geometry",
     ):
-        d = huracanpy.calc.density(data.lon, data.lat, method=method, crop=crop)
+        d = huracanpy.calc.density(
+            data.lon, data.lat, data.track_id, method=method, crop=crop
+        )
 
     # Currently non-spherical KDE gives inconsistent results
-    if method != "kde":
+    if method == "histogram":
         assert d.min() == 0.0
         assert d.max() == 43.0
-    np.testing.assert_allclose(d.sum(), len(data.record))
+    elif method == "line":
+        assert d.min() == 0.0
+        assert d.max() == 9.0
+
+    # Total counts equals total points
+    # Not true for "line"
+    if method in ["histogram", "kde"]:
+        np.testing.assert_allclose(d.sum(), len(data.record))
+    elif method == "line":
+        assert d.sum() == 744
 
     # "crop=True" used to cut out any rows/columns with all NaN (no data) but this leads
     # to non-even spacing in longitude or latitude where it has cut out in between data

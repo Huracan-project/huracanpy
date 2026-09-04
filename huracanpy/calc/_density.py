@@ -4,13 +4,17 @@ Module containing function to compute track densities
 
 import warnings
 
+import geopandas as gpd
 import numpy as np
+import shapely
 import xarray as xr
+from cartopy.crs import Geodetic
 from metpy.constants import earth_avg_radius
 from scipy.stats import gaussian_kde
 from sklearn.neighbors import KernelDensity
 
 from .._metpy import dequantify_results
+from ..convert import to_geodataframe
 
 
 def _area(x_edge, y_edge):
@@ -23,6 +27,8 @@ def _area(x_edge, y_edge):
 def density(
     lon,
     lat,
+    track_id=None,
+    *,
     method="histogram",
     bin_size=5,
     lon_range=None,
@@ -40,9 +46,18 @@ def density(
         longitude series
     lat : array_like
         latitude series
+    track_id : array_like:
+        Track ID of each if density is calculated by track line intersections with a
+        grid (method="line")
     method : str, default="histogram"
-        The method used to calculate the density, currently "histogram" or "kde", which
-        gives a 2d histogram using `np.histogram2d`
+        The method used to calculate the density
+        - **histogram** gives a 2d histogram using :func:`np.histogram2d`
+        - **kde** gives a kernel density estimate using
+          :class:`sklearn.neighbors.KernelDensity` if `spherical=True` or
+          :obj:`scipy.stats.gaussian_kde` if `spherical=False`
+        - **line** gives a 2d histogram where the counts are based if the track crosses
+          each gridbox. This means tracks with multiple points in the same gridbox are
+          only counted once per gridbox.
     bin_size : int or float, default=5
         When using histogram, defines the size (in degrees) of the bins.
     lon_range : tuple, default
@@ -57,7 +72,7 @@ def density(
     function_kws : dict
         Keyword arguments passed to the function used for calculating density
 
-        * If method="histogram", :func:`numpy.histogram2d`
+        * If method="histogram" or "line", :func:`numpy.histogram2d`
         * If method="kde" and spherical=`True`,
           :class:`sklearn.neighbors.KernelDensity`. Note that the bandwidth argument is
           set to `"scott"` rather than the default of `1.0`
@@ -93,7 +108,7 @@ def density(
 
     # Define coordinates for mapping
     if lon_range is None:
-        lon_range = (-180, 180) if lon.min() < 0 else (0, 360)
+        lon_range = (-180, 180) if lon.min() < 0 or method == "line" else (0, 360)
 
     x_edge = np.arange(lon_range[0], lon_range[1] + bin_size, bin_size)
     y_edge = np.arange(lat_range[0], lat_range[1] + bin_size, bin_size)
@@ -105,6 +120,17 @@ def density(
 
         if spherical:
             h = h / _area(x_edge, y_edge)
+
+    elif method == "line":
+        if track_id is None:
+            msg = "track_id must be set to calculate density using line intersections"
+            raise ValueError(msg)
+
+        h = _line_intersections(lon, lat, track_id, x_edge, y_edge, function_kws)
+
+        if spherical:
+            h = h / _area(x_edge, y_edge)
+
     elif method == "kde":
         if spherical:
             h = _spherical_kde(lon, lat, x_mid, y_mid, function_kws)
@@ -143,6 +169,40 @@ def _histogram(lon, lat, x_edge, y_edge, function_kws):
     # Compute 2D histogram with numpy
     h, _x, _y = np.histogram2d(lon, lat, bins=[x_edge, y_edge], **function_kws)
     return h.T  # Transpose result
+
+
+def _line_intersections(lon, lat, track_id, x_edge, y_edge, function_kws):
+    tracks_df = to_geodataframe(lon, lat, track_id)
+
+    # Create a geodataframe containing the grid as a set of boxes
+    # Retain the indices to use in the histogram for counting
+    x_indices, y_indices, geometries = [], [], []
+    for y_idx in range(len(y_edge) - 1):
+        for x_idx in range(len(x_edge) - 1):
+            geometries.append(
+                shapely.box(
+                    x_edge[x_idx], y_edge[y_idx], x_edge[x_idx + 1], y_edge[y_idx + 1]
+                )
+            )
+            x_indices.append(x_idx)
+            y_indices.append(y_idx)
+
+    grid = gpd.GeoDataFrame(
+        dict(x_idx=x_indices, y_idx=y_indices, geometry=geometries), crs=Geodetic()
+    )
+
+    # A GeoDataFrame with one line for each track-gridbox intersection
+    result = gpd.tools.sjoin(tracks_df, grid, predicate="intersects")
+
+    # Convert to histogram using the saved gridbox indices
+    h, _, _ = np.histogram2d(
+        result.y_idx,
+        result.x_idx,
+        bins=[np.arange(-0.5, len(y_edge) - 1), np.arange(-0.5, len(x_edge) - 1)],
+        **function_kws,
+    )
+
+    return h
 
 
 def _kde(lon, lat, x_mid, y_mid, function_kws):

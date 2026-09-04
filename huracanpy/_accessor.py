@@ -641,10 +641,22 @@ class HuracanPyDatasetAccessor:
             self._dataset[lon_name], self._dataset[lat_name], intensity_var, **kwargs
         )
 
-    def plot_density(self, lon_name="lon", lat_name="lat", density_kws=None, **kwargs):
+    def plot_density(
+        self,
+        lon_name="lon",
+        lat_name="lat",
+        track_id_name="track_id",
+        density_kws=None,
+        **kwargs,
+    ):
         if density_kws is None:
             density_kws = dict()
-        d = self.get_density(lon_name=lon_name, lat_name=lat_name, **density_kws)
+        d = self.get_density(
+            lon_name=lon_name,
+            lat_name=lat_name,
+            track_id_name=track_id_name,
+            **density_kws,
+        )
         return plot.density(d, **kwargs)
 
     def plot_fancyline(
@@ -702,9 +714,23 @@ class HuracanPyDatasetAccessor:
 
     # %% diags
     # ---- density
-    def get_density(self, lon_name="lon", lat_name="lat", method="histogram", **kwargs):
+    def get_density(
+        self,
+        lon_name="lon",
+        lat_name="lat",
+        track_id_name="track_id",
+        *,
+        method="histogram",
+        **kwargs,
+    ):
+        track_id = self._dataset[track_id_name] if method == "line" else None
+
         return calc.density(
-            self._dataset[lon_name], self._dataset[lat_name], method=method, **kwargs
+            self._dataset[lon_name],
+            self._dataset[lat_name],
+            track_id=track_id,
+            method=method,
+            **kwargs,
         )
 
     # ---- track stats
