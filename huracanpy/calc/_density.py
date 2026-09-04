@@ -72,7 +72,7 @@ def density(
     function_kws : dict
         Keyword arguments passed to the function used for calculating density
 
-        * If method="histogram", :func:`numpy.histogram2d`
+        * If method="histogram" or "line", :func:`numpy.histogram2d`
         * If method="kde" and spherical=`True`,
           :class:`sklearn.neighbors.KernelDensity`. Note that the bandwidth argument is
           set to `"scott"` rather than the default of `1.0`
