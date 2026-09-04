@@ -125,7 +125,7 @@ def offline(subset="wmo"):
     warnings.warn(
         "This offline function loads a light version of IBTrACS which is embedded"
         " within the package, based on a file produced manually by the developers.\n"
-        " It was last updated on the 15th Nov 2024, based on the IBTrACS file at that"
+        " It was last updated on the 4th Sep 2026, based on the IBTrACS file at that"
         " date.\n It contains only data from 1980 up to the last year with no"
         " provisional tracks. All spur tracks were removed. Only 6-hourly time steps"
         " were kept.",
