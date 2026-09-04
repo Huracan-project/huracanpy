@@ -641,10 +641,22 @@ class HuracanPyDatasetAccessor:
             self._dataset[lon_name], self._dataset[lat_name], intensity_var, **kwargs
         )
 
-    def plot_density(self, lon_name="lon", lat_name="lat", density_kws=None, **kwargs):
+    def plot_density(
+        self,
+        lon_name="lon",
+        lat_name="lat",
+        track_id_name="track_id",
+        density_kws=None,
+        **kwargs,
+    ):
         if density_kws is None:
             density_kws = dict()
-        d = self.get_density(lon_name=lon_name, lat_name=lat_name, **density_kws)
+        d = self.get_density(
+            lon_name=lon_name,
+            lat_name=lat_name,
+            track_id_name=track_id_name,
+            **density_kws,
+        )
         return plot.density(d, **kwargs)
 
     def plot_fancyline(
