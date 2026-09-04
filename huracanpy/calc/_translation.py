@@ -31,7 +31,7 @@ def _get_distance_azimuth_geod(lon1, lat1, lon2, lat2, ellps="WGS84"):
             category=UnitStrippedWarning,
             message="The unit of the quantity is stripped when downcasting to ndarray.",
         )
-        fwd_azimuth, back_azimuth, dist = geodesic.inv(lon1, lat1, lon2, lat2)
+        fwd_azimuth, _back_azimuth, dist = geodesic.inv(lon1, lat1, lon2, lat2)
 
     return dist * units("m"), fwd_azimuth * units("degrees")
 

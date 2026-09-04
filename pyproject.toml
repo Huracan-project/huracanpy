@@ -96,6 +96,11 @@ extend-select = [
     "PGH", # pygrep-hooks
     "I", # ISort
 ]
+ignore = [
+  "C408", # dict() vs {}
+  "DTZ001", # datetime.datetime with tzinfo
+  "RUF022", # sorted imports/__all__
+]
 
 [tool.ruff.lint.per-file-ignores]
 # Only check for use of assert/print in main module

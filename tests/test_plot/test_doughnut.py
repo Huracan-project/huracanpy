@@ -96,7 +96,7 @@ def test_doughnut_roberts2020():
         20.8,
     ]
 
-    fig, axes = plt.subplots(3, 6, figsize=(20, 10))
+    _fig, axes = plt.subplots(3, 6, figsize=(20, 10))
     axes = axes.flatten()
 
     # Thickness of doughnuts relative to the "Obs" doughnut

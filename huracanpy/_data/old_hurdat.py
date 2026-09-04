@@ -41,16 +41,14 @@ def parse_track_point(content):
 def load(filename):
     with open(filename) as f:
         # Read file
-        lines = f.readlines()
-        # Remove escape character
-        lines = [line[:-1] if line.endswith("\n") else line for line in lines]
+        lines = f.read().splitlines()
 
     # Parse through file
     c, track_length = 0, 0
     lines_out = []
     while len(lines) > 0:
         line = lines.pop(0)
-        nb, content = parse_any_line(line)
+        _, content = parse_any_line(line)
         line_type = identify_line_type(content)
         if line_type == "track_header":
             # Check that previous track was finished
@@ -59,7 +57,7 @@ def load(filename):
                 raise ValueError(msg)
             # Start new track
             c = 0
-            date, track_length, track_id = parse_track_header(content)
+            _, track_length, track_id = parse_track_header(content)
         elif line_type == "track_point":
             c += 1  # Count point
             time, lat, lon, wind, pres, lat_wind, lon_wind = parse_track_point(content)
