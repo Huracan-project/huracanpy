@@ -6,8 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## v1.5.0
+### Added
 - Update IBTrACS offline subsets to 2024
 - Use more explicit "offline-" prefix for offline IBTrACS subsets by default
+- Calculate track density using line intersections
+- Specify the name of the trajectory ID (track_id) in huracanpy.load if the `cf_role` attribute is not present. This is separate from `rename`
 
 ## v1.4.1
 ### Fixed
