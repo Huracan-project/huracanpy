@@ -25,6 +25,9 @@ from . import (
 rename_defaults = dict(
     id="track_id",
     sid="track_id",
+    TRACK_ID="track_id",
+    n_track="track_id",
+    stormID="track_id",
     longitude="lon",
     latitude="lat",
     # Names for MIT netCDF
@@ -40,6 +43,19 @@ rename_defaults = dict(
     rlat="lat",
     sname="name",
 )
+
+trajectory_id_defaults = [
+    # Default name for HuracanPy
+    "track_id",
+    # Expected name for CF netCDF
+    "trajectory_id",
+    # TRACK
+    "TRACK_ID",
+    # MIT netCDF
+    "n_track",
+    # CHAZ
+    "stormID",
+]
 
 pandas_valid_time_labels = [
     "year",
@@ -75,6 +91,7 @@ def load(
     baselon=None,
     infer_track_id=None,
     track_id_prefix=None,
+    trajectory_id=None,
     ibtracs_subset="offline-wmo",
     iris_timestep=timedelta(hours=3),
     tempest_extremes_unstructured=False,
@@ -151,6 +168,17 @@ def load(
         the track_ids to keep them as unique identifiers. See
         :py:func:`huracanpy.concat_tracks` for more details
 
+    trajectory_id : str, optional
+        A CF-compliant netCDF file will have a trajectory ID which is identified by
+        having the attribute `cf_role="trajectory_id"`. This is what is generally
+        referred to as the "track_id" in HuracanPy, but other names are allowed.
+
+        When loading from a non-netCDF file or a netCDF file missing the
+        `cf_role` attribute, HuracanPy tries a few assumed names for the trajectory ID
+        and adds the `cf_role` attribute.
+        If this doesn't work, you need to explicitly pass the name of the trajectory ID
+        here.
+
     ibtracs_subset : str, default="offline-wmo"
         IBTrACS subset. Two offline versions are available:
 
@@ -222,6 +250,12 @@ def load(
     # "rename" second in this dictionary combination
     rename = combine_kws(rename, rename_defaults)
 
+    if trajectory_id is not None:
+        if isinstance(trajectory_id, str):
+            trajectory_id = list(trajectory_id)
+    else:
+        trajectory_id = trajectory_id_defaults
+
     if isinstance(filename, (list, tuple, np.ndarray)):
         # Loop through all the files and open them
         tracks = [
@@ -233,6 +267,7 @@ def load(
                 units=units,
                 baselon=baselon,
                 infer_track_id=infer_track_id,
+                trajectory_id=trajectory_id,
                 ibtracs_subset=ibtracs_subset,
                 iris_timestep=iris_timestep,
                 tempest_extremes_unstructured=tempest_extremes_unstructured,
@@ -253,7 +288,7 @@ def load(
         elif extension == "parquet":
             tracks = _csv.load(filename, load_function=pd.read_parquet, **kwargs)
         elif filename.split(".")[-1] == "nc":
-            tracks = _netcdf.load(filename, **kwargs)
+            tracks = _netcdf.load(filename, trajectory_id, **kwargs)
         else:
             msg = "Source is set to None and file type is not detected"
             raise ValueError(msg)
@@ -279,7 +314,7 @@ def load(
         elif source == "ibtracs":
             tracks = ibtracs.load(ibtracs_subset, filename, **kwargs)
         elif source == "netcdf":
-            tracks = _netcdf.load(filename, **kwargs)
+            tracks = _netcdf.load(filename, trajectory_id, **kwargs)
         elif source in [
             "old_hurdat",
             "ecmwf",
@@ -331,7 +366,9 @@ def load(
     if infer_track_id is not None:
         tracks["track_id"] = inferred_track_id(*[tracks[var] for var in infer_track_id])
 
-    tracks.track_id.attrs["cf_role"] = "trajectory_id"
+    # This will add cf_role="trajectory_id" to the relevant variable if it has not
+    # already been added
+    _trajectory_id = _netcdf._find_trajectory_id(tracks, trajectory_id)
 
     return tracks
 

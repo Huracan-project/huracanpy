@@ -11,11 +11,11 @@ import xarray as xr
 # trajectories to allow us to use groupby() and sel() with track_id to work by
 # individual tracks. So we need to replace the "track_id" or equivalent variable when
 # loading or saving the data
-def load(filename, **kwargs):
+def load(filename, trajectory_id_names, **kwargs):
     dataset = xr.open_dataset(filename, **kwargs)
 
     # Check which type of netCDF we have (2d, ragged, or CSV-like)
-    track_id = _find_trajectory_id(dataset)
+    track_id = _find_trajectory_id(dataset, trajectory_id_names)
     time = dataset.time
 
     if time.dims != track_id.dims:
@@ -31,7 +31,7 @@ def load(filename, **kwargs):
         vars_2d = [var for var in dataset if sorted(dims) == sorted(dataset[var].dims)]
 
         if len(vars_2d) > 0:
-            return as1d(dataset, dims, track_id, vars_2d)
+            return as1d(dataset, dims, vars_2d)
         # Otherwise ragged array
         return stretch_trid(dataset, track_id)
     # Otherwise it is in the CSV format used by huracanpy, so just return the
@@ -41,7 +41,7 @@ def load(filename, **kwargs):
 
 def save(dataset, filename, **kwargs):
     # Find the variable with cf_role=trajectory_id
-    trajectory_id = _find_trajectory_id(dataset)
+    trajectory_id = _find_trajectory_id(dataset, [])
 
     # Get the name of the sample dimension. The name "record" has been used in the load
     # functions, but we don't need to assume that is the name. It may be different when
@@ -83,14 +83,14 @@ def stretch_trid(dataset, trajectory_id):
 
     dataset = dataset.drop_vars([trajectory_id.name, rowsize.name])
 
-    dataset["track_id"] = (sample_dimension, trajectory_id_stretched)
+    dataset[trajectory_id.name] = (sample_dimension, trajectory_id_stretched)
     # Keep attributes (add cf_role if not already there)
-    dataset["track_id"].attrs = trajectory_id.attrs
+    dataset[trajectory_id.name].attrs = trajectory_id.attrs
 
     return dataset
 
 
-def as1d(dataset, dims, track_id, vars_2d):
+def as1d(dataset, dims, vars_2d):
     # Stack 2d dimensions into a record dimension
     dataset = dataset.stack(record=dims)
 
@@ -111,28 +111,10 @@ def as1d(dataset, dims, track_id, vars_2d):
     nans = np.array([np.isnan(dataset[var]) for var in vars_2d_floats]).all(axis=0)
     dataset = dataset.isel(record=np.where(~nans)[0])
 
-    # Add cf role to track_id
-    if track_id.name != "track_id":
-        dataset = dataset.rename({track_id.name: "track_id"})
-
     return dataset
 
 
-_trajectory_id_names = [
-    # Default name for HuracanPy
-    "track_id",
-    # TRACK
-    "TRACK_ID",
-    # MIT netCDF
-    "n_track",
-    # CHAZ
-    "stormID",
-    # IBTrACS netCDF
-    "storm",
-]
-
-
-def _find_trajectory_id(dataset):
+def _find_trajectory_id(dataset, trajectory_id_names):
     # Find the variable with cf_role=trajectory_id
     trajectory_id = [
         dataset[var]
@@ -143,7 +125,7 @@ def _find_trajectory_id(dataset):
 
     if len(trajectory_id) == 1:
         return trajectory_id[0]
-    for name in _trajectory_id_names:
+    for name in trajectory_id_names:
         if name in dataset or name in dataset.dims:
             trajectory_id = dataset[name]
             trajectory_id.attrs["cf_role"] = "trajectory_id"
