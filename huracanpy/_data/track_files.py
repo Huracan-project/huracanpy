@@ -95,8 +95,8 @@ def load(filename, variable_names=None):
         else:
             if len(variable_names) != nfields:
                 msg = (
-                    f"Number of variable names given ({len(variable_names)}) does not"
-                    f"match number of fields in file ({len(nfields)})"
+                    f"Number of variable names given ({len(variable_names)}) does not "
+                    f"match number of fields in file ({nfields})"
                 )
                 raise ValueError(msg)
         for n, variable_name in enumerate(variable_names):
