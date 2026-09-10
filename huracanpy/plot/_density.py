@@ -4,17 +4,12 @@ Functions to plot track/genesis/whatever density
 To compute the density, see huracanpy.diags.track_density
 """
 
-import cartopy.crs as ccrs
-import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
-from cartopy.mpl.geoaxes import GeoAxes
-from cartopy.util import add_cyclic
 
 from .._util import combine_kws
 
 _contourf_default_kws = dict(cmap="magma_r", levels=10)
-_subplot_default_kws = dict(projection=ccrs.PlateCarree(180))
 _fig_default_kws = dict()
 _cbar_default_kws = dict(label="")
 
@@ -50,6 +45,13 @@ def density(
         The figure and axes instances created for the plot
 
     """
+    import cartopy.crs as ccrs
+    import matplotlib.pyplot as plt
+    from cartopy.mpl.geoaxes import GeoAxes
+    from cartopy.util import add_cyclic
+
+    _subplot_default_kws = dict(projection=ccrs.PlateCarree(180))
+
     contourf_kws = combine_kws(contourf_kws, _contourf_default_kws)
     subplot_kws = combine_kws(subplot_kws, _subplot_default_kws)
     fig_kws = combine_kws(fig_kws, _fig_default_kws)

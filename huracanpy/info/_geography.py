@@ -5,11 +5,8 @@ Utils related to geographical attributes
 import warnings
 from collections import Counter
 
-import geopandas as gpd
 import numpy as np
 import xarray as xr
-from cartopy.io.shapereader import natural_earth
-from metpy.xarray import preprocess_and_wrap
 from pint.errors import UnitStrippedWarning
 
 from .._basins import basins
@@ -32,7 +29,6 @@ def _wrap_arrays(*args):
     return arrays
 
 
-@preprocess_and_wrap(wrap_like="lat")
 def hemisphere(lat):
     """
     Function to detect which hemisphere each point corresponds to.
@@ -50,8 +46,13 @@ def hemisphere(lat):
 
         >>> tracks["hemisphere"] = get_hemisphere(tracks.lat)
     """
+    from metpy.xarray import preprocess_and_wrap
 
-    return np.where(lat >= 0, "N", "S")
+    @preprocess_and_wrap(wrap_like="lat")
+    def _impl(lat):
+        return np.where(lat >= 0, "N", "S")
+
+    return _impl(lat)
 
 
 def basin(lon, lat, convention="WMO-TC", crs=None):
@@ -117,17 +118,25 @@ def basin(lon, lat, convention="WMO-TC", crs=None):
 
 
 # Running this on lots of tracks was very slow if the file is reopened every time this
-# is called
-_natural_earth_feature_cache = {
-    f"physical_{key}_0_basin": value.rename_axis("basin").reset_index()
-    for key, value in basins.items()
-}
+# is called. The cache is populated lazily on first access.
+_natural_earth_feature_cache = {}
 
 
 def _cache_natural_earth_feature(feature, category, name, resolution):
+    import geopandas as gpd
+    from cartopy.io.shapereader import natural_earth
+
     key = f"{category}_{name}_{resolution}_{feature}"
     if key in _natural_earth_feature_cache:
         df = _natural_earth_feature_cache[key]
+    elif feature == "basin" and category == "physical" and resolution == 0:
+        # Basin data is defined locally; no network download needed
+        if name in basins:
+            df = basins[name].rename_axis("basin").reset_index()
+            _natural_earth_feature_cache[key] = df
+        else:
+            msg = f"Unknown basin convention: {name!r}"
+            raise KeyError(msg)
     else:
         fname = natural_earth(resolution=resolution, category=category, name=name)
         df = gpd.read_file(fname)
@@ -137,7 +146,6 @@ def _cache_natural_earth_feature(feature, category, name, resolution):
     return df
 
 
-@preprocess_and_wrap(wrap_like="lon")
 def _get_natural_earth_feature(
     lon,
     lat,
@@ -149,36 +157,63 @@ def _get_natural_earth_feature(
     track_id=None,
     crs=None,
 ):
-    lon, lat, track_id = _wrap_arrays(lon, lat, track_id)
+    import geopandas as gpd
+    from metpy.xarray import preprocess_and_wrap
 
-    df = _cache_natural_earth_feature(feature, category, name, resolution)
+    @preprocess_and_wrap(wrap_like="lon")
+    def _impl(
+        lon,
+        lat,
+        feature,
+        category,
+        name,
+        resolution,
+        predicate="intersects",
+        track_id=None,
+        crs=None,
+    ):
+        lon, lat, track_id = _wrap_arrays(lon, lat, track_id)
 
-    tracks = to_geodataframe(lon, lat, track_id, crs=crs).to_crs(df.crs)
+        df = _cache_natural_earth_feature(feature, category, name, resolution)
 
-    result = gpd.tools.sjoin(df, tracks, how="right", predicate=predicate)
+        tracks = to_geodataframe(lon, lat, track_id, crs=crs).to_crs(df.crs)
 
-    # Select first result when a point returns two results
-    # e.g. exactly on the dividing line of two basins
-    # Gives an Nx2 array with first column the index in the result, and the second
-    # column the number of times that index is repeated
-    counts = np.asarray(list(Counter(result.index).items()))
+        result = gpd.tools.sjoin(df, tracks, how="right", predicate=predicate)
 
-    # Subset to only repeated indices
-    counts = counts[counts[:, 1] > 1]
+        # Select first result when a point returns two results
+        # e.g. exactly on the dividing line of two basins
+        # Gives an Nx2 array with first column the index in the result, and the second
+        # column the number of times that index is repeated
+        counts = np.asarray(list(Counter(result.index).items()))
 
-    iloc_indices = list(range(len(result)))
-    offset = 1
-    for idx, count in counts:
-        for _n in range(1, count):
-            iloc_indices.remove(idx + offset)
-            offset += 1
+        # Subset to only repeated indices
+        counts = counts[counts[:, 1] > 1]
 
-    result = result.iloc[iloc_indices][feature].to_numpy().astype(str)
+        iloc_indices = list(range(len(result)))
+        offset = 1
+        for idx, count in counts:
+            for _n in range(1, count):
+                iloc_indices.remove(idx + offset)
+                offset += 1
 
-    # Set "nan" as empty
-    result[result == "nan"] = ""
+        result = result.iloc[iloc_indices][feature].to_numpy().astype(str)
 
-    return result
+        # Set "nan" as empty
+        result[result == "nan"] = ""
+
+        return result
+
+    return _impl(
+        lon,
+        lat,
+        feature,
+        category,
+        name,
+        resolution,
+        predicate=predicate,
+        track_id=track_id,
+        crs=crs,
+    )
 
 
 def is_ocean(lon, lat, resolution="10m", crs=None):
@@ -334,7 +369,6 @@ def continent(lon, lat, resolution="10m", crs=None):
     )
 
 
-@preprocess_and_wrap()
 def landfall_points(lon, lat, track_id, *, resolution="10m", crs=None):
     """Find the points where the tracks intersect with a coastline
 
@@ -361,31 +395,40 @@ def landfall_points(lon, lat, track_id, *, resolution="10m", crs=None):
     xarray.Dataset
 
     """
-    lon, lat, track_id = _wrap_arrays(lon, lat, track_id)
+    import geopandas as gpd
+    from metpy.xarray import preprocess_and_wrap
 
-    df = _cache_natural_earth_feature("featurecla", "physical", "coastline", resolution)
+    @preprocess_and_wrap()
+    def _impl(lon, lat, track_id, *, resolution="10m", crs=None):
+        lon, lat, track_id = _wrap_arrays(lon, lat, track_id)
 
-    tracks = to_geodataframe(lon, lat, track_id, crs=crs).to_crs(df.crs)
-
-    # Get the combinations of track_id / coastline that have intersections
-    result = gpd.tools.sjoin(tracks, df, predicate="intersects")
-
-    # For each combination of track_id / coastline get the exact point(s) that they
-    # intersect and save as a set of tracks in the same record, track_id format
-    points = []
-    for n, row in result.iterrows():
-        track_id = tracks.loc[n].track_id
-        track = gpd.GeoSeries(tracks.loc[n].geometry, crs=tracks.crs)
-        coastline = gpd.GeoSeries(df.loc[row.index_right].geometry, crs=df.crs)
-
-        points += [
-            (track_id, p.x, p.y) for p in track.intersection(coastline).explode()
-        ]
-
-    return xr.Dataset(
-        data_vars=dict(
-            track_id=("record", [p[0] for p in points]),
-            lon=("record", [p[1] for p in points]),
-            lat=("record", [p[2] for p in points]),
+        df = _cache_natural_earth_feature(
+            "featurecla", "physical", "coastline", resolution
         )
-    )
+
+        tracks = to_geodataframe(lon, lat, track_id, crs=crs).to_crs(df.crs)
+
+        # Get the combinations of track_id / coastline that have intersections
+        result = gpd.tools.sjoin(tracks, df, predicate="intersects")
+
+        # For each combination of track_id / coastline get the exact point(s) that they
+        # intersect and save as a set of tracks in the same record, track_id format
+        points = []
+        for n, row in result.iterrows():
+            track_id = tracks.loc[n].track_id
+            track = gpd.GeoSeries(tracks.loc[n].geometry, crs=tracks.crs)
+            coastline = gpd.GeoSeries(df.loc[row.index_right].geometry, crs=df.crs)
+
+            points += [
+                (track_id, p.x, p.y) for p in track.intersection(coastline).explode()
+            ]
+
+        return xr.Dataset(
+            data_vars=dict(
+                track_id=("record", [p[0] for p in points]),
+                lon=("record", [p[1] for p in points]),
+                lat=("record", [p[2] for p in points]),
+            )
+        )
+
+    return _impl(lon, lat, track_id, resolution=resolution, crs=crs)

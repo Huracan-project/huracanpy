@@ -1,12 +1,58 @@
-import geopandas as gpd
-from cartopy.crs import Geodetic
 from shapely.geometry import MultiPolygon, Polygon
 
-geodetic = Geodetic()
 
-# %% Basins
+class _LazyBasins:
+    """Dict-like wrapper that lazily creates GeoDataFrames from shapely geometry dicts.
 
-basins = {}  # Dictionary to save basin definition from different conventions
+    geopandas and cartopy are only imported when a specific basin convention is first
+    accessed, keeping ``import huracanpy`` fast.
+    """
+
+    def __init__(self, raw_data):
+        self._raw = raw_data
+        self._cache = {}
+
+    def _create_gdf(self, name):
+        import geopandas as gpd
+        from cartopy.crs import Geodetic
+
+        raw = self._raw[name]
+        return gpd.GeoDataFrame(
+            index=raw.keys(), geometry=list(raw.values()), crs=Geodetic()
+        )
+
+    def __getitem__(self, key):
+        if key not in self._cache:
+            if key not in self._raw:
+                raise KeyError(key)
+            self._cache[key] = self._create_gdf(key)
+        return self._cache[key]
+
+    def __contains__(self, key):
+        return key in self._raw
+
+    def __iter__(self):
+        return iter(self._raw)
+
+    def __len__(self):
+        return len(self._raw)
+
+    def keys(self):
+        return self._raw.keys()
+
+    def values(self):
+        for key in self._raw:
+            yield self[key]
+
+    def items(self):
+        for key in self._raw:
+            yield key, self[key]
+
+
+# %% Basin geometry data (shapely only — no geopandas/cartopy at module level)
+
+_raw_basins = {}  # dict of {convention: {basin_name: shapely geometry}}
+
 
 # WMO convention
 ## Northern hemisphere
@@ -31,9 +77,7 @@ SA = Polygon(((-65, -90), (-65, 0), (20, 0), (20, -90)))
 SH = {"SI": SI, "AUS": AUS, "SP": SP, "SA": SA}
 
 B = dict(SH, **NH)
-basins["WMO-TC"] = gpd.GeoDataFrame(
-    index=B.keys(), geometry=list(B.values()), crs=geodetic
-)
+_raw_basins["WMO-TC"] = B
 
 ibtracs = dict(
     NI=Polygon(((30, 0), (30, 90), (100, 90), (100, 0))),
@@ -49,9 +93,7 @@ ibtracs = dict(
     ),
     SA=Polygon(((-65, -90), (-65, 0), (20, 0), (20, -90))),
 )
-basins["ibtracs"] = gpd.GeoDataFrame(
-    index=ibtracs.keys(), geometry=list(ibtracs.values()), crs=geodetic
-)
+_raw_basins["ibtracs"] = ibtracs
 
 # Sainsbury et. al. (2022)
 # What Governs the Interannual Variability of Recurving North Atlantic Tropical
@@ -73,9 +115,7 @@ B = dict(
         ]
     ),
 )
-basins["Sainsbury2022JCLI"] = gpd.GeoDataFrame(
-    index=B.keys(), geometry=list(B.values()), crs=geodetic
-)
+_raw_basins["Sainsbury2022JCLI"] = B
 
 # Sainsbury et. al. (2022)
 # Why Do Some Post-Tropical Cyclones Impact Europe?
@@ -84,9 +124,7 @@ B = dict(
     Europe=Polygon([(-10, 36), (30, 36), (30, 70), (-10, 70)]),
     NoEurope=Polygon([(-70, 36), (-10, 36), (-10, 70), (-70, 70)]),
 )
-basins["Sainsbury2022MWR"] = gpd.GeoDataFrame(
-    index=B.keys(), geometry=list(B.values()), crs=geodetic
-)
+_raw_basins["Sainsbury2022MWR"] = B
 
 # Knutson et al. (2020)
 # Tropical Cyclones and Climate Change Assessment: Part II: Projected Response to
@@ -106,6 +144,6 @@ B = dict(
     ),
     SA=Polygon(((-65, -90), (-65, 0), (20, 0), (20, -90))),
 )
-basins["Knutson2020"] = gpd.GeoDataFrame(
-    index=B.keys(), geometry=list(B.values()), crs=geodetic
-)
+_raw_basins["Knutson2020"] = B
+
+basins = _LazyBasins(_raw_basins)

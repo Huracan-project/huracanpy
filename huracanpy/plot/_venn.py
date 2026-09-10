@@ -1,7 +1,6 @@
 """Venn diagrams for tracks matching visualisation"""
 
 import numpy as np
-from matplotlib_venn import venn2, venn2_circles, venn3, venn3_circles
 
 
 def venn(datasets, match, labels, colors=None, circle_color="k"):
@@ -53,6 +52,8 @@ def venn(datasets, match, labels, colors=None, circle_color="k"):
 
 
 def _venn_2datasets(data1, data2, match, colors, labels=None, circle_color="k"):
+    from matplotlib_venn import venn2, venn2_circles
+
     n1 = len(np.unique(data1.track_id.values))  # Number of tracks in dataset 1
     n2 = len(np.unique(data2.track_id.values))  # Number of tracks in dataset 2
     m = len(match)  # Number of tracks matching
@@ -63,6 +64,8 @@ def _venn_2datasets(data1, data2, match, colors, labels=None, circle_color="k"):
 def _venn_3datasets(
     data1, data2, data3, matches, colors, labels=None, circle_color="k"
 ):
+    from matplotlib_venn import venn3, venn3_circles
+
     n1 = len(np.unique(data1.track_id.values))  # Number of tracks in dataset 1
     n2 = len(np.unique(data2.track_id.values))  # Number of tracks in dataset 2
     n3 = len(np.unique(data3.track_id.values))  # Number of tracks in dataset 3

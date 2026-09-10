@@ -1,12 +1,9 @@
-import matplotlib.pyplot as plt
 import numpy as np
-from cartopy.crs import Geodetic
-from cartopy.mpl.geoaxes import GeoAxes
-from matplotlib.collections import LineCollection
-from matplotlib.patheffects import Stroke
 
 
 def _map_values(values, vmin, vmax, vrange, clip):
+    import matplotlib.pyplot as plt
+
     # Allow a single value to be set for all the line segments
     if np.size(values) == 1:
         return values
@@ -131,6 +128,12 @@ def fancyline(
         The plotted LineCollection. Required as argument to
         :func:`matplotlib.pyplot.colorbar`
     """
+    import matplotlib.pyplot as plt
+    from cartopy.crs import Geodetic
+    from cartopy.mpl.geoaxes import GeoAxes
+    from matplotlib.collections import LineCollection
+    from matplotlib.patheffects import Stroke
+
     if ax is None:
         ax = plt.gca()
 
