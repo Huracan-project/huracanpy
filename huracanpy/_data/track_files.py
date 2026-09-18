@@ -107,14 +107,18 @@ def load(filename, variable_names=None):
 
         # Read in each track as an xarray dataset with time as the coordinate
         output = [",".join(var_labels)]
-        for _n in range(ntracks):
+        for n in range(ntracks):
             # Read individual track header (two lines)
             line = f.readline().strip()
             if line.replace(" ", "") != "":  # If line is empty
                 try:
-                    track_info = _parse(track_header_fmt, line).named
+                    track_id = _parse(track_header_fmt, line).named["track_id"]
                 except ValueError:
-                    track_info = _parse(track_header_fmt_new, line).named
+                    track_id = _parse(track_header_fmt_new, line).named["track_id"]
+
+                # Some old track files have all the track IDs set to zero due to a bug
+                # Make sure they are ascending
+                track_id = max(track_id, n)
 
                 line = f.readline().strip()
                 npoints = _parse(track_info_fmt, line)["npoints"]
@@ -123,10 +127,7 @@ def load(filename, variable_names=None):
                 for _m in range(npoints):
                     line = f.readline().strip()
                     output.append(
-                        ",".join(
-                            [str(track_info["track_id"])]
-                            + line.replace("&", " ").split()
-                        )
+                        ",".join([str(track_id)] + line.replace("&", " ").split())
                     )
             else:
                 warnings.warn(
