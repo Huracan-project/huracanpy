@@ -23,7 +23,7 @@ dependencies = [
   "nvector",
   "pandas",
   "parse",
-  "pint",
+  "pint<0.26",
   "pyarrow",
   "pyproj",
   "scikit-learn",
