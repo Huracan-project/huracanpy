@@ -7,20 +7,19 @@ import huracanpy
 
 
 @pytest.mark.parametrize("centering", ["forward", "backward"])
-@pytest.mark.parametrize("unit", [None, "m s-1"])
 @pytest.mark.parametrize(
-    ("var", "track_id", "expected"),
+    ("var", "track_id", "expected", "unit"),
     [
         # Test with only delta_var
         # With wind
-        ("wind10", None, 0.089352551),
+        ("wind10", None, 0.089352551, "m s-1"),
         # With slp
-        ("slp", None, -23.8743878),
+        ("slp", None, -23.8743878, "hPa"),
         # With time
-        ("time", None, 21600.0),
+        ("time", None, 21600.0, None),
         # Test with track_ids
-        ("wind10", "track_id", 0.0546914583),
-        ("time", "track_id", 23625.0),
+        ("wind10", "track_id", 0.0546914583, "m s-1"),
+        ("time", "track_id", 23625.0, None),
     ],
 )
 def test_get_delta(tracks_csv, var, track_id, expected, unit, centering):
