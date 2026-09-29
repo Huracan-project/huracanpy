@@ -1,7 +1,5 @@
 import numpy as np
-import seaborn as sns
 from matplotlib.collections import PathCollection
-from metpy.xarray import preprocess_and_wrap
 
 from .. import tc
 from .._metpy import validate_units
@@ -15,7 +13,6 @@ _histplot_kws_defaults = dict(element="step", fill=False)
 _pressure_wind_model_kws_defaults = dict()
 
 
-@preprocess_and_wrap()
 def pressure_wind_relation(
     pressure=None,
     wind=None,
@@ -105,81 +102,126 @@ def pressure_wind_relation(
     -------
     tuple[seaborn.JointGrid, array_like, array_like]
     """
-    pressure = validate_units(pressure, pressure_units)
-    wind = validate_units(wind, wind_units)
+    import seaborn as sns
+    from metpy.xarray import preprocess_and_wrap
 
-    jointgrid_kws = combine_kws(jointgrid_kws, _jointgrid_kws_defaults)
-    scatterplot_kws = combine_kws(scatterplot_kws, _scatterplot_kws_defaults)
-    lineplot_kws = combine_kws(lineplot_kws, _lineplot_kws_defaults)
-    histplot_kws = combine_kws(histplot_kws, _histplot_kws_defaults)
-    pressure_wind_model_kwargs = combine_kws(
-        pressure_wind_model_kwargs, _pressure_wind_model_kws_defaults
-    )
+    @preprocess_and_wrap()
+    def _impl(
+        pressure=None,
+        wind=None,
+        bins_pressure=None,
+        bins_wind=None,
+        pressure_units="hPa",
+        wind_units="m s-1",
+        grid=None,
+        color=None,
+        label=None,
+        mslp_convention="Klotzbach",
+        wind_convention="10min",
+        jointgrid_kws=None,
+        scatterplot_kws=None,
+        lineplot_kws=None,
+        histplot_kws=None,
+        pressure_wind_model_kwargs=None,
+        category_color="darkgrey",
+        category_linestyle="--",
+    ):
+        pressure = validate_units(pressure, pressure_units)
+        wind = validate_units(wind, wind_units)
 
-    if bins_pressure is None:
-        bins_pressure = np.linspace(np.min(pressure), np.max(pressure), 10)
-
-    if bins_wind is None:
-        bins_wind = np.linspace(np.min(wind), np.max(wind), 10)
-
-    if grid is None:
-        grid = _setup_grid(
-            ylabel_xpos=bins_wind[-1],
-            xlabel_ypos=bins_pressure[-1],
-            jointgrid_kws=jointgrid_kws,
-            mslp_convention=mslp_convention,
-            wind_convention=wind_convention,
-            mslp_units=pressure.units,
-            wind_units=wind.units,
-            category_color=category_color,
-            category_linestyle=category_linestyle,
+        jointgrid_kws = combine_kws(jointgrid_kws, _jointgrid_kws_defaults)
+        scatterplot_kws = combine_kws(scatterplot_kws, _scatterplot_kws_defaults)
+        lineplot_kws = combine_kws(lineplot_kws, _lineplot_kws_defaults)
+        histplot_kws = combine_kws(histplot_kws, _histplot_kws_defaults)
+        pressure_wind_model_kwargs = combine_kws(
+            pressure_wind_model_kwargs, _pressure_wind_model_kws_defaults
         )
 
-    sns.scatterplot(
-        x=wind,
-        y=pressure,
-        ax=grid.ax_joint,
-        **scatterplot_kws,
-    )
+        if bins_pressure is None:
+            bins_pressure = np.linspace(np.min(pressure), np.max(pressure), 10)
 
-    # Match color on other axes to scatter points
-    if color is None:
-        pc = [c for c in grid.ax_joint.get_children() if isinstance(c, PathCollection)][
-            -1
-        ]
-        color = pc.get_facecolor()[0][:3]
+        if bins_wind is None:
+            bins_wind = np.linspace(np.min(wind), np.max(wind), 10)
 
-    model = tc.pressure_wind_relation(pressure, wind, **pressure_wind_model_kwargs)
-    sns.lineplot(
-        x=model.predict(bins_pressure),
-        y=bins_pressure,
-        ax=grid.ax_joint,
+        if grid is None:
+            grid = _setup_grid(
+                ylabel_xpos=bins_wind[-1],
+                xlabel_ypos=bins_pressure[-1],
+                jointgrid_kws=jointgrid_kws,
+                mslp_convention=mslp_convention,
+                wind_convention=wind_convention,
+                mslp_units=pressure.units,
+                wind_units=wind.units,
+                category_color=category_color,
+                category_linestyle=category_linestyle,
+            )
+
+        sns.scatterplot(
+            x=wind,
+            y=pressure,
+            ax=grid.ax_joint,
+            **scatterplot_kws,
+        )
+
+        # Match color on other axes to scatter points
+        if color is None:
+            pc = [
+                c for c in grid.ax_joint.get_children() if isinstance(c, PathCollection)
+            ][-1]
+            color = pc.get_facecolor()[0][:3]
+
+        model = tc.pressure_wind_relation(pressure, wind, **pressure_wind_model_kwargs)
+        sns.lineplot(
+            x=model.predict(bins_pressure),
+            y=bins_pressure,
+            ax=grid.ax_joint,
+            color=color,
+            label=label,
+            **lineplot_kws,
+        )
+
+        sns.histplot(
+            x=wind,
+            bins=np.asarray(bins_wind),
+            color=color,
+            ax=grid.ax_marg_x,
+            **histplot_kws,
+        )
+        grid.ax_marg_x.set_ylabel("")
+
+        sns.histplot(
+            y=pressure,
+            bins=np.asarray(bins_pressure),
+            color=color,
+            ax=grid.ax_marg_y,
+            **histplot_kws,
+        )
+        grid.ax_marg_y.set_xlabel("")
+
+        grid.figure.tight_layout()
+
+        return grid, bins_pressure, bins_wind
+
+    return _impl(
+        pressure=pressure,
+        wind=wind,
+        bins_pressure=bins_pressure,
+        bins_wind=bins_wind,
+        pressure_units=pressure_units,
+        wind_units=wind_units,
+        grid=grid,
         color=color,
         label=label,
-        **lineplot_kws,
+        mslp_convention=mslp_convention,
+        wind_convention=wind_convention,
+        jointgrid_kws=jointgrid_kws,
+        scatterplot_kws=scatterplot_kws,
+        lineplot_kws=lineplot_kws,
+        histplot_kws=histplot_kws,
+        pressure_wind_model_kwargs=pressure_wind_model_kwargs,
+        category_color=category_color,
+        category_linestyle=category_linestyle,
     )
-
-    sns.histplot(
-        x=wind,
-        bins=np.asarray(bins_wind),
-        color=color,
-        ax=grid.ax_marg_x,
-        **histplot_kws,
-    )
-    grid.ax_marg_x.set_ylabel("")
-
-    sns.histplot(
-        y=pressure,
-        bins=np.asarray(bins_pressure),
-        color=color,
-        ax=grid.ax_marg_y,
-        **histplot_kws,
-    )
-    grid.ax_marg_y.set_xlabel("")
-
-    grid.figure.tight_layout()
-
-    return grid, bins_pressure, bins_wind
 
 
 def _setup_grid(
@@ -193,6 +235,8 @@ def _setup_grid(
     category_color="darkgrey",
     category_linestyle="--",
 ):
+    import seaborn as sns
+
     grid = sns.JointGrid(**jointgrid_kws)
     categories_mslp = _thresholds[mslp_convention]
     bins_mslp = categories_mslp["bins"].to(mslp_units)

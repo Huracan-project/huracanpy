@@ -2,16 +2,7 @@
 Functions to plot the tracks
 """
 
-import cartopy.crs as ccrs
-import matplotlib.pyplot as plt
-import seaborn as sns
-from cartopy.mpl.geoaxes import GeoAxes
-
 from .._util import combine_kws
-
-_subplot_kws_default = dict(projection=ccrs.PlateCarree(180))
-_fig_kws_default = dict(figsize=(10, 10))
-_scatter_kws_default = dict(palette="turbo", color="k")
 
 
 def tracks(
@@ -49,6 +40,15 @@ def tracks(
         The figure and axes instances created for the plot
 
     """
+    import cartopy.crs as ccrs
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from cartopy.mpl.geoaxes import GeoAxes
+
+    _subplot_kws_default = dict(projection=ccrs.PlateCarree(180))
+    _fig_kws_default = dict(figsize=(10, 10))
+    _scatter_kws_default = dict(palette="turbo", color="k")
+
     subplot_kws = combine_kws(subplot_kws, _subplot_kws_default)
     fig_kws = combine_kws(fig_kws, _fig_kws_default)
     scatter_kws = combine_kws(scatter_kws, _scatter_kws_default)
