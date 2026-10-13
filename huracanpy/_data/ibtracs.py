@@ -22,6 +22,18 @@ online_default_kwargs = dict(
         "SUBBASIN": str,
         "LON": float,
         "LAT": float,
+        "WMO_AGENCY": str,
+        "USA_AGENCY": str,
+        "USA_ATCF_ID": str,
+        "USA_RECORD": str,
+        "USA_STATUS": str,
+        "USA_SSHS": int,
+        "HKO_CAT": str,
+        "KMA_CAT": str,
+        "NEWDELHI_GRADE": str,
+        "DS824_STAGE": str,
+        "NEUMANN_CLASS": str,
+        "MLC_CLASS": str,
     },
 )
 
