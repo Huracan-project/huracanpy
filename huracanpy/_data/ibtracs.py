@@ -4,6 +4,8 @@ import pathlib
 import warnings
 from urllib.request import urlretrieve
 
+import pandas as pd
+
 from . import _csv
 
 here = pathlib.Path(__file__).parent
@@ -22,6 +24,18 @@ online_default_kwargs = dict(
         "SUBBASIN": str,
         "LON": float,
         "LAT": float,
+        "WMO_AGENCY": str,
+        "USA_AGENCY": str,
+        "USA_ATCF_ID": str,
+        "USA_RECORD": str,
+        "USA_STATUS": str,
+        "USA_SSHS": int,
+        "HKO_CAT": str,
+        "KMA_CAT": str,
+        "NEWDELHI_GRADE": str,
+        "DS824_STAGE": str,
+        "NEUMANN_CLASS": str,
+        "MLC_CLASS": str,
     },
 )
 
@@ -82,7 +96,16 @@ def online(subset, filename=None, **kwargs):
     # "https:/" at the start anyway
     filename, _ = urlretrieve(url, filename)  # noqa: S310
 
-    return _csv.load(filename, **kwargs)
+    tracks = _csv.load(filename, **kwargs)
+
+    units = pd.read_csv(filename, header=0, nrows=1)
+
+    for column in units:
+        unit = units[column].iloc[0]
+        if column.lower() in tracks and unit != " ":
+            tracks[column.lower()].attrs["units"] = unit
+
+    return tracks
 
 
 def offline(subset="wmo"):
