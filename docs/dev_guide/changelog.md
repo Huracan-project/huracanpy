@@ -9,8 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Update IBTrACS offline subsets to 2024
 - Use more explicit "offline-" prefix for offline IBTrACS subsets by default
+- Add units to variable attributes when loading online IBTrACS
 - Calculate track density using line intersections
 - Specify the name of the trajectory ID (track_id) in huracanpy.load if the `cf_role` attribute is not present. This is separate from `rename`
+
+### Fixed
+- Specify types explicitly for IBTrACS online columns with difficult values
 
 ## v1.4.1
 ### Fixed
